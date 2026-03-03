@@ -1,11 +1,9 @@
 ---
 const links = [
   { href: "#about", label: "About" },
-  { href: "#experience", label: "Experience" },
+  { href: "#work-experience", label: "Work Experience" },
   { href: "#projects", label: "Projects" },
   { href: "#activities", label: "Activities" },
-  { href: "#skills", label: "Skills" },
-  { href: "#blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
 ];
 ---
@@ -14,23 +12,31 @@ const links = [
   id="navbar"
   class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
 >
-  <div class="max-w-site mx-auto px-6 py-4 flex items-center justify-between">
+  <div class="max-w-site mx-auto px-6 py-4 flex items-center justify-between relative">
     <a href="#" class="font-heading font-bold text-lg text-foreground dark:text-foreground-dark hover:text-accent transition-colors lowercase">
-      wilson.
+      wilson soon
     </a>
 
-    <!-- Desktop links -->
-    <div class="hidden md:flex items-center gap-8">
+    <!-- Desktop links (centered) -->
+    <div class="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
       {links.map((link) => (
         <a
           href={link.href}
-          class="text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
+          class="nav-link text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
         >
           {link.label}
         </a>
       ))}
+      <a
+        href="#blog"
+        class="nav-link text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
+      >
+        blog
+      </a>
+    </div>
 
-      <!-- Dark mode toggle -->
+    <!-- Desktop dark mode toggle (right) -->
+    <div class="hidden md:flex items-center">
       <button
         id="theme-toggle"
         class="p-2 text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors"
@@ -45,15 +51,6 @@ const links = [
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
-
-      <a
-        href="/resume.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-sm px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors lowercase"
-      >
-        resume
-      </a>
     </div>
 
     <!-- Mobile: theme toggle + hamburger -->
@@ -92,18 +89,16 @@ const links = [
     {links.map((link) => (
       <a
         href={link.href}
-        class="mobile-link text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
+        class="mobile-link nav-link text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
       >
         {link.label}
       </a>
     ))}
     <a
-      href="/resume.pdf"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-sm px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-center lowercase"
+      href="#blog"
+      class="mobile-link nav-link text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full w-fit hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
     >
-      resume
+      blog
     </a>
   </div>
 </nav>
@@ -177,6 +172,19 @@ const links = [
       bar1?.classList.remove("rotate-45", "translate-y-[4px]");
       bar2?.classList.remove("opacity-0");
       bar3?.classList.remove("-rotate-45", "-translate-y-[4px]");
+    });
+  });
+
+  // Smooth scroll for nav anchor links and section divider links
+  document.querySelectorAll('a.nav-link[href^="#"], a.section-nav-link[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const href = (e.currentTarget as HTMLAnchorElement).getAttribute("href");
+      if (!href) return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth" });
+      }
     });
   });
 </script>

@@ -1,54 +1,80 @@
 ---
-
+const photoCount = 4;
+const photos = Array.from({ length: photoCount }, (_, i) => `/photos/photo-${String(i + 1).padStart(2, '0')}.jpg`);
 ---
 
 <section id="about" class="py-20 bg-background-alt dark:bg-background-dark-alt">
   <div class="max-w-site mx-auto px-6">
     <div class="scroll-reveal">
       <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
-        about me
+        more about me
       </h2>
     </div>
+    <div class="scroll-reveal mt-8">
+      <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
+        i'm currently thinking about how to be a better individual contributor as a software engineer with AI. i'm also interested in product thinking and building something people want, and learning how to ace prioritisations of a hundred things.
+      </p>
+    </div>
 
-    <div class="grid md:grid-cols-2 gap-12">
-      <div class="scroll-reveal">
-        <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed mb-6">
-          i'm a penultimate computer science student at the National University of Singapore (NUS). driven by curiosity for all things and a love for adventure, i build projects that helps to solve problems i encounter, and for the better good of the community where possible. i strive to bring the same energy everywhere to create the best craft i can.
-        </p>
-        <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed mb-6">
-          currently thinking about how to be a better individual contributor as a software engineer in the age of rapid AI development and co-existence. also interested in product thinking and building something people want, learning how to ace prioritisations of a hundred things.
-        </p>
-        <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
-          outside of work, you'll find me exploring tea brands, freestyle dancing and photographing around singapore. currently learning the guitar, rock climbing and volleyball. all these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.
-        </p>
-      </div>
+    <!-- Full-width "outside of work" paragraph (de-emphasized) -->
+    <div class="scroll-reveal mt-8">
+      <p class="text-foreground-muted dark:text-foreground-dark-muted text-base leading-relaxed">
+        in my free time, i like exploring tea brands, freestyle dancing and doing photography. i am also currently learning the guitar, rock climbing and volleyball. these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.
+      </p>
+    </div>
 
-      <div class="scroll-reveal">
-        <div class="bg-background dark:bg-background-dark rounded-xl p-8 border border-foreground/5 dark:border-foreground-dark/10">
-          <h3 class="font-heading font-semibold text-xl text-foreground dark:text-foreground-dark mb-4">
-            Education
-          </h3>
-          <div class="flex items-start gap-4">
-            <div class="w-12 h-12 bg-accent-light dark:bg-accent-dark-light rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-accent font-heading font-bold text-lg">N</span>
-            </div>
-            <div>
-              <p class="font-heading font-semibold text-foreground dark:text-foreground-dark">
-                National University of Singapore
-              </p>
-              <p class="text-foreground-muted dark:text-foreground-dark-muted">
-                Bachelor of Computing in Computer Science (Honours)
-              </p>
-              <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1">
-                Aug 2023 – May 2027
-              </p>
-              <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-2">
-                <span class="font-medium text-foreground dark:text-foreground-dark">Relevant Coursework:</span> Data Structures & Algorithms, Database Systems, Software Engineering, Computer Networks
-              </p>
-            </div>
+    <!-- "photos i took!" label -->
+    <p class="text-sm text-foreground-muted dark:text-foreground-dark-muted font-body lowercase mt-6 mb-2">
+      photos i took!
+    </p>
+
+    <!-- Static photo grid -->
+    <div class="scroll-reveal">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {photos.map((src, i) => (
+          <div class="overflow-hidden rounded-lg group cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_20px_rgba(107,91,149,0.4)]">
+            <img
+              src={src}
+              alt={`Photography ${i + 1}`}
+              class="carousel-photo h-[180px] md:h-[260px] w-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
+              loading="lazy"
+            />
           </div>
-        </div>
+        ))}
       </div>
     </div>
   </div>
 </section>
+
+<!-- Lightbox overlay -->
+<div id="photo-lightbox" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden cursor-pointer">
+  <img id="lightbox-img" src="" alt="Photo enlarged" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg" />
+</div>
+
+<script>
+  // Lightbox
+  const lightbox = document.getElementById("photo-lightbox");
+  const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement | null;
+
+  document.querySelectorAll(".carousel-photo").forEach((photo) => {
+    photo.addEventListener("click", () => {
+      const src = (photo as HTMLImageElement).src;
+      if (lightboxImg && lightbox) {
+        lightboxImg.src = src;
+        lightbox.classList.remove("hidden");
+      }
+    });
+  });
+
+  lightbox?.addEventListener("click", () => {
+    lightbox.classList.add("hidden");
+    if (lightboxImg) lightboxImg.src = "";
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) {
+      lightbox.classList.add("hidden");
+      if (lightboxImg) lightboxImg.src = "";
+    }
+  });
+</script>

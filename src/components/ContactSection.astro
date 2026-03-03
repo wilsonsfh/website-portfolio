@@ -34,26 +34,31 @@ const socials = [
       </p>
     </div>
 
-    <div class="scroll-reveal flex flex-col sm:flex-row flex-wrap gap-6">
-      {socials.map((social) => (
-        <a
-          href={social.href}
-          target={social.href.startsWith("mailto") ? undefined : "_blank"}
-          rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
-          class="flex items-center gap-3 text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors group"
-        >
-          <div class="w-10 h-10 bg-accent-light dark:bg-accent-dark-light rounded-lg flex items-center justify-center group-hover:bg-accent transition-colors">
-            <svg
-              class="w-5 h-5 text-accent group-hover:text-white transition-colors"
-              fill={social.filled ? "currentColor" : "none"}
-              stroke={social.filled ? "none" : "currentColor"}
-              viewBox="0 0 24 24"
-              set:html={social.icon}
-            />
-          </div>
-          <span class="text-sm">{social.display}</span>
-        </a>
-      ))}
+    <div class="scroll-reveal flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+      <div class="flex flex-wrap gap-4">
+        {socials.map((social) => (
+          <a
+            href={social.href}
+            target={social.href.startsWith("mailto") ? undefined : "_blank"}
+            rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
+            class="text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors group"
+            aria-label={social.label}
+          >
+            <div class="w-12 h-12 bg-accent-light dark:bg-accent-dark-light rounded-lg flex items-center justify-center group-hover:bg-accent transition-colors">
+              <svg
+                class="w-6 h-6 text-accent dark:text-accent-dark group-hover:text-white transition-colors"
+                fill={social.filled ? "currentColor" : "none"}
+                stroke={social.filled ? "none" : "currentColor"}
+                viewBox="0 0 24 24"
+                set:html={social.icon}
+              />
+            </div>
+          </a>
+        ))}
+      </div>
+      <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm lowercase">
+        &copy; 2026, wilson soon
+      </p>
     </div>
   </div>
 </section>
