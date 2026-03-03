@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Electronic Health Records",
+    "description": "Built a full-stack electronic health records system using Python and Flask, enabling clinics to digitise patient records and streamline appointment management. Implemented secure authentication and role-based access control for healthcare providers.",
+    "tags": ["Python", "Flask"],
+    "github": "https://github.com/wilsonsfh/servIT-",
+    "live": "",
+    "date": "Oct 2018 – Jan 2019"
+  },
+  {
+    "title": "Personal Portfolio Website",
+    "description": "My personal portfolio website, built with Astro and Tailwind CSS. Designed to showcase my experience, projects, and interests with a modern aesthetic and smooth animations.",
+    "tags": ["Astro", "TailwindCSS", "TypeScript"],
+    "github": "https://github.com/wilsonsfh/website-portfolio",
+    "live": "",
+    "date": "Mar 2026"
+  }
+]

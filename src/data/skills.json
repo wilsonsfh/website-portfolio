@@ -1,0 +1,6 @@
+{
+  "Languages": ["Python", "JavaScript", "TypeScript", "Java", "C#", "C", "SQL"],
+  "Frameworks & Libraries": ["React", "Next.js", "Django", "Flask", "Express.js", "Node.js"],
+  "Databases & Cloud": ["PostgreSQL", "MongoDB", "MySQL", "Google Cloud Platform", "Google Cloud Storage"],
+  "Tools": ["Git", "Docker", "GitHub Actions", "Neovim", "Hadoop", "Tableau"]
+}

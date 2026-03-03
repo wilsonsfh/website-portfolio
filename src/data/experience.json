@@ -1,0 +1,33 @@
+[
+  {
+    "company": "Glints",
+    "role": "Product Management Intern",
+    "date": "Dec 2025 – Present",
+    "description": [
+      "Conducted user research and analysed product metrics using SQL and Metabase to drive data-informed decisions for feature prioritisation",
+      "Collaborated with cross-functional engineering teams to define product requirements and scope technical solutions for platform improvements",
+      "Synthesised qualitative and quantitative insights from user interviews and analytics dashboards to inform product roadmap planning"
+    ],
+    "tags": ["SQL", "Metabase", "Lark", "User Research"]
+  },
+  {
+    "company": "NUS Enterprise Minimum Viable Product Studio",
+    "role": "Software Engineering Intern",
+    "date": "May 2025 – Jul 2025",
+    "description": [
+      "Developed a full-stack web application using React and Django with PostgreSQL, enabling researchers to upload and analyse audio data",
+      "Integrated BirdNET machine learning model for automated bird species identification from audio recordings uploaded via Google Cloud Storage",
+      "Built RESTful APIs and implemented file processing pipelines using Python to handle large-scale audio dataset analysis"
+    ],
+    "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
+  },
+  {
+    "company": "Singapore Land Authority",
+    "role": "Software Engineering Intern",
+    "date": "Nov 2020 – Feb 2021",
+    "description": [
+      "Developed a C# plugin for Autodesk Revit using the Buildings and Habitats object Model (BHoM) to automate extraction and validation of building data for geospatial applications"
+    ],
+    "tags": ["C#", "Autodesk Revit", "BHoM"]
+  }
+]
