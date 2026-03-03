@@ -1,0 +1,31 @@
+---
+interface Props {
+  company: string;
+  role: string;
+  date: string;
+  description: string[];
+  tags: string[];
+}
+
+const { company, role, date, description, tags } = Astro.props;
+---
+
+<div class="bg-background dark:bg-background-dark rounded-xl p-6 border border-foreground/5 dark:border-foreground-dark/10 hover:border-accent/20 hover:shadow-lg transition-all duration-300">
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+    <div>
+      <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark">{role}</h3>
+      <p class="text-accent font-medium">{company}</p>
+    </div>
+    <span class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1 sm:mt-0 font-mono">{date}</span>
+  </div>
+  <ul class="list-disc list-inside text-foreground-muted dark:text-foreground-dark-muted space-y-1.5 mb-4 text-sm">
+    {description.map((item) => <li>{item}</li>)}
+  </ul>
+  <div class="flex flex-wrap gap-2">
+    {tags.map((tag) => (
+      <span class="text-xs font-mono px-2.5 py-1 bg-accent-light dark:bg-accent-dark-light text-accent rounded-md">
+        {tag}
+      </span>
+    ))}
+  </div>
+</div>
