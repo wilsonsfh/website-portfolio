@@ -1,0 +1,86 @@
+---
+interface Props {
+  words: string[];
+}
+
+const { words } = Astro.props;
+---
+
+<span
+  id="typewriter"
+  class="font-mono text-accent"
+  data-words={JSON.stringify(words)}
+  aria-label={words.join(", ")}
+></span>
+<span class="animate-blink font-mono text-accent">|</span>
+
+<style>
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .animate-blink {
+    animation: blink 0.7s step-end infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-blink {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const el = document.getElementById("typewriter");
+  if (el) {
+    const words: string[] = JSON.parse(el.dataset.words || "[]");
+    let wordIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+    let pauseEnd = 0;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function tick() {
+      if (prefersReducedMotion) {
+        el.textContent = words[wordIndex];
+        setTimeout(() => {
+          wordIndex = (wordIndex + 1) % words.length;
+          tick();
+        }, 3000);
+        return;
+      }
+
+      const now = Date.now();
+      if (now < pauseEnd) {
+        requestAnimationFrame(tick);
+        return;
+      }
+
+      const currentWord = words[wordIndex];
+
+      if (!deleting) {
+        charIndex++;
+        el.textContent = currentWord.slice(0, charIndex);
+
+        if (charIndex === currentWord.length) {
+          deleting = true;
+          pauseEnd = now + 2000;
+        }
+      } else {
+        charIndex--;
+        el.textContent = currentWord.slice(0, charIndex);
+
+        if (charIndex === 0) {
+          deleting = false;
+          wordIndex = (wordIndex + 1) % words.length;
+        }
+      }
+
+      const speed = deleting ? 40 : 80;
+      setTimeout(() => requestAnimationFrame(tick), speed);
+    }
+
+    tick();
+  }
+</script>
