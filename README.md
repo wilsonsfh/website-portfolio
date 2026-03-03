@@ -8,11 +8,13 @@ Hi, I'm Wilson, a Computer Science undergrad at NUS. This is my personal site to
 
 ## Motivation behind tech stack
 
-A portfolio is mostly static content. My projects, work experience, and about page don't need to be fetched at runtime or re-rendered on the client, so I didn't want to ship a JavaScript framework to handle all of that.
+A portfolio is mostly static content. My projects, work experience, and about page don't change between page loads and don't need to respond to live data, so I didn't want to ship a JavaScript framework to handle all of that.
 
-[Astro](https://astro.build) renders everything to plain HTML at build time. By default it sends zero JavaScript to the browser; the only JS that ships is what I explicitly write in `<script>` blocks. For this site, that's about 270 lines of vanilla JS total covering dark mode, the mobile nav, photo lightbox, scroll reveal animations, and the typewriter effect. No React, no Vue, no runtime overhead. The entire `package.json` only has three entries: `astro`, `@astrojs/tailwind`, and `tailwindcss`, all of which are build-time tools that disappear after the build.
+Most popular frameworks like React, Vue, and Next.js use a virtual DOM: a lightweight in-memory copy of the page that the framework diffs against the real DOM whenever state changes. That machinery has a cost. The diffing algorithm, the reconciler, and the runtime all ship to the browser as JavaScript. React alone sends about 45KB before you've written a single line of application code. Frameworks that do server-side rendering also require hydration: after the HTML loads, the browser re-executes all the components and attaches event listeners to the existing nodes, creating a window where the page looks interactive but isn't.
 
-The `.astro` component format is also just HTML with a frontmatter block for data and logic. There's no virtual DOM or hydration lifecycle to reason about. For a personal site I plan to keep updating over time, that simplicity is worth a lot.
+[Astro](https://astro.build) renders everything to plain HTML at build time. There's no virtual DOM to ship and no hydration to reason about. The HTML the browser receives is already the final output. The only JS that ships is what I explicitly write in `<script>` blocks: about 270 lines covering dark mode, the mobile nav, photo lightbox, scroll reveal, and the typewriter effect. Minified, that's roughly 3-5KB, compared to React's 45KB before a single line of my own code.
+
+For a personal site I plan to keep updating over time, that simplicity is also worth a lot as an author. There's no "is this running on the server or the client" to reason about, no hydration timing to debug, no framework version to stay current with. What I write is what the browser gets.
 
 ---
 
