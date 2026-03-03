@@ -5,7 +5,7 @@ interface Props {
 }
 
 const {
-  title = "Wilson Soon — Software Engineer & CS Student",
+  title = "Wilson Soon",
   description = "Personal portfolio of Wilson Soon, a Computer Science undergraduate at NUS. Software engineer, product manager, dancer, and tea lover.",
 } = Astro.props;
 ---
@@ -22,13 +22,14 @@ const {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/jpeg" href="/images/hero.jpg" />
+    <link rel="apple-touch-icon" href="/images/hero.jpg" />
     <title>{title}</title>
 
     <script is:inline>
       (function() {
         const theme = localStorage.getItem('theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (theme !== 'light') {
           document.documentElement.classList.add('dark');
         }
       })();

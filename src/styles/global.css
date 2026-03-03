@@ -49,11 +49,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
-  }
-
-  html.dark body {
-    @apply bg-background-dark text-foreground-dark;
+    @apply bg-background text-foreground font-body dark:bg-background-dark dark:text-foreground-dark;
   }
 
   h1, h2, h3, h4, h5, h6 {

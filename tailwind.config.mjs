@@ -21,6 +21,7 @@ export default {
           DEFAULT: '#6B5B95',
           hover: '#574A7A',
           light: '#EDE8F5',
+          dark: '#9B8CC4',
           'dark-light': '#2D2650',
         },
       },
