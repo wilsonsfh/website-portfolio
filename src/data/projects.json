@@ -2,7 +2,7 @@
   {
     "title": "Personal Portfolio Website",
     "description": "My personal portfolio website, built with Astro and Tailwind CSS. Designed to showcase my experience, projects, and interests with a modern aesthetic and smooth animations.",
-    "tags": ["Astro", "TailwindCSS", "TypeScript"],
+    "tags": ["Astro", "Tailwind CSS", "TypeScript"],
     "github": "https://github.com/wilsonsfh/website-portfolio",
     "live": "",
     "date": "Mar 2026"

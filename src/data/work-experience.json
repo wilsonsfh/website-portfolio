@@ -16,8 +16,8 @@
     "date": "May 2025 – Jul 2025",
     "description": [
       "Developed a full-stack web application using React and Django with PostgreSQL, enabling researchers to upload and analyse audio data",
-      "Integrated BirdNET machine learning model for automated bird species identification from audio recordings uploaded via Google Cloud Storage",
-      "Built RESTful APIs and implemented file processing pipelines using Python to handle large-scale audio dataset analysis"
+      "Integrated BirdNET Machine Learning classifier using eBird API and GPS coordinate data to automate bird species identification across geographic regions, improving classification accuracy compared to manual labeling",
+      "Enhanced cloud data pipeline with Python scripting to batch ingest and synchronize large volumes of bird audio recordings between local storage and Google Cloud Storage, reducing manual data entry time"
     ],
     "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
   },
