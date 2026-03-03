@@ -1,0 +1,16 @@
+---
+interface Props {
+  label: string;
+  nextSection: string;
+}
+const { label, nextSection } = Astro.props;
+---
+<div class="py-4 flex flex-col items-center gap-2">
+  <div class="w-16 h-px bg-foreground/10 dark:bg-foreground-dark/10"></div>
+  <a href={`#${nextSection}`} class="section-nav-link flex flex-col items-center gap-1 text-xs text-foreground-muted dark:text-foreground-dark-muted lowercase hover:text-accent dark:hover:text-accent-dark transition-colors">
+    <span>{label}</span>
+    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7" />
+    </svg>
+  </a>
+</div>
