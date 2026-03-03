@@ -13,7 +13,7 @@ const { title, role, date, description } = Astro.props;
   <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2">
     <div>
       <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark">{title}</h3>
-      <p class="text-accent font-medium text-sm">{role}</p>
+      <p class="text-accent dark:text-accent-dark font-medium text-sm">{role}</p>
     </div>
     <span class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1 sm:mt-0 font-mono">{date}</span>
   </div>
