@@ -1,0 +1,157 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import About from "../components/About.astro";
+import ExperienceCard from "../components/ExperienceCard.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ActivityCard from "../components/ActivityCard.astro";
+import SkillBadge from "../components/SkillBadge.astro";
+import ContactSection from "../components/ContactSection.astro";
+import Footer from "../components/Footer.astro";
+import ScrollReveal from "../components/ScrollReveal.astro";
+
+import experienceData from "../data/experience.json";
+import projectsData from "../data/projects.json";
+import activitiesData from "../data/activities.json";
+import skillsData from "../data/skills.json";
+---
+
+<Layout>
+  <Navbar />
+  <main>
+    <Hero />
+    <About />
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20">
+      <div class="max-w-site mx-auto px-6">
+        <div class="scroll-reveal">
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
+            experience
+          </h2>
+        </div>
+        <div class="space-y-6">
+          {experienceData.map((exp, i) => (
+            <ScrollReveal delay={i * 100}>
+              <ExperienceCard {...exp} />
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-background-alt dark:bg-background-dark-alt">
+      <div class="max-w-site mx-auto px-6">
+        <div class="scroll-reveal">
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
+            projects
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          {projectsData.map((project, i) => (
+            <ScrollReveal delay={i * 100}>
+              <ProjectCard {...project} />
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Activities Section -->
+    <section id="activities" class="py-20">
+      <div class="max-w-site mx-auto px-6">
+        <div class="scroll-reveal">
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
+            activities & involvement
+          </h2>
+        </div>
+        <div class="space-y-6">
+          {activitiesData.map((activity, i) => (
+            <ScrollReveal delay={i * 100}>
+              <ActivityCard {...activity} />
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-background-alt dark:bg-background-dark-alt">
+      <div class="max-w-site mx-auto px-6">
+        <div class="scroll-reveal">
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
+            skills & tools
+          </h2>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {Object.entries(skillsData).map(([category, skills], i) => (
+            <ScrollReveal delay={i * 100}>
+              <div>
+                <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark mb-4">
+                  {category}
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  {(skills as string[]).map((skill) => (
+                    <SkillBadge name={skill} />
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="py-20">
+      <div class="max-w-site mx-auto px-6">
+        <div class="scroll-reveal">
+          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-4">
+            blog
+          </h2>
+          <div class="bg-background-alt dark:bg-background-dark-alt rounded-xl p-12 text-center border border-foreground/5 dark:border-foreground-dark/10">
+            <p class="text-4xl mb-4">&#9997;&#65039;</p>
+            <p class="text-foreground dark:text-foreground-dark font-heading font-semibold text-xl mb-2">
+              stay tuned — writing in progress
+            </p>
+            <p class="text-foreground-muted dark:text-foreground-dark-muted">
+              i'm working on some posts about tech, product, and everything in between. check back soon!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <ContactSection />
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  // Scroll reveal using Intersection Observer
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!prefersReducedMotion) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    document.querySelectorAll(".scroll-reveal").forEach((el) => {
+      observer.observe(el);
+    });
+  } else {
+    document.querySelectorAll(".scroll-reveal").forEach((el) => {
+      el.classList.add("revealed");
+    });
+  }
+</script>
