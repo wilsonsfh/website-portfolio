@@ -1,43 +1,43 @@
-# Astro Starter Kit: Minimal
+# Wilson Soon's Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
-```
+A personal portfolio website showcasing work experience, projects, and activities.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+**🔗 [View Live](https://wilsonsoon-website-portfolio.vercel.app/)**
 
-## 🚀 Project Structure
+## 📋 Sections
 
-Inside of your Astro project, you'll see the following folders and files:
+- **Hero** — Introduction with typewriter effect
+- **About** — Photo carousel and personal bio
+- **Work Experience** — Professional roles and responsibilities
+- **Projects** — [View projects](https://wilsonsoon-website-portfolio.vercel.app/#projects)
+- **Activities** — Involvement and interests
+- **Contact** — Get in touch
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## 🛠️ Built With
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- **Astro 5** — Static site generation
+- **Tailwind CSS 3** — Utility-first styling
+- **Dark Mode** — Theme toggle with localStorage persistence
+- **Vanilla JS** — Scroll reveal, typewriter effect, carousel animations
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 📦 Commands
 
-Any static assets, like images, can be placed in the `public/` directory.
+| Command          | Action                                    |
+| :--------------- | :---------------------------------------- |
+| `npm install`    | Install dependencies                      |
+| `npm run dev`    | Start dev server at `localhost:4321`      |
+| `npm run build`  | Build production site to `./dist/`        |
+| `npm run preview`| Preview built site locally                |
 
-## 🧞 Commands
+## 🎨 Features
 
-All commands are run from the root of the project, from a terminal:
+- Responsive design with mobile-first approach
+- Dark/light mode toggle
+- Smooth scroll navigation with anchor links
+- Image carousel with lightbox modal
+- Scroll reveal animations
+- Custom color palette (beige, dark gray, purple)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## 📄 License
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Personal project — feel free to use as inspiration for your own portfolio.
