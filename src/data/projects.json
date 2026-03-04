@@ -1,12 +1,9 @@
 [
   {
-    "title": "CS Flashcards",
-    "description": "A spaced repetition PWA for mastering CS fundamentals and acing coding interviews — built on cognitive science, not cramming.",
+    "title": "Computer Science Flashcards",
+    "description": "A spaced repetition PWA for mastering CS fundamentals and acing coding interviews built on principles of cognitive science.",
     "highlights": [
-      "Motivated by Ebbinghaus's forgetting curve: without review, ~90% of new knowledge is lost within a week",
-      "Spaced repetition learners retain 82% vs 27% for crammers — 3× better recall with 30–40% less study time",
-      "Ships with 1,792 pre-seeded cards from Coding Interview University covering algorithms, data structures, OS, and networking",
-      "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to your personal learning patterns",
+      "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to personal learning patterns",
       "Cross-device sync via Supabase, offline support as a PWA, and 30-day review history dashboard"
     ],
     "tags": ["Next.js 15", "TypeScript", "Supabase", "Tailwind CSS", "shadcn/ui", "FSRS"],
@@ -24,7 +21,11 @@
   },
   {
     "title": "Electronic Health Records",
-    "description": "Built a full-stack electronic health records system using Python and Flask, enabling clinics to digitise patient records and streamline appointment management. Implemented secure authentication and role-based access control for healthcare providers.",
+    "description": "An electronic health records system enabling clinics to digitise patient records.",
+    "highlights": [
+      "Role-based access control (RBAC) with separate patient and doctor portals for managing medical records",
+      "Soft-deletion mechanism with timestamp-based recovery to preserve medical record history, ensuring synchronized data visibility across patient and doctor account views."
+    ],
     "tags": ["Python", "Flask"],
     "github": "https://github.com/wilsonsfh/servIT-",
     "live": "",
