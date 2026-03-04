@@ -1,5 +1,20 @@
 [
   {
+    "title": "CS Flashcards",
+    "description": "A spaced repetition PWA for mastering CS fundamentals and acing coding interviews — built on cognitive science, not cramming.",
+    "highlights": [
+      "Motivated by Ebbinghaus's forgetting curve: without review, ~90% of new knowledge is lost within a week",
+      "Spaced repetition learners retain 82% vs 27% for crammers — 3× better recall with 30–40% less study time",
+      "Ships with 1,792 pre-seeded cards from Coding Interview University covering algorithms, data structures, OS, and networking",
+      "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to your personal learning patterns",
+      "Cross-device sync via Supabase, offline support as a PWA, and 30-day review history dashboard"
+    ],
+    "tags": ["Next.js 15", "TypeScript", "Supabase", "Tailwind CSS", "shadcn/ui", "FSRS"],
+    "github": "https://github.com/wilsonsfh/cs-flashcards",
+    "live": "https://cs-flashcards-ruby.vercel.app",
+    "date": "Mar 2026"
+  },
+  {
     "title": "Personal Portfolio Website",
     "description": "My personal portfolio website, built with Astro and Tailwind CSS. Designed to showcase my experience, projects, and interests with a modern aesthetic and smooth animations.",
     "tags": ["Astro", "Tailwind CSS", "TypeScript"],

@@ -2,13 +2,14 @@
 interface Props {
   title: string;
   description: string;
+  highlights?: string[];
   tags: string[];
   github: string;
   live: string;
   date?: string;
 }
 
-const { title, description, tags, github, live, date } = Astro.props;
+const { title, description, highlights, tags, github, live, date } = Astro.props;
 ---
 
 <div class="bg-background dark:bg-background-dark rounded-xl p-6 border border-foreground/5 dark:border-foreground-dark/10 hover:border-accent/20 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
@@ -16,7 +17,13 @@ const { title, description, tags, github, live, date } = Astro.props;
     <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark">{title}</h3>
     {date && <span class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1 sm:mt-0 font-mono">{date}</span>}
   </div>
-  <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm leading-relaxed mb-4 flex-grow">{description}</p>
+  <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm leading-relaxed mb-2">{description}</p>
+  {highlights && highlights.length > 0 && (
+    <ul class="text-foreground-muted dark:text-foreground-dark-muted text-sm leading-relaxed mb-4 space-y-1 list-disc list-inside flex-grow">
+      {highlights.map((point) => <li>{point}</li>)}
+    </ul>
+  )}
+  {(!highlights || highlights.length === 0) && <div class="flex-grow" />}
   <div class="flex flex-wrap gap-2 mb-4">
     {tags.map((tag) => (
       <span class="text-xs font-mono px-2.5 py-1 bg-accent-light dark:bg-accent-dark-light text-accent dark:text-accent-dark rounded-md">
