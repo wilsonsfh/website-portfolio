@@ -22,14 +22,14 @@ const links = [
       {links.map((link) => (
         <a
           href={link.href}
-          class="nav-link text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
+          class="nav-link font-heading text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
         >
           {link.label}
         </a>
       ))}
       <a
         href="#blog"
-        class="nav-link text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
+        class="nav-link font-heading text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
       >
         blog
       </a>
@@ -89,14 +89,14 @@ const links = [
     {links.map((link) => (
       <a
         href={link.href}
-        class="mobile-link nav-link text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
+        class="mobile-link nav-link font-heading text-sm text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors lowercase"
       >
         {link.label}
       </a>
     ))}
     <a
       href="#blog"
-      class="mobile-link nav-link text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full w-fit hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
+      class="mobile-link nav-link font-heading text-sm bg-accent/10 text-accent dark:bg-accent-dark-light dark:text-accent-dark px-3 py-1 rounded-full w-fit hover:bg-accent/20 dark:hover:bg-accent-dark-light/80 transition-colors lowercase"
     >
       blog
     </a>
@@ -117,20 +117,62 @@ const links = [
   function updateNavbarScroll() {
     const isDark = document.documentElement.classList.contains("dark");
     if (window.scrollY > 20) {
-      navbar?.classList.add("backdrop-blur-md", "shadow-sm");
+      navbar?.classList.add("backdrop-blur-xl", "shadow-sm", "border-b");
+      navbar?.classList.add("border-foreground/5");
       if (isDark) {
-        navbar?.classList.add("bg-background-dark/90");
-        navbar?.classList.remove("bg-background/90");
+        navbar?.classList.add("bg-background-dark/70");
+        navbar?.classList.remove("bg-background/70");
+        navbar?.classList.remove("border-foreground/5");
+        navbar?.classList.add("border-foreground-dark/5");
       } else {
-        navbar?.classList.add("bg-background/90");
-        navbar?.classList.remove("bg-background-dark/90");
+        navbar?.classList.add("bg-background/70");
+        navbar?.classList.remove("bg-background-dark/70");
+        navbar?.classList.remove("border-foreground-dark/5");
+        navbar?.classList.add("border-foreground/5");
       }
     } else {
-      navbar?.classList.remove("bg-background/90", "bg-background-dark/90", "backdrop-blur-md", "shadow-sm");
+      navbar?.classList.remove(
+        "bg-background/70", "bg-background-dark/70",
+        "backdrop-blur-xl", "shadow-sm", "border-b",
+        "border-foreground/5", "border-foreground-dark/5"
+      );
     }
   }
 
-  window.addEventListener("scroll", updateNavbarScroll);
+  // Active nav link highlighting
+  const sectionIds = ["about", "work-experience", "projects", "activities", "blog", "contact"];
+  const desktopNavLinks = document.querySelectorAll<HTMLAnchorElement>('.hidden.md\\:flex a.nav-link[href^="#"]');
+
+  function updateActiveNavLink() {
+    let activeId = "";
+    for (const id of sectionIds) {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 100) {
+        activeId = id;
+      }
+    }
+
+    desktopNavLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === `#${activeId}`) {
+        link.classList.add("nav-link-active");
+      } else {
+        link.classList.remove("nav-link-active");
+      }
+    });
+  }
+
+  let navTicking = false;
+  window.addEventListener("scroll", () => {
+    updateNavbarScroll();
+    if (!navTicking) {
+      requestAnimationFrame(() => {
+        updateActiveNavLink();
+        navTicking = false;
+      });
+      navTicking = true;
+    }
+  }, { passive: true });
 
   // Theme toggle
   function toggleTheme() {
