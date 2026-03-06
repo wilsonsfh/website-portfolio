@@ -12,7 +12,10 @@ interface Props {
 const { title, description, highlights, tags, github, live, date } = Astro.props;
 ---
 
-<div class="bg-background dark:bg-background-dark rounded-xl p-6 border border-foreground/5 dark:border-foreground-dark/10 hover:border-accent/20 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+<div class="bg-background dark:bg-background-dark rounded-xl overflow-hidden border border-foreground/5 dark:border-foreground-dark/10 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+  <!-- Gradient top bar -->
+  <div class="h-1 bg-gradient-to-r from-accent via-amber-400 to-accent"></div>
+  <div class="p-6 flex flex-col h-full">
   <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2">
     <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark">{title}</h3>
     {date && <span class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1 sm:mt-0 font-mono">{date}</span>}
@@ -26,7 +29,7 @@ const { title, description, highlights, tags, github, live, date } = Astro.props
   {(!highlights || highlights.length === 0) && <div class="flex-grow" />}
   <div class="flex flex-wrap gap-2 mb-4">
     {tags.map((tag) => (
-      <span class="text-xs font-mono px-2.5 py-1 bg-accent-light dark:bg-accent-dark-light text-accent dark:text-accent-dark rounded-md">
+      <span class="text-xs font-mono px-2.5 py-1 rounded-full border border-accent/20 dark:border-accent-dark/20 bg-accent/5 dark:bg-accent-dark/10 text-accent dark:text-accent-dark">
         {tag}
       </span>
     ))}
@@ -54,5 +57,6 @@ const { title, description, highlights, tags, github, live, date } = Astro.props
         Live Demo
       </a>
     )}
+  </div>
   </div>
 </div>
