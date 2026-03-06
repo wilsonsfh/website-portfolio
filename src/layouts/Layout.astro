@@ -26,10 +26,24 @@ const {
     <link rel="apple-touch-icon" href="/images/hero.jpg" />
     <title>{title}</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
+
+    <style is:inline>
+      html:not(.dark) { background-color: #FAF7F2; color: #2D2D2D; }
+      html.dark        { background-color: #1A1A2E; color: #E8E8E8; }
+
+      /* Section alt-backgrounds — prevents beige→warm-white flash */
+      html:not(.dark) [class~="bg-background-alt"]  { background-color: #F0ECE3; }
+      html.dark [class*="bg-background-dark-alt"]    { background-color: #16213E; }
+
+      /* Contact card light mode: show light-purple immediately, not transparent */
+      html:not(.dark) [class~="bg-accent-light"] { background-color: #EDE8F5; }
+    </style>
     <script is:inline>
       (function() {
-        const theme = localStorage.getItem('theme');
-        if (theme !== 'light') {
+        if (localStorage.getItem('theme') === 'dark') {
           document.documentElement.classList.add('dark');
         }
       })();
@@ -37,5 +51,23 @@ const {
   </head>
   <body class="antialiased">
     <slot />
+    <script>
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          const href = (link as HTMLAnchorElement).getAttribute('href');
+          if (!href) return;
+          if (href === '#') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    </script>
   </body>
 </html>

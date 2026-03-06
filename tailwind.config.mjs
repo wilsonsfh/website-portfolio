@@ -23,10 +23,11 @@ export default {
           light: '#EDE8F5',
           dark: '#9B8CC4',
           'dark-light': '#2D2650',
+          'dark-hover': '#7B6DB0',
         },
       },
       fontFamily: {
-        heading: ['Poppins', 'system-ui', 'sans-serif'],
+        heading: ['Playfair Display', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },

@@ -3,22 +3,6 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-600.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-700.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Inter';
   src: url('/fonts/inter-400.woff2') format('woff2');
   font-weight: 400;
@@ -68,9 +52,60 @@
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
   }
 
-  .scroll-reveal.revealed {
+  .scroll-reveal-left {
+    opacity: 0;
+    transform: translateX(-24px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  }
+
+  .scroll-reveal-right {
+    opacity: 0;
+    transform: translateX(24px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  }
+
+  .scroll-reveal.revealed,
+  .scroll-reveal-left.revealed,
+  .scroll-reveal-right.revealed {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(0);
+  }
+
+  /* Dot grid background pattern for alt sections */
+  .dot-grid-bg {
+    background-image: radial-gradient(circle, currentColor 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    color: rgba(0, 0, 0, 0.03);
+  }
+
+  :is(.dark .dot-grid-bg) {
+    color: rgba(255, 255, 255, 0.03);
+  }
+
+  /* Active nav link indicator */
+  .nav-link-active {
+    color: theme('colors.accent.DEFAULT');
+    position: relative;
+  }
+
+  :is(.dark .nav-link-active) {
+    color: theme('colors.accent.dark');
+  }
+
+  .nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: theme('colors.accent.DEFAULT');
+  }
+
+  :is(.dark .nav-link-active)::after {
+    background-color: theme('colors.accent.dark');
   }
 }
 
@@ -79,7 +114,9 @@
     scroll-behavior: auto;
   }
 
-  .scroll-reveal {
+  .scroll-reveal,
+  .scroll-reveal-left,
+  .scroll-reveal-right {
     opacity: 1;
     transform: none;
     transition: none;
