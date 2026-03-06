@@ -1,14 +1,26 @@
 ---
-const photoCount = 4;
-const photos = Array.from({ length: photoCount }, (_, i) => `/photos/photo-${String(i + 1).padStart(2, '0')}.jpg`);
+const photos = [
+  '/photos/photo-01.jpg', '/photos/photo-02.jpg',
+  '/photos/photo-03.jpg', '/photos/photo-04.jpg',
+  '/photos/photo-05.jpg', '/photos/photo-06.jpg',
+  '/photos/photo-07.jpg', '/photos/photo-08.jpg',
+  '/photos/photo-09.jpg', '/photos/photo-10.jpg',
+  '/photos/photo-11.jpg', '/photos/photo-12.jpg',
+  '/photos/photo-13.jpg', '/photos/photo-14.jpg',
+  '/photos/photo-15.jpg', '/photos/photo-16.jpg',
+];
+const photoCount = photos.length;
+// Duplicate for seamless infinite loop
+const allPhotos = [...photos, ...photos];
 ---
 
-<section id="about" class="py-20 bg-background-alt dark:bg-background-dark-alt">
+<section id="about" class="py-20 bg-background-alt dark:bg-background-dark-alt dot-grid-bg">
   <div class="max-w-site mx-auto px-6">
-    <div class="scroll-reveal">
-      <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-12">
+    <div class="scroll-reveal-right">
+      <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
         more about me
       </h2>
+      <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
     </div>
     <div class="scroll-reveal mt-8">
       <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
@@ -16,7 +28,6 @@ const photos = Array.from({ length: photoCount }, (_, i) => `/photos/photo-${Str
       </p>
     </div>
 
-    <!-- Full-width "outside of work" paragraph (de-emphasized) -->
     <div class="scroll-reveal mt-8">
       <p class="text-foreground-muted dark:text-foreground-dark-muted text-base leading-relaxed">
         in my free time, i like exploring tea brands, freestyle dancing and doing photography. i am also currently learning the guitar, rock climbing and volleyball. these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.
@@ -24,57 +35,196 @@ const photos = Array.from({ length: photoCount }, (_, i) => `/photos/photo-${Str
     </div>
 
     <!-- "photos i took!" label -->
-    <p class="text-sm text-foreground-muted dark:text-foreground-dark-muted font-body lowercase mt-6 mb-2">
+    <p class="text-sm text-foreground-muted dark:text-foreground-dark-muted font-body lowercase mt-6 mb-3">
       photos i took!
     </p>
+  </div>
 
-    <!-- Static photo grid -->
-    <div class="scroll-reveal">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {photos.map((src, i) => (
-          <div class="overflow-hidden rounded-lg group cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_20px_rgba(107,91,149,0.4)]">
-            <img
-              src={src}
-              alt={`Photography ${i + 1}`}
-              class="carousel-photo h-[180px] md:h-[260px] w-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
-              loading="lazy"
-            />
+  <!-- Full-bleed carousel — sits outside max-w-site so it spans the full section width -->
+  <!-- py-6 gives vertical room for the hover-scale to breathe without clipping -->
+  <div id="carousel-container" class="overflow-hidden py-6 cursor-grab">
+    <div class="carousel-track flex gap-5 w-max" style="will-change: transform">
+      {allPhotos.map((src, i) => (
+        <div
+          class="carousel-item flex-shrink-0 w-52 h-72 md:w-64 md:h-80 relative rounded-2xl overflow-hidden
+                 cursor-pointer shadow-md
+                 transition-transform duration-300 ease-out hover:scale-[1.07] hover:shadow-2xl hover:z-10
+                 group"
+          data-src={src}
+          role="button"
+          tabindex="0"
+          aria-label={`Open photo ${(i % photoCount) + 1} fullscreen`}
+        >
+          <img
+            src={src}
+            alt={`Photography ${(i % photoCount) + 1}`}
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          <!-- Hover overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                      flex items-end justify-center pb-5">
+            <span class="text-white text-xs font-medium tracking-wide uppercase">view full</span>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
+  </div>
+  <div id="carousel-hint"
+       class="flex justify-center mt-2 mb-1 opacity-0 transition-opacity duration-200 pointer-events-none">
+    <span class="inline-flex items-center gap-1.5 bg-black/5 dark:bg-white/5
+                 text-foreground-muted dark:text-foreground-dark-muted
+                 text-xs px-3 py-1.5 rounded-full border border-black/10 dark:border-white/10">
+      ↔ drag to quick scroll photo gallery
+    </span>
   </div>
 </section>
 
-<!-- Lightbox overlay -->
-<div id="photo-lightbox" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden cursor-pointer">
-  <img id="lightbox-img" src="" alt="Photo enlarged" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg" />
+<!-- Lightbox overlay with fade transition -->
+<div id="photo-lightbox"
+     class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center
+            opacity-0 pointer-events-none transition-opacity duration-300">
+  <!-- Close button -->
+  <button
+    id="lightbox-close"
+    class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20
+           text-white flex items-center justify-center hover:bg-white/25 transition-colors z-10"
+    aria-label="Close lightbox"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+  <img id="lightbox-img" src="" alt="Photo enlarged"
+       class="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl" />
 </div>
 
 <script>
-  // Lightbox
+  // --- Carousel rAF + Drag ---
+  const carouselContainer = document.getElementById('carousel-container') as HTMLElement | null;
+  const carouselHint = document.getElementById('carousel-hint');
+  const track = document.querySelector<HTMLElement>('.carousel-track');
+
+  let hasDragged = false;
+
+  if (track && carouselContainer) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Tooltip show/hide on container hover
+    carouselContainer.addEventListener('mouseenter', () => {
+      carouselHint?.classList.remove('opacity-0');
+      carouselHint?.classList.add('opacity-100');
+    });
+    carouselContainer.addEventListener('mouseleave', () => {
+      carouselHint?.classList.add('opacity-0');
+      carouselHint?.classList.remove('opacity-100');
+    });
+
+    if (!prefersReducedMotion) {
+      let pos = 0;
+      let raf: number | null = null;
+      let halfWidth = track.scrollWidth / 2;
+      const speed = 0.6;
+
+      let isDragging = false;
+      let dragStartX = 0;
+      let dragStartPos = 0;
+
+      const tick = () => {
+        pos += speed;
+        if (pos >= halfWidth) pos -= halfWidth;
+        track.style.transform = `translateX(-${pos}px)`;
+        raf = requestAnimationFrame(tick);
+      };
+      const start = () => { if (raf === null && !isDragging) raf = requestAnimationFrame(tick); };
+      const stop  = () => { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } };
+
+      window.addEventListener('resize', () => { halfWidth = track.scrollWidth / 2; });
+
+      // Pause on hover (non-drag)
+      carouselContainer.addEventListener('mouseenter', stop);
+      carouselContainer.addEventListener('mouseleave', () => { if (!isDragging) start(); });
+
+      // Drag start
+      track.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        hasDragged = false;
+        dragStartX = e.clientX;
+        dragStartPos = pos;
+        stop();
+        track.style.cursor = 'grabbing';
+        carouselContainer.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+
+      // Drag move
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const delta = dragStartX - e.clientX;
+        if (Math.abs(delta) > 5) hasDragged = true;
+        pos = dragStartPos + delta;
+        if (pos < 0) pos += halfWidth;
+        if (pos >= halfWidth) pos -= halfWidth;
+        track.style.transform = `translateX(-${pos}px)`;
+      });
+
+      // Drag end
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.cursor = '';
+        carouselContainer.style.cursor = '';
+        start();
+      });
+
+      start();
+    }
+  }
+
+  // --- Lightbox ---
   const lightbox = document.getElementById("photo-lightbox");
   const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement | null;
 
-  document.querySelectorAll(".carousel-photo").forEach((photo) => {
-    photo.addEventListener("click", () => {
-      const src = (photo as HTMLImageElement).src;
-      if (lightboxImg && lightbox) {
-        lightboxImg.src = src;
-        lightbox.classList.remove("hidden");
+  function openLightbox(src: string) {
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = src;
+    lightbox.classList.remove("pointer-events-none", "opacity-0");
+    lightbox.classList.add("opacity-100");
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add("opacity-0", "pointer-events-none");
+    lightbox.classList.remove("opacity-100");
+    if (lightboxImg) setTimeout(() => { lightboxImg.src = ""; }, 300);
+  }
+
+  // Click/keyboard on carousel items
+  document.querySelectorAll(".carousel-item").forEach((item) => {
+    const src = item.getAttribute("data-src");
+    if (!src) return;
+
+    item.addEventListener("click", () => {
+      if (hasDragged) return;
+      openLightbox(src);
+    });
+    item.addEventListener("keydown", (e) => {
+      if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+        e.preventDefault();
+        openLightbox(src);
       }
     });
   });
 
-  lightbox?.addEventListener("click", () => {
-    lightbox.classList.add("hidden");
-    if (lightboxImg) lightboxImg.src = "";
+  // Close on backdrop or button
+  lightbox?.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
   });
-
+  document.getElementById("lightbox-close")?.addEventListener("click", closeLightbox);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) {
-      lightbox.classList.add("hidden");
-      if (lightboxImg) lightboxImg.src = "";
+    if (e.key === "Escape" && lightbox && !lightbox.classList.contains("pointer-events-none")) {
+      closeLightbox();
     }
   });
 </script>
