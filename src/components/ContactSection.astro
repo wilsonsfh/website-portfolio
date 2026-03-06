@@ -26,39 +26,42 @@ const socials = [
 <section id="contact" class="py-20 bg-background-alt dark:bg-background-dark-alt">
   <div class="max-w-site mx-auto px-6">
     <div class="scroll-reveal">
-      <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark mb-4">
-        get in touch
-      </h2>
-      <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg mb-12 max-w-lg lowercase">
-        i'm always open to new opportunities, collaborations, or just a good conversation. feel free to reach out!
-      </p>
-    </div>
+      <div class="rounded-2xl bg-background dark:bg-accent-light p-8 md:p-12">
+        <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground">
+          get in touch
+        </h2>
+        <div class="w-12 h-1 bg-accent/30 rounded-full mt-3 mb-6"></div>
+        <p class="text-foreground-muted text-lg mb-10 max-w-lg lowercase">
+          i'm always open to new opportunities, collaborations, or just a good conversation. feel free to reach out!
+        </p>
 
-    <div class="scroll-reveal flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-      <div class="flex flex-wrap gap-4">
-        {socials.map((social) => (
-          <a
-            href={social.href}
-            target={social.href.startsWith("mailto") ? undefined : "_blank"}
-            rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
-            class="text-foreground-muted dark:text-foreground-dark-muted hover:text-accent transition-colors group"
-            aria-label={social.label}
-          >
-            <div class="w-12 h-12 bg-accent-light dark:bg-accent-dark-light rounded-lg flex items-center justify-center group-hover:bg-accent transition-colors">
-              <svg
-                class="w-6 h-6 text-accent dark:text-accent-dark group-hover:text-white transition-colors"
-                fill={social.filled ? "currentColor" : "none"}
-                stroke={social.filled ? "none" : "currentColor"}
-                viewBox="0 0 24 24"
-                set:html={social.icon}
-              />
-            </div>
-          </a>
-        ))}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div class="flex flex-wrap gap-4">
+            {socials.map((social) => (
+              <a
+                href={social.href}
+                target={social.href.startsWith("mailto") ? undefined : "_blank"}
+                rel={social.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
+                class="group"
+                aria-label={social.label}
+              >
+                <div class="w-12 h-12 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-lg flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                  <svg
+                    class="w-6 h-6 text-accent"
+                    fill={social.filled ? "currentColor" : "none"}
+                    stroke={social.filled ? "none" : "currentColor"}
+                    viewBox="0 0 24 24"
+                    set:html={social.icon}
+                  />
+                </div>
+              </a>
+            ))}
+          </div>
+          <p class="text-foreground-muted text-sm lowercase">
+            &copy; 2026, wilson soon
+          </p>
+        </div>
       </div>
-      <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm lowercase">
-        &copy; 2026, wilson soon
-      </p>
     </div>
   </div>
 </section>
