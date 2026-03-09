@@ -43,7 +43,7 @@ const allPhotos = [...photos, ...photos];
   <!-- Full-bleed carousel — sits outside max-w-site so it spans the full section width -->
   <!-- py-6 gives vertical room for the hover-scale to breathe without clipping -->
   <div id="carousel-container" class="overflow-hidden py-6 cursor-grab">
-    <div class="carousel-track flex gap-5 w-max" style="will-change: transform">
+    <div class="carousel-track flex gap-5 w-max" style="will-change: transform; touch-action: pan-y">
       {allPhotos.map((src, i) => (
         <div
           class="carousel-item flex-shrink-0 w-52 h-72 md:w-64 md:h-80 relative rounded-2xl overflow-hidden
@@ -62,7 +62,7 @@ const allPhotos = [...photos, ...photos];
             loading="lazy"
           />
           <!-- Hover overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent
+          <div class="carousel-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent
                       opacity-0 group-hover:opacity-100 transition-opacity duration-300
                       flex items-end justify-center pb-5">
             <span class="text-white text-xs font-medium tracking-wide uppercase">view full</span>
@@ -121,6 +121,38 @@ const allPhotos = [...photos, ...photos];
       carouselHint?.classList.remove('opacity-100');
     });
 
+    // Touch: show/hide "drag to quick scroll" hint
+    let hintTimeout: ReturnType<typeof setTimeout>;
+    carouselContainer.addEventListener('touchstart', () => {
+      clearTimeout(hintTimeout);
+      carouselHint?.classList.remove('opacity-0');
+      carouselHint?.classList.add('opacity-100');
+    }, { passive: true });
+    const hideHint = () => {
+      hintTimeout = setTimeout(() => {
+        carouselHint?.classList.add('opacity-0');
+        carouselHint?.classList.remove('opacity-100');
+      }, 1500);
+    };
+    carouselContainer.addEventListener('touchend', hideHint, { passive: true });
+    carouselContainer.addEventListener('touchcancel', hideHint, { passive: true });
+
+    // Touch: show/hide "view full" overlay on carousel items
+    track.querySelectorAll('.carousel-item').forEach((item) => {
+      const overlay = item.querySelector('.carousel-overlay') as HTMLElement | null;
+      if (!overlay) return;
+      item.addEventListener('touchstart', () => {
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
+      }, { passive: true });
+      const hideOverlay = () => {
+        overlay.classList.add('opacity-0');
+        overlay.classList.remove('opacity-100');
+      };
+      item.addEventListener('touchend', hideOverlay, { passive: true });
+      item.addEventListener('touchcancel', hideOverlay, { passive: true });
+    });
+
     if (!prefersReducedMotion) {
       let pos = 0;
       let raf: number | null = null;
@@ -129,7 +161,10 @@ const allPhotos = [...photos, ...photos];
 
       let isDragging = false;
       let dragStartX = 0;
+      let dragStartY = 0;
       let dragStartPos = 0;
+      let touchDetermined = false;
+      let touchIsHorizontal = false;
 
       const tick = () => {
         pos += speed;
@@ -177,6 +212,66 @@ const allPhotos = [...photos, ...photos];
         carouselContainer.style.cursor = '';
         start();
       });
+
+      // Touch drag start
+      track.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        if (!touch) return;
+        isDragging = true;
+        hasDragged = false;
+        touchDetermined = false;
+        touchIsHorizontal = false;
+        dragStartX = touch.clientX;
+        dragStartY = touch.clientY;
+        dragStartPos = pos;
+        stop();
+      }, { passive: true });
+
+      // Touch drag move — passive: false so we can preventDefault for horizontal swipes
+      track.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        const dx = dragStartX - touch.clientX;
+        const dy = dragStartY - touch.clientY;
+
+        if (!touchDetermined) {
+          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
+            touchDetermined = true;
+          } else {
+            return;
+          }
+        }
+
+        if (!touchIsHorizontal) {
+          isDragging = false;
+          start();
+          return;
+        }
+
+        // Horizontal drag confirmed — hide any open overlays to avoid flicker
+        track.querySelectorAll<HTMLElement>('.carousel-overlay').forEach(el => {
+          el.classList.add('opacity-0');
+          el.classList.remove('opacity-100');
+        });
+        e.preventDefault();
+        if (Math.abs(dx) > 5) hasDragged = true;
+        pos = dragStartPos + dx;
+        if (pos < 0) pos += halfWidth;
+        if (pos >= halfWidth) pos -= halfWidth;
+        track.style.transform = `translateX(-${pos}px)`;
+      }, { passive: false });
+
+      // Touch drag end/cancel — reset hasDragged so subsequent taps open the lightbox
+      const endTouchDrag = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        hasDragged = false;
+        start();
+      };
+      window.addEventListener('touchend', endTouchDrag, { passive: true });
+      window.addEventListener('touchcancel', endTouchDrag, { passive: true });
 
       start();
     }
