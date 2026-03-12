@@ -29,7 +29,7 @@ const allPhotos = [...photos, ...photos];
     </div>
 
     <div class="scroll-reveal mt-8">
-      <p class="text-foreground-muted dark:text-foreground-dark-muted text-base leading-relaxed">
+      <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
         in my free time, i like exploring tea brands, freestyle dancing and doing photography. i am also currently learning the guitar, rock climbing and volleyball. these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.
       </p>
     </div>
@@ -121,7 +121,7 @@ const allPhotos = [...photos, ...photos];
       carouselHint?.classList.remove('opacity-100');
     });
 
-    // Touch: show/hide "drag to quick scroll" hint
+    // Touch: show/hide "drag to quick scroll" hint + slow down on touch
     let hintTimeout: ReturnType<typeof setTimeout>;
     carouselContainer.addEventListener('touchstart', () => {
       clearTimeout(hintTimeout);
@@ -157,7 +157,9 @@ const allPhotos = [...photos, ...photos];
       let pos = 0;
       let raf: number | null = null;
       let halfWidth = track.scrollWidth / 2;
-      const speed = 0.6;
+      const speedNormal = 0.6;
+      const speedHover = 0.2;
+      let currentSpeed = speedNormal;
 
       let isDragging = false;
       let dragStartX = 0;
@@ -167,19 +169,24 @@ const allPhotos = [...photos, ...photos];
       let touchIsHorizontal = false;
 
       const tick = () => {
-        pos += speed;
-        if (pos >= halfWidth) pos -= halfWidth;
-        track.style.transform = `translateX(-${pos}px)`;
+        if (!isDragging) {
+          pos += currentSpeed;
+          if (pos >= halfWidth) pos -= halfWidth;
+          track.style.transform = `translateX(-${pos}px)`;
+        }
         raf = requestAnimationFrame(tick);
       };
-      const start = () => { if (raf === null && !isDragging) raf = requestAnimationFrame(tick); };
+      const start = () => { if (raf === null) raf = requestAnimationFrame(tick); };
       const stop  = () => { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } };
 
       window.addEventListener('resize', () => { halfWidth = track.scrollWidth / 2; });
 
-      // Pause on hover (non-drag)
-      carouselContainer.addEventListener('mouseenter', stop);
-      carouselContainer.addEventListener('mouseleave', () => { if (!isDragging) start(); });
+      // Slow down on hover/touch instead of stopping
+      carouselContainer.addEventListener('mouseenter', () => { currentSpeed = speedHover; });
+      carouselContainer.addEventListener('mouseleave', () => { currentSpeed = speedNormal; });
+      carouselContainer.addEventListener('touchstart', () => { currentSpeed = speedHover; }, { passive: true });
+      carouselContainer.addEventListener('touchend', () => { currentSpeed = speedNormal; }, { passive: true });
+      carouselContainer.addEventListener('touchcancel', () => { currentSpeed = speedNormal; }, { passive: true });
 
       // Drag start
       track.addEventListener('mousedown', (e) => {
@@ -187,7 +194,6 @@ const allPhotos = [...photos, ...photos];
         hasDragged = false;
         dragStartX = e.clientX;
         dragStartPos = pos;
-        stop();
         track.style.cursor = 'grabbing';
         carouselContainer.style.cursor = 'grabbing';
         e.preventDefault();
@@ -210,7 +216,6 @@ const allPhotos = [...photos, ...photos];
         isDragging = false;
         track.style.cursor = '';
         carouselContainer.style.cursor = '';
-        start();
       });
 
       // Touch drag start
@@ -224,7 +229,6 @@ const allPhotos = [...photos, ...photos];
         dragStartX = touch.clientX;
         dragStartY = touch.clientY;
         dragStartPos = pos;
-        stop();
       }, { passive: true });
 
       // Touch drag move — passive: false so we can preventDefault for horizontal swipes
@@ -268,7 +272,6 @@ const allPhotos = [...photos, ...photos];
         if (!isDragging) return;
         isDragging = false;
         hasDragged = false;
-        start();
       };
       window.addEventListener('touchend', endTouchDrag, { passive: true });
       window.addEventListener('touchcancel', endTouchDrag, { passive: true });
