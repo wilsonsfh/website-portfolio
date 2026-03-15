@@ -3,10 +3,10 @@ interface Props {
   title: string;
   role: string;
   date: string;
-  description: string;
+  descriptions: string[];
 }
 
-const { title, role, date, description } = Astro.props;
+const { title, role, date, descriptions } = Astro.props;
 ---
 
 <div class="bg-background dark:bg-background-dark rounded-xl p-6 border border-foreground/5 dark:border-foreground-dark/10 border-l-[3px] border-l-accent dark:border-l-accent-dark hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -17,5 +17,7 @@ const { title, role, date, description } = Astro.props;
     </div>
     <span class="text-foreground-muted dark:text-foreground-dark-muted text-sm mt-1 sm:mt-0 font-mono">{date}</span>
   </div>
-  <p class="text-foreground-muted dark:text-foreground-dark-muted text-sm leading-relaxed">{description}</p>
+  <div class="text-foreground-muted dark:text-foreground-dark-muted text-sm leading-relaxed space-y-2">
+    {descriptions.map((desc) => <p>{desc}</p>)}
+  </div>
 </div>

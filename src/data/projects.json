@@ -6,7 +6,7 @@
       "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to personal learning patterns",
       "Cross-device sync via Supabase, offline support as a PWA, and 30-day review history dashboard"
     ],
-    "tags": ["Next.js 15", "TypeScript", "Supabase", "Tailwind CSS", "shadcn/ui", "FSRS"],
+    "tags": ["Next.js", "TypeScript", "Supabase", "Tailwind CSS", "shadcn/ui", "FSRS"],
     "github": "https://github.com/wilsonsfh/cs-flashcards",
     "live": "https://cs-flashcards-ruby.vercel.app",
     "date": "Mar 2026"
@@ -18,7 +18,7 @@
       "Covers only networking, algorithms, databases, and system design across any domain",
       "AI explanations (Groq llama-3.3-70b) rendered as interactive React Flow graphs with Dagre auto-layout"
     ],
-    "tags": ["Next.js 15", "React Flow", "Dagre", "Groq API", "Upstash Redis", "Zustand", "Framer Motion", "Tailwind CSS"],
+    "tags": ["Next.js", "React Flow", "Dagre", "Groq API", "Redis", "Zustand", "Framer Motion", "Tailwind CSS"],
     "github": "https://github.com/wilsonsfh/concept-visualizer",
     "live": "https://concept-visualizer-seven.vercel.app/",
     "date": "Mar 2026"

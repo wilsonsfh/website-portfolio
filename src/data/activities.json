@@ -2,25 +2,34 @@
   {
     "title": "ItsRainingRaincoats",
     "role": "Product Manager",
-    "date": "Sep 2025 – Present",
-    "description": "Working on product development for a non-profit organisation supporting migrant workers in Singapore. Managing product requirements for a donation collection scheduling chatbot to improve platform usability."
+    "date": "Sep 2025 – Nov 2025",
+    "descriptions": [
+      "Owned product requirements document features to develop a donation collection scheduling chatbot to improve platform usability, for a non-profit organisation supporting migrant workers in Singapore."
+    ]
   },
   {
-    "title": "Campus Growth & Advocacy",
-    "role": "Microsoft Student Ambassador · Perplexity AI Campus Growth Partner",
-    "date": "Aug 2025 – Present",
-    "description": "Microsoft Student Ambassador (Jan 2026 – Present): Organising technical workshops and events to foster AI literacy on campus. Perplexity AI Campus Growth Partner (Aug – Dec 2025): Drove campus adoption and awareness of AI-powered search tools through events and community engagement."
+    "title": "Student Ambassadorial Programmes",
+    "role": "Microsoft Student Ambassador · Perplexity Student Growth Partner",
+    "date": "",
+    "descriptions": [
+      "Microsoft Student Ambassador (Jan 2026 – Present): Collaborating with 10 student ambassadors to drive 100,000 Copilot Chat student activations in Singapore, by organising technical workshops and events.",
+      "Perplexity Student Growth Partner (Aug – Dec 2025): Drove campus adoption and awareness of the AI-powered Comet Browser through community engagement."
+    ]
   },
   {
     "title": "NUS Students' Computing Club",
     "role": "Vice President of External Relations",
     "date": "Aug 2024 – Aug 2025",
-    "description": "Led a team to manage corporate partnerships, sponsorships, and external communications for the largest computing student organisation at NUS. Secured partnerships with tech companies for career fairs, hackathons, and networking events."
+    "descriptions": [
+      "Represented 6000+ computing students, led a 72-strong team, and raised $54,450 through partnerships."
+    ]
   },
   {
     "title": "Hackathons",
     "role": "5+ Hackathon Participations",
-    "date": "2023 – Present",
-    "description": "Active hackathon participant across various themes including software, maritime, and social impact. Notable participations include Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, GGEF Open Hack Singapore 2024 and NUS-RightShip Hackathon 2024."
+    "date": "",
+    "descriptions": [
+      "Active hackathon participant across various themes including software, maritime, and social impact. Notable participations include Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, GGEF Open Hack Singapore 2024 and NUS-RightShip Hackathon 2024."
+    ]
   }
 ]
