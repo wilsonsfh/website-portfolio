@@ -1,5 +1,17 @@
 [
   {
+    "title": "CorrectiveRehabApp",
+    "description": "End-to-end biomechanical analysis pipeline for gym exercises.",
+    "highlights": [
+      "Detects 8 lift-specific form issues (knee valgus, hip shift, butt wink, forward lean, etc.) with 0–100 symmetry scores and severity grading per rep across 6 exercises",
+      "Mobile skeleton visualizer renders react-native-svg overlays (24 joint connections, teal/orange/red severity coloring) with a side-by-side session diff view classifying issues as improved/regressed/resolved/new"
+    ],
+    "tags": ["React Native", "Expo", "FastAPI", "MediaPipe", "Google Cloud Run", "Supabase", "PostgreSQL"],
+    "github": "https://github.com/wilsonsfh/CorrectiveRehabApp",
+    "live": "",
+    "date": "Present"
+  },
+  {
     "title": "Computer Science Flashcards",
     "description": "A spaced repetition PWA for mastering CS fundamentals and acing coding interviews built on principles of cognitive science.",
     "highlights": [
@@ -21,14 +33,6 @@
     "tags": ["Next.js", "React Flow", "Dagre", "Groq API", "Redis", "Zustand", "Framer Motion", "Tailwind CSS"],
     "github": "https://github.com/wilsonsfh/concept-visualizer",
     "live": "https://concept-visualizer-seven.vercel.app/",
-    "date": "Mar 2026"
-  },
-  {
-    "title": "Personal Portfolio Website",
-    "description": "My personal portfolio website, built with Astro and Tailwind CSS. Designed to showcase my experience, projects, and interests with a modern aesthetic and smooth animations.",
-    "tags": ["Astro", "Tailwind CSS", "TypeScript"],
-    "github": "https://github.com/wilsonsfh/website-portfolio",
-    "live": "",
     "date": "Mar 2026"
   },
   {
