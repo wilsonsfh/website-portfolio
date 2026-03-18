@@ -8,15 +8,15 @@
       "Collaborated with cross-functional engineering teams to define product requirements and scope technical solutions for platform improvements",
       "Synthesised qualitative and quantitative insights from user interviews and analytics dashboards to inform product roadmap planning"
     ],
-    "tags": ["SQL", "Metabase", "Lark", "User Research"]
+    "tags": ["SQL", "Metabase", "User Research", "Product Analytics"]
   },
   {
     "company": "NUS Enterprise Minimum Viable Product Studio",
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
     "description": [
-      "Developed a full-stack web application using React and Django with PostgreSQL, enabling researchers to upload and analyse audio data",
-      "Integrated BirdNET Machine Learning classifier using eBird API and GPS coordinate data to automate bird species identification across geographic regions, improving classification accuracy compared to manual labeling",
+      "Worked on a full-stack web application for researchers to analyse bird patterns with React and Django with PostgreSQL",
+      "Improved bird species identification across geographic regions by integrating BirdNET Machine Learning classifier using eBird API and GPS coordinate data, increasing classification accuracy compared to manual labeling",
       "Enhanced cloud data pipeline with Python scripting to batch ingest and synchronize large volumes of bird audio recordings between local storage and Google Cloud Storage, reducing manual data entry time"
     ],
     "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
@@ -26,7 +26,7 @@
     "role": "Software Engineering Intern",
     "date": "Nov 2020 – Feb 2021",
     "description": [
-      "Developed a C# plugin for Autodesk Revit using the Buildings and Habitats object Model (BHoM) to automate extraction and validation of building data for geospatial applications"
+      "Enhanced extraction of building data for geospatial applications such as Autodesk Revit by implementing C# plugin and open-source Buildings and Habitats object Model (BHoM)"
     ],
     "tags": ["C#", "Autodesk Revit", "BHoM"]
   }

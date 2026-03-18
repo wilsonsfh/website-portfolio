@@ -13,31 +13,31 @@
   },
   {
     "title": "Computer Science Flashcards",
-    "description": "A spaced repetition PWA for mastering CS fundamentals and acing coding interviews built on principles of cognitive science.",
+    "description": "Spaced repetition built on principles of cognitive science to learn Computer Science fundamentals.",
     "highlights": [
       "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to personal learning patterns",
       "Cross-device sync via Supabase, offline support as a PWA, and 30-day review history dashboard"
     ],
-    "tags": ["Next.js", "TypeScript", "Supabase", "Tailwind CSS", "shadcn/ui", "FSRS"],
+    "tags": ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
     "github": "https://github.com/wilsonsfh/cs-flashcards",
     "live": "https://cs-flashcards-ruby.vercel.app",
     "date": "Mar 2026"
   },
   {
     "title": "Concept Visualizer",
-    "description": "AI-powered interactive node diagram generator to explain technical concepts through visualisation of step-through animated node graph.",
+    "description": "Visual learn technical concepts through AI-powered step-through animated node graph.",
     "highlights": [
-      "Covers only networking, algorithms, databases, and system design across any domain",
+      "Covers only computer science domains in networking, algorithms, databases, and system design",
       "AI explanations (Groq llama-3.3-70b) rendered as interactive React Flow graphs with Dagre auto-layout"
     ],
-    "tags": ["Next.js", "React Flow", "Dagre", "Groq API", "Redis", "Zustand", "Framer Motion", "Tailwind CSS"],
+    "tags": ["Next.js", "Tailwind CSS", "React Flow", "Redis", "Groq API"],
     "github": "https://github.com/wilsonsfh/concept-visualizer",
     "live": "https://concept-visualizer-seven.vercel.app/",
     "date": "Mar 2026"
   },
   {
     "title": "Electronic Health Records",
-    "description": "An electronic health records system enabling clinics to digitise patient records.",
+    "description": "Enable clinics to digitise patient records.",
     "highlights": [
       "Role-based access control (RBAC) with separate patient and doctor portals for managing medical records",
       "Soft-deletion mechanism with timestamp-based recovery to preserve medical record history, ensuring synchronized data visibility across patient and doctor account views."
