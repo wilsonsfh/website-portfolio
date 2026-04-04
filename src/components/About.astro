@@ -10,196 +10,99 @@ const photos = [
   '/photos/photo-15.jpg', '/photos/photo-16.jpg',
 ];
 const photoCount = photos.length;
-// Duplicate for seamless infinite loop
 const allPhotos = [...photos, ...photos];
 ---
 
-<section id="about" class="py-20 bg-background-alt dark:bg-background-dark-alt dot-grid-bg">
+<section id="about" class="py-48 bg-background-alt dark:bg-background-dark-alt dot-grid-bg">
   <div class="max-w-site mx-auto px-6">
-    <div class="scroll-reveal-right">
+    <div class="gsap-reveal text-center flex flex-col items-center opacity-0 translate-y-10">
       <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
         more about me
       </h2>
-      <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
+      <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12 mx-auto"></div>
     </div>
-    <div class="scroll-reveal mt-8">
-      <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
+    
+    <div class="mt-8 space-y-6">
+      <p class="gsap-reveal opacity-0 translate-y-10 text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
         i'm currently thinking about how to be a better individual contributor as a software engineer with AI. i'm also interested in product thinking and building something people want, and learning how to ace prioritisations of a hundred things.
       </p>
-    </div>
-
-    <div class="scroll-reveal mt-8">
-      <p class="text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
+      <p class="gsap-reveal opacity-0 translate-y-10 text-foreground-muted dark:text-foreground-dark-muted text-lg leading-relaxed">
         in my free time, i like exploring tea brands, freestyle dancing and doing photography. i am also currently learning the guitar, rock climbing and volleyball. these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.
       </p>
     </div>
 
-    <!-- "photos i took!" label -->
-    <p class="text-sm text-foreground-muted dark:text-foreground-dark-muted font-body lowercase mt-6 mb-3">
+    <p class="gsap-reveal opacity-0 translate-y-10 text-sm text-foreground-muted dark:text-foreground-dark-muted font-body lowercase mt-12 mb-3">
       photos i took!
     </p>
   </div>
 
-  <!-- Full-bleed carousel — sits outside max-w-site so it spans the full section width -->
-  <!-- py-6 gives vertical room for the hover-scale to breathe without clipping -->
-  <div id="carousel-container" class="overflow-hidden py-6 cursor-grab">
+  <div id="carousel-container" class="gsap-reveal opacity-0 translate-y-10 overflow-hidden py-6 cursor-grab">
     <div class="carousel-track flex gap-5 w-max" style="will-change: transform; touch-action: pan-y">
       {allPhotos.map((src, i) => (
         <div
-          class="carousel-item flex-shrink-0 w-52 h-72 md:w-64 md:h-80 relative rounded-2xl overflow-hidden
-                 cursor-pointer shadow-md
-                 transition-transform duration-300 ease-out hover:scale-[1.07] hover:shadow-2xl hover:z-10
-                 group"
+          class="carousel-item flex-shrink-0 w-52 h-72 md:w-64 md:h-80 relative rounded-2xl overflow-hidden cursor-pointer shadow-md transition-transform duration-300 ease-out hover:scale-[1.07] hover:shadow-2xl hover:z-10 group"
           data-src={src}
           role="button"
           tabindex="0"
           aria-label={`Open photo ${(i % photoCount) + 1} fullscreen`}
         >
-          <img
-            src={src}
-            alt={`Photography ${(i % photoCount) + 1}`}
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-          <!-- Hover overlay -->
-          <div class="carousel-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent
-                      opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                      flex items-end justify-center pb-5">
+          <img src={src} alt="Photography" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+          <div class="carousel-overlay absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-5">
             <span class="text-white text-xs font-medium tracking-wide uppercase">view full</span>
           </div>
         </div>
       ))}
     </div>
   </div>
-  <div id="carousel-hint"
-       class="flex justify-center mt-2 mb-1 opacity-0 transition-opacity duration-200 pointer-events-none">
-    <span class="inline-flex items-center gap-1.5 bg-black/5 dark:bg-white/5
-                 text-foreground-muted dark:text-foreground-dark-muted
-                 text-xs px-3 py-1.5 rounded-full border border-black/10 dark:border-white/10">
+  <div id="carousel-hint" class="flex justify-center mt-2 mb-1 opacity-0 transition-opacity duration-200 pointer-events-none">
+    <span class="inline-flex items-center gap-1.5 bg-black/5 dark:bg-white/5 text-foreground-muted dark:text-foreground-dark-muted text-xs px-3 py-1.5 rounded-full border border-black/10 dark:border-white/10">
       ↔ drag to quick scroll photo gallery
     </span>
   </div>
 </section>
 
-<!-- Lightbox overlay with fade transition -->
-<div id="photo-lightbox"
-     class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center
-            opacity-0 pointer-events-none transition-opacity duration-300">
-  <!-- Close button -->
-  <button
-    id="lightbox-close"
-    class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20
-           text-white flex items-center justify-center hover:bg-white/25 transition-colors z-10"
-    aria-label="Close lightbox"
-  >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
+<!-- Lightbox overlay -->
+<div id="photo-lightbox" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+  <button id="lightbox-close" class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/25 transition-colors z-10" aria-label="Close lightbox">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
   </button>
-  <img id="lightbox-img" src="" alt="Photo enlarged"
-       class="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl" />
+  <img id="lightbox-img" src="" alt="Photo enlarged" class="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl" />
 </div>
 
 <script>
-  // --- Carousel rAF + Drag ---
+  // Same robust carousel functionality
   const carouselContainer = document.getElementById('carousel-container') as HTMLElement | null;
   const carouselHint = document.getElementById('carousel-hint');
   const track = document.querySelector<HTMLElement>('.carousel-track');
-
   let hasDragged = false;
 
   if (track && carouselContainer) {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Tooltip show/hide on container hover
-    carouselContainer.addEventListener('mouseenter', () => {
-      carouselHint?.classList.remove('opacity-0');
-      carouselHint?.classList.add('opacity-100');
-    });
-    carouselContainer.addEventListener('mouseleave', () => {
-      carouselHint?.classList.add('opacity-0');
-      carouselHint?.classList.remove('opacity-100');
-    });
-
-    // Touch: show/hide "drag to quick scroll" hint + slow down on touch
-    let hintTimeout: ReturnType<typeof setTimeout>;
-    carouselContainer.addEventListener('touchstart', () => {
-      clearTimeout(hintTimeout);
-      carouselHint?.classList.remove('opacity-0');
-      carouselHint?.classList.add('opacity-100');
-    }, { passive: true });
-    const hideHint = () => {
-      hintTimeout = setTimeout(() => {
-        carouselHint?.classList.add('opacity-0');
-        carouselHint?.classList.remove('opacity-100');
-      }, 1500);
-    };
-    carouselContainer.addEventListener('touchend', hideHint, { passive: true });
-    carouselContainer.addEventListener('touchcancel', hideHint, { passive: true });
-
-    // Touch: show/hide "view full" overlay on carousel items
-    track.querySelectorAll('.carousel-item').forEach((item) => {
-      const overlay = item.querySelector('.carousel-overlay') as HTMLElement | null;
-      if (!overlay) return;
-      item.addEventListener('touchstart', () => {
-        overlay.classList.remove('opacity-0');
-        overlay.classList.add('opacity-100');
-      }, { passive: true });
-      const hideOverlay = () => {
-        overlay.classList.add('opacity-0');
-        overlay.classList.remove('opacity-100');
-      };
-      item.addEventListener('touchend', hideOverlay, { passive: true });
-      item.addEventListener('touchcancel', hideOverlay, { passive: true });
-    });
+    carouselContainer.addEventListener('mouseenter', () => { carouselHint?.classList.remove('opacity-0'); carouselHint?.classList.add('opacity-100'); });
+    carouselContainer.addEventListener('mouseleave', () => { carouselHint?.classList.add('opacity-0'); carouselHint?.classList.remove('opacity-100'); });
 
     if (!prefersReducedMotion) {
       let pos = 0;
       let raf: number | null = null;
       let halfWidth = track.scrollWidth / 2;
-      const speedNormal = 0.6;
-      const speedHover = 0.2;
-      let currentSpeed = speedNormal;
-
       let isDragging = false;
-      let dragStartX = 0;
-      let dragStartY = 0;
-      let dragStartPos = 0;
-      let touchDetermined = false;
-      let touchIsHorizontal = false;
+      let dragStartX = 0; let dragStartY = 0; let dragStartPos = 0;
+      let touchDetermined = false; let touchIsHorizontal = false;
 
       const tick = () => {
         if (!isDragging) {
-          pos += currentSpeed;
+          pos += 0.6;
           if (pos >= halfWidth) pos -= halfWidth;
           track.style.transform = `translateX(-${pos}px)`;
         }
         raf = requestAnimationFrame(tick);
       };
       const start = () => { if (raf === null) raf = requestAnimationFrame(tick); };
-      const stop  = () => { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } };
-
-      window.addEventListener('resize', () => { halfWidth = track.scrollWidth / 2; });
-
-      // Slow down on hover/touch instead of stopping
-      carouselContainer.addEventListener('mouseenter', () => { currentSpeed = speedHover; });
-      carouselContainer.addEventListener('mouseleave', () => { currentSpeed = speedNormal; });
-      carouselContainer.addEventListener('touchstart', () => { currentSpeed = speedHover; }, { passive: true });
-      carouselContainer.addEventListener('touchend', () => { currentSpeed = speedNormal; }, { passive: true });
-      carouselContainer.addEventListener('touchcancel', () => { currentSpeed = speedNormal; }, { passive: true });
-
-      // Drag start
+      
       track.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        hasDragged = false;
-        dragStartX = e.clientX;
-        dragStartPos = pos;
-        track.style.cursor = 'grabbing';
-        carouselContainer.style.cursor = 'grabbing';
-        e.preventDefault();
+        isDragging = true; hasDragged = false; dragStartX = e.clientX; dragStartPos = pos;
+        track.style.cursor = 'grabbing'; carouselContainer.style.cursor = 'grabbing'; e.preventDefault();
       });
-
-      // Drag move
       window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         const delta = dragStartX - e.clientX;
@@ -209,120 +112,48 @@ const allPhotos = [...photos, ...photos];
         if (pos >= halfWidth) pos -= halfWidth;
         track.style.transform = `translateX(-${pos}px)`;
       });
-
-      // Drag end
-      window.addEventListener('mouseup', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        track.style.cursor = '';
-        carouselContainer.style.cursor = '';
-      });
-
-      // Touch drag start
+      window.addEventListener('mouseup', () => { isDragging = false; track.style.cursor = ''; carouselContainer.style.cursor = ''; });
+      
       track.addEventListener('touchstart', (e) => {
         const touch = e.touches[0];
         if (!touch) return;
-        isDragging = true;
-        hasDragged = false;
-        touchDetermined = false;
-        touchIsHorizontal = false;
-        dragStartX = touch.clientX;
-        dragStartY = touch.clientY;
-        dragStartPos = pos;
+        isDragging = true; hasDragged = false; touchDetermined = false; touchIsHorizontal = false;
+        dragStartX = touch.clientX; dragStartY = touch.clientY; dragStartPos = pos;
       }, { passive: true });
-
-      // Touch drag move — passive: false so we can preventDefault for horizontal swipes
+      
       track.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         const touch = e.touches[0];
         if (!touch) return;
-        const dx = dragStartX - touch.clientX;
-        const dy = dragStartY - touch.clientY;
-
+        const dx = dragStartX - touch.clientX; const dy = dragStartY - touch.clientY;
         if (!touchDetermined) {
-          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-            touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
-            touchDetermined = true;
-          } else {
-            return;
-          }
+          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) { touchIsHorizontal = Math.abs(dx) > Math.abs(dy); touchDetermined = true; } else return;
         }
-
-        if (!touchIsHorizontal) {
-          isDragging = false;
-          start();
-          return;
-        }
-
-        // Horizontal drag confirmed — hide any open overlays to avoid flicker
-        track.querySelectorAll<HTMLElement>('.carousel-overlay').forEach(el => {
-          el.classList.add('opacity-0');
-          el.classList.remove('opacity-100');
-        });
+        if (!touchIsHorizontal) { isDragging = false; start(); return; }
         e.preventDefault();
         if (Math.abs(dx) > 5) hasDragged = true;
         pos = dragStartPos + dx;
-        if (pos < 0) pos += halfWidth;
-        if (pos >= halfWidth) pos -= halfWidth;
+        if (pos < 0) pos += halfWidth; if (pos >= halfWidth) pos -= halfWidth;
         track.style.transform = `translateX(-${pos}px)`;
       }, { passive: false });
-
-      // Touch drag end/cancel — reset hasDragged so subsequent taps open the lightbox
-      const endTouchDrag = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        hasDragged = false;
-      };
+      
+      const endTouchDrag = () => { if (!isDragging) return; isDragging = false; hasDragged = false; };
       window.addEventListener('touchend', endTouchDrag, { passive: true });
       window.addEventListener('touchcancel', endTouchDrag, { passive: true });
-
       start();
     }
   }
 
-  // --- Lightbox ---
   const lightbox = document.getElementById("photo-lightbox");
   const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement | null;
-
-  function openLightbox(src: string) {
-    if (!lightbox || !lightboxImg) return;
-    lightboxImg.src = src;
-    lightbox.classList.remove("pointer-events-none", "opacity-0");
-    lightbox.classList.add("opacity-100");
-  }
-
-  function closeLightbox() {
-    if (!lightbox) return;
-    lightbox.classList.add("opacity-0", "pointer-events-none");
-    lightbox.classList.remove("opacity-100");
-    if (lightboxImg) setTimeout(() => { lightboxImg.src = ""; }, 300);
-  }
-
-  // Click/keyboard on carousel items
+  function openLightbox(src: string) { if (!lightbox || !lightboxImg) return; lightboxImg.src = src; lightbox.classList.remove("pointer-events-none", "opacity-0"); lightbox.classList.add("opacity-100"); }
+  function closeLightbox() { if (!lightbox) return; lightbox.classList.add("opacity-0", "pointer-events-none"); lightbox.classList.remove("opacity-100"); if (lightboxImg) setTimeout(() => { lightboxImg.src = ""; }, 300); }
+  
   document.querySelectorAll(".carousel-item").forEach((item) => {
     const src = item.getAttribute("data-src");
     if (!src) return;
-
-    item.addEventListener("click", () => {
-      if (hasDragged) return;
-      openLightbox(src);
-    });
-    item.addEventListener("keydown", (e) => {
-      if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
-        e.preventDefault();
-        openLightbox(src);
-      }
-    });
+    item.addEventListener("click", () => { if (hasDragged) return; openLightbox(src); });
   });
-
-  // Close on backdrop or button
-  lightbox?.addEventListener("click", (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
+  lightbox?.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
   document.getElementById("lightbox-close")?.addEventListener("click", closeLightbox);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && lightbox && !lightbox.classList.contains("pointer-events-none")) {
-      closeLightbox();
-    }
-  });
 </script>

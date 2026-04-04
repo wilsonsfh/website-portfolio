@@ -7,7 +7,6 @@ import WorkExperienceCard from "../components/WorkExperienceCard.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ActivityCard from "../components/ActivityCard.astro";
 import ContactSection from "../components/ContactSection.astro";
-import ScrollReveal from "../components/ScrollReveal.astro";
 
 import workExperienceData from "../data/work-experience.json";
 import projectsData from "../data/projects.json";
@@ -16,110 +15,138 @@ import activitiesData from "../data/activities.json";
 
 <Layout>
   <Navbar />
-  <main>
-    <Hero />
+  
+  <main class="overflow-x-hidden w-full relative">
+    
+    <!-- Hero Section -->
+    <div id="seq-hero" class="relative">
+      <Hero />
+    </div>
 
-    <About />
-
+    <!-- About Section -->
+    <div id="seq-about" class="relative w-full">
+      <div class="absolute inset-0 pointer-events-none z-10 max-w-site mx-auto px-6 overflow-visible">
+        <img id="char-about-1" src="/images/3d/about_photo_1774892992603.png" class="gsap-parallax absolute left-[-5%] top-[10%] w-48 md:w-64 opacity-0 drop-shadow-2xl" />
+        <img id="char-about-2" src="/images/3d/about_tea_1774893014368.png" class="gsap-parallax absolute right-[-5%] bottom-[30%] w-48 md:w-64 opacity-0 drop-shadow-2xl" />
+        <img id="char-about-3" src="/images/3d/about_guitar_1774893033791.png" class="gsap-parallax absolute left-[15%] bottom-[10%] w-48 md:w-64 opacity-0 drop-shadow-2xl" />
+      </div>
+      <About />
+    </div>
 
     <!-- Work Experience Section -->
-    <section id="work-experience" class="py-20 bg-background dark:bg-background-dark">
-      <div class="max-w-site mx-auto px-6">
-        <div class="scroll-reveal-left">
-          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
-            work experience
-          </h2>
-          <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
-        </div>
-        <div class="space-y-6">
-          {workExperienceData.map((exp, i) => (
-            <ScrollReveal delay={i * 100}>
-              <WorkExperienceCard {...exp} />
-            </ScrollReveal>
-          ))}
-        </div>
+    <div id="seq-work" class="relative w-full">
+      <div class="absolute inset-0 pointer-events-none z-10 max-w-site mx-auto px-6 overflow-visible">
+        <img id="char-work" src="/images/3d/nano_banana_coding_night_1774890740457.png" class="gsap-parallax absolute right-[0%] top-[25%] w-64 md:w-96 opacity-0 drop-shadow-2xl" />
       </div>
-    </section>
-
-
+      
+      <section id="work-experience" class="py-48 bg-background dark:bg-background-dark max-w-full">
+        <div class="max-w-site mx-auto px-6 relative z-20">
+          <div class="gsap-reveal opacity-0 translate-y-10">
+            <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
+              work experience
+            </h2>
+            <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
+          </div>
+          <div class="space-y-6">
+            {workExperienceData.map((exp, i) => (
+              <div class="gsap-reveal opacity-0 translate-y-10">
+                <WorkExperienceCard {...exp} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-background-alt dark:bg-background-dark-alt dot-grid-bg">
-      <div class="max-w-site mx-auto px-6">
-        <div class="scroll-reveal-right">
-          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
-            projects
-          </h2>
-          <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
-        </div>
-        <div class="grid md:grid-cols-2 gap-6">
-          {projectsData.map((project, i) => (
-            <ScrollReveal delay={i * 100}>
-              <ProjectCard {...project} />
-            </ScrollReveal>
-          ))}
-        </div>
+    <div id="seq-projects" class="relative w-full">
+      <div class="absolute inset-0 pointer-events-none z-10 max-w-site mx-auto px-6 overflow-visible">
+        <img id="char-projects" src="/images/3d/nano_banana_supper_1774890724164.png" class="gsap-parallax absolute left-[-2%] bottom-[15%] w-64 md:w-80 opacity-0 drop-shadow-2xl" />
       </div>
-    </section>
 
-
+      <section id="projects" class="py-48 bg-background-alt dark:bg-background-dark-alt dot-grid-bg">
+        <div class="max-w-site mx-auto px-6 relative z-20">
+          <div class="gsap-reveal opacity-0 translate-y-10">
+            <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
+              projects
+            </h2>
+            <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6">
+            {projectsData.map((project, i) => (
+              <div class="gsap-reveal opacity-0 translate-y-10">
+                <ProjectCard {...project} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Activities Section -->
-    <section id="activities" class="py-20 bg-background dark:bg-background-dark">
-      <div class="max-w-site mx-auto px-6">
-        <div class="scroll-reveal-left">
-          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
-            activities & involvement
-          </h2>
-          <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
-        </div>
-        <div class="space-y-6">
-          {activitiesData.map((activity, i) => (
-            <ScrollReveal delay={i * 100}>
-              <ActivityCard {...activity} />
-            </ScrollReveal>
-          ))}
-        </div>
+    <div id="seq-activities" class="relative w-full">
+      <div class="absolute inset-0 pointer-events-none z-10 max-w-site mx-auto px-6 overflow-visible">
+        <img id="char-activity" src="/images/3d/nano_banana_photography_1774890707092.png" class="gsap-parallax absolute right-[5%] top-[10%] w-56 md:w-80 opacity-0 drop-shadow-2xl" />
+        <img id="char-life" src="/images/3d/nano_banana_dancing_1774890691909.png" class="gsap-parallax absolute left-[15%] bottom-[15%] w-64 md:w-96 opacity-0 drop-shadow-2xl" />
       </div>
-    </section>
 
-
+      <section id="activities" class="py-48 bg-background dark:bg-background-dark">
+        <div class="max-w-site mx-auto px-6 relative z-20">
+          <div class="gsap-reveal opacity-0 translate-y-10">
+            <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
+              activities & involvement
+            </h2>
+            <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-12"></div>
+          </div>
+          <div class="space-y-6">
+            {activitiesData.map((activity, i) => (
+              <div class="gsap-reveal opacity-0 translate-y-10">
+                <ActivityCard {...activity} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Blog Section -->
-    <section id="blog" class="py-20 bg-background dark:bg-background-dark">
-      <div class="max-w-site mx-auto px-6">
-        <div class="scroll-reveal-right">
-          <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
-            blog
-          </h2>
-          <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-8"></div>
-          <div class="relative rounded-2xl p-[1px] bg-gradient-to-br from-accent via-amber-400 to-accent">
-            <div class="bg-background dark:bg-background-dark rounded-2xl p-12 text-center">
-              <div class="w-14 h-14 rounded-full bg-accent/10 dark:bg-accent-dark/15 flex items-center justify-center mx-auto mb-4">
-                <span class="text-2xl">&#9997;&#65039;</span>
+    <div class="relative w-full">
+      <section id="blog" class="py-48 bg-background dark:bg-background-dark">
+        <div class="max-w-site mx-auto px-6 relative z-20">
+          <div class="gsap-reveal opacity-0 translate-y-10">
+            <h2 class="font-heading font-bold text-3xl md:text-4xl text-foreground dark:text-foreground-dark">
+              blog
+            </h2>
+            <div class="w-12 h-1 bg-gradient-to-r from-accent to-amber-400 rounded-full mt-3 mb-8"></div>
+            <div class="relative rounded-2xl p-[1px] bg-gradient-to-br from-accent via-amber-400 to-accent">
+              <div class="bg-background dark:bg-background-dark rounded-2xl p-12 text-center">
+                <div class="w-14 h-14 rounded-full bg-accent/10 dark:bg-accent-dark/15 flex items-center justify-center mx-auto mb-4">
+                  <span class="text-2xl">&#9997;&#65039;</span>
+                </div>
+                <p class="text-foreground dark:text-foreground-dark font-heading font-semibold text-xl mb-2">
+                  stay tuned — writing in progress
+                </p>
+                <p class="text-foreground-muted dark:text-foreground-dark-muted">
+                  i'm working on some posts about tech, product, and everything in between. check back soon!
+                </p>
               </div>
-              <p class="text-foreground dark:text-foreground-dark font-heading font-semibold text-xl mb-2">
-                stay tuned — writing in progress
-              </p>
-              <p class="text-foreground-muted dark:text-foreground-dark-muted">
-                i'm working on some posts about tech, product, and everything in between. check back soon!
-              </p>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
-
-
-    <ContactSection />
+    <!-- Contact Section -->
+    <div class="relative w-full z-40">
+      <ContactSection />
+    </div>
   </main>
 
   <!-- Floating navigation buttons -->
   <button
     id="prev-section-btn"
     aria-label="Scroll to previous section"
-    class="fixed bottom-20 right-6 z-40 w-12 h-12 rounded-full bg-background/80 dark:bg-background-dark/80 backdrop-blur-md border border-foreground/10 dark:border-foreground-dark/10 text-foreground dark:text-foreground-dark flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 hidden"
+    class="fixed bottom-20 right-6 z-50 w-12 h-12 rounded-full bg-background/80 dark:bg-background-dark/80 backdrop-blur-md border border-foreground/10 dark:border-foreground-dark/10 text-foreground dark:text-foreground-dark flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 hidden"
   >
     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
@@ -128,7 +155,7 @@ import activitiesData from "../data/activities.json";
   <button
     id="next-section-btn"
     aria-label="Scroll to next section"
-    class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-background/80 dark:bg-background-dark/80 backdrop-blur-md border border-foreground/10 dark:border-foreground-dark/10 text-foreground dark:text-foreground-dark flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+    class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-background/80 dark:bg-background-dark/80 backdrop-blur-md border border-foreground/10 dark:border-foreground-dark/10 text-foreground dark:text-foreground-dark flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
   >
     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -137,30 +164,72 @@ import activitiesData from "../data/activities.json";
 </Layout>
 
 <script>
-  // Scroll reveal using Intersection Observer
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-  if (!prefersReducedMotion) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealed");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
-    );
+  gsap.registerPlugin(ScrollTrigger);
 
-    document.querySelectorAll(".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right").forEach((el) => {
-      observer.observe(el);
+  window.addEventListener("DOMContentLoaded", () => {
+    
+    // SEQUENCE 1: Hero scrub out
+    const tlHero = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#seq-hero",
+        start: "top top",
+        end: "bottom top",
+        scrub: 1, 
+      }
     });
-  } else {
-    document.querySelectorAll(".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right").forEach((el) => {
-      el.classList.add("revealed");
+
+    // Animate hero image fading and moving
+    tlHero.to("#hero img", { opacity: 0, y: -100, scale: 0.9, duration: 2, ease: "power2.inOut" }, 0);
+    // Animate hero text sliding up slightly faster
+    tlHero.to(["#hero-heading", "#hero-subheading", "#hero-body", "#hero-buttons"], { 
+      opacity: 0, 
+      y: -150, 
+      stagger: 0.1,
+      duration: 1.5,
+      ease: "power1.inOut" 
+    }, 0.2);
+
+
+    // Create generic scroll reveals scrubbed to the viewport
+    const reveals = gsap.utils.toArray<HTMLElement>('.gsap-reveal');
+    reveals.forEach(el => {
+      gsap.to(el, {
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%", // Trigger when element hits bottom 10% of viewport
+          end: "top 60%",   // Fully revealed at 40% from bottom
+          scrub: 1,         // Strict scrubbing
+        },
+        y: 0,
+        opacity: 1,
+        ease: "none"
+      });
     });
-  }
+
+    // Create parallax floating 3D assets that fade in and float
+    const parallaxImages = gsap.utils.toArray<HTMLElement>('.gsap-parallax');
+    parallaxImages.forEach(img => {
+      
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: img.closest('.relative.w-full'),
+          start: "top 80%",
+          end: "bottom top",
+          scrub: 1.5, // Parallax scrub smoothing
+        }
+      });
+
+      // Fade in smoothly as their parent section comes in
+      tl.to(img, { opacity: 1, duration: 1, ease: "none" }, 0);
+      
+      // Move them upward significantly to create deep parallax against scrolling text
+      tl.to(img, { yPercent: -120, duration: 5, ease: "none" }, 0);
+    });
+
+  });
 </script>
 
 <script>
@@ -179,20 +248,8 @@ import activitiesData from "../data/activities.json";
     function updateButtons(idx: number) {
       currentIndex = idx;
       const lastIndex = sectionIds.length - 1;
-
-      // Hide up button on hero (index 0)
-      if (idx <= 0) {
-        prevBtn!.classList.add("hidden");
-      } else {
-        prevBtn!.classList.remove("hidden");
-      }
-
-      // Hide down button on contact (last index)
-      if (idx >= lastIndex) {
-        nextBtn!.classList.add("hidden");
-      } else {
-        nextBtn!.classList.remove("hidden");
-      }
+      if (idx <= 0) prevBtn!.classList.add("hidden"); else prevBtn!.classList.remove("hidden");
+      if (idx >= lastIndex) nextBtn!.classList.add("hidden"); else nextBtn!.classList.remove("hidden");
     }
 
     function getActiveSection(): number {
@@ -222,10 +279,7 @@ import activitiesData from "../data/activities.json";
         updateButtons(targetIdx);
         isManualScrolling = true;
         clearTimeout(manualScrollTimer);
-        manualScrollTimer = setTimeout(() => {
-          isManualScrolling = false;
-          updateButtons(getActiveSection());
-        }, 1000);
+        manualScrollTimer = setTimeout(() => { isManualScrolling = false; updateButtons(getActiveSection()); }, 1000);
         document.getElementById(sectionIds[targetIdx])?.scrollIntoView({ behavior: scrollBehavior });
       }
     });
@@ -236,10 +290,7 @@ import activitiesData from "../data/activities.json";
         updateButtons(targetIdx);
         isManualScrolling = true;
         clearTimeout(manualScrollTimer);
-        manualScrollTimer = setTimeout(() => {
-          isManualScrolling = false;
-          updateButtons(getActiveSection());
-        }, 1000);
+        manualScrollTimer = setTimeout(() => { isManualScrolling = false; updateButtons(getActiveSection()); }, 1000);
         document.getElementById(sectionIds[targetIdx])?.scrollIntoView({ behavior: scrollBehavior });
       }
     });
