@@ -1,8 +1,8 @@
 ---
 const links = [
-  { href: "#about", label: "About" },
   { href: "#work-experience", label: "Work Experience" },
   { href: "#projects", label: "Projects" },
+  { href: "#about", label: "About" },
   { href: "#activities", label: "Activities" },
   { href: "#contact", label: "Contact" },
 ];
@@ -140,7 +140,7 @@ const links = [
   }
 
   // Active nav link highlighting
-  const sectionIds = ["about", "work-experience", "projects", "activities", "blog", "contact"];
+  const sectionIds = ["work-experience", "projects", "about", "activities", "blog", "contact"];
   const desktopNavLinks = document.querySelectorAll<HTMLAnchorElement>('.hidden.md\\:flex a.nav-link[href^="#"]');
 
   function updateActiveNavLink() {

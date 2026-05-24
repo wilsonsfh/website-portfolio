@@ -1,8 +1,20 @@
 [
   {
+    "company": "Cloudflare",
+    "logo": "/images/logos/cloudflare.png",
+    "logoDarkBg": true,
+    "role": "Software Engineering Intern",
+    "date": "May 2026 - Present",
+    "description": [
+      "Working with AI solutioning and products to enhance internal tooling"
+    ],
+    "tags": ["Workers AI"]
+  },
+  {
     "company": "Glints",
+    "logo": "/images/logos/glints.png",
     "role": "Product Management Intern",
-    "date": "Dec 2025 – Present",
+    "date": "Dec 2025 – Apr 2026",
     "description": [
       "Conducted user research and analysed product metrics using SQL and Metabase to drive data-informed decisions for feature prioritisation",
       "Collaborated with cross-functional engineering teams to define product requirements and scope technical solutions for platform improvements",
@@ -12,6 +24,8 @@
   },
   {
     "company": "NUS Enterprise Minimum Viable Product Studio",
+    "logo": "/images/logos/nus-enterprise.png",
+    "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
     "description": [
@@ -23,6 +37,7 @@
   },
   {
     "company": "Singapore Land Authority",
+    "logo": "/images/logos/sla.png",
     "role": "Software Engineering Intern",
     "date": "Nov 2020 – Feb 2021",
     "description": [

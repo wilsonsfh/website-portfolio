@@ -19,8 +19,6 @@ import activitiesData from "../data/activities.json";
   <main>
     <Hero />
 
-    <About />
-
 
     <!-- Work Experience Section -->
     <section id="work-experience" class="py-20 bg-background dark:bg-background-dark">
@@ -61,6 +59,10 @@ import activitiesData from "../data/activities.json";
         </div>
       </div>
     </section>
+
+
+
+    <About />
 
 
 
@@ -165,7 +167,7 @@ import activitiesData from "../data/activities.json";
 
 <script>
   // Floating navigation buttons logic
-  const sectionIds = ["hero", "about", "work-experience", "projects", "activities", "blog", "contact"];
+  const sectionIds = ["hero", "work-experience", "projects", "about", "activities", "blog", "contact"];
   const nextBtn = document.getElementById("next-section-btn");
   const prevBtn = document.getElementById("prev-section-btn");
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
