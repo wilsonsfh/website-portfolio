@@ -6,6 +6,7 @@
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2026 - Present",
+    "location": "Singapore, Singapore",
     "description": [
       "Working with AI solutioning and products to enhance internal tooling"
     ],
@@ -17,6 +18,7 @@
     "website": "https://glints.com/sg",
     "role": "Product Management Intern",
     "date": "Dec 2025 – Apr 2026",
+    "location": "Singapore, Singapore & Jakarta, Indonesia",
     "description": [
       "Conducted user research and analysed product metrics using SQL and Metabase to drive data-informed decisions for feature prioritisation",
       "Collaborated with cross-functional engineering teams to define product requirements and scope technical solutions for platform improvements",
@@ -31,6 +33,7 @@
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
+    "location": "Singapore, Singapore",
     "description": [
       "Worked on a full-stack web application for researchers to analyse bird patterns with React and Django with PostgreSQL",
       "Improved bird species identification across geographic regions by integrating BirdNET Machine Learning classifier using eBird API and GPS coordinate data, increasing classification accuracy compared to manual labeling",
@@ -44,6 +47,7 @@
     "website": "https://www.sla.gov.sg/",
     "role": "Software Engineering Intern",
     "date": "Nov 2020 – Feb 2021",
+    "location": "Singapore, Singapore",
     "description": [
       "Enhanced extraction of building data for geospatial applications such as Autodesk Revit by implementing C# plugin and open-source Buildings and Habitats object Model (BHoM)"
     ],
