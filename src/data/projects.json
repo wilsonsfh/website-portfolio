@@ -1,5 +1,17 @@
 [
   {
+    "title": "ClearerToday",
+    "description": "AI speech coach for enunciation practice and adaptive pronunciation feedback.",
+    "highlights": [
+      "Built an AI speech coach for enunciation based on analysis of phoneme-level mouth-shape gaps with MediaPipe Face Mesh and ElevenLabs transcription",
+      "Developed an adaptive feedback loop that stores persistent user gap profiles in Convex to rerank future guidance, retrieving live pronunciation references with Exa and generating next-drill instructions scored primarily by OpenAI frontier model."
+    ],
+    "tags": ["Next.js", "React", "TypeScript", "Convex", "MediaPipe Face Mesh", "ElevenLabs", "Exa"],
+    "github": "https://github.com/wilsonsfh/ClearerToday",
+    "live": "",
+    "date": "Ongoing"
+  },
+  {
     "title": "CorrectiveRehabApp",
     "description": "End-to-end biomechanical analysis pipeline for gym exercises.",
     "highlights": [
@@ -9,7 +21,7 @@
     "tags": ["React Native", "Expo", "FastAPI", "MediaPipe", "Google Cloud Run", "Supabase", "PostgreSQL"],
     "github": "https://github.com/wilsonsfh/CorrectiveRehabApp",
     "live": "",
-    "date": "Present"
+    "date": "Ongoing"
   },
   {
     "title": "Computer Science Flashcards",
@@ -34,17 +46,5 @@
     "github": "https://github.com/wilsonsfh/concept-visualizer",
     "live": "https://concept-visualizer-seven.vercel.app/",
     "date": "Mar 2026"
-  },
-  {
-    "title": "Electronic Health Records",
-    "description": "Enable clinics to digitise patient records.",
-    "highlights": [
-      "Role-based access control (RBAC) with separate patient and doctor portals for managing medical records",
-      "Soft-deletion mechanism with timestamp-based recovery to preserve medical record history, ensuring synchronized data visibility across patient and doctor account views."
-    ],
-    "tags": ["Python", "Flask"],
-    "github": "https://github.com/wilsonsfh/servIT-",
-    "live": "",
-    "date": "Oct 2018 – Jan 2019"
   }
 ]

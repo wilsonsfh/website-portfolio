@@ -2,6 +2,7 @@
   {
     "company": "Cloudflare",
     "logo": "/images/logos/cloudflare.png",
+    "website": "https://www.cloudflare.com/",
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2026 - Present",
@@ -13,6 +14,7 @@
   {
     "company": "Glints",
     "logo": "/images/logos/glints.png",
+    "website": "https://glints.com/sg",
     "role": "Product Management Intern",
     "date": "Dec 2025 – Apr 2026",
     "description": [
@@ -25,6 +27,7 @@
   {
     "company": "NUS Enterprise Minimum Viable Product Studio",
     "logo": "/images/logos/nus-enterprise.png",
+    "website": "https://enterprise.nus.edu.sg/tti/initiatives-programmes/nus-minimum-viable-product-mvp-studio/",
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
@@ -38,6 +41,7 @@
   {
     "company": "Singapore Land Authority",
     "logo": "/images/logos/sla.png",
+    "website": "https://www.sla.gov.sg/",
     "role": "Software Engineering Intern",
     "date": "Nov 2020 – Feb 2021",
     "description": [
