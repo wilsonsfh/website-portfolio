@@ -14,33 +14,76 @@ const { company, logo, website, role, date, location, description, tags } = Astr
 ---
 
 <div class="bg-background dark:bg-background-dark rounded-xl p-6 border border-foreground/5 dark:border-foreground-dark/10 border-l-[3px] border-l-accent dark:border-l-accent-dark hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
-  <div class="flex flex-col gap-4 sm:grid sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-start">
+  <div class="grid grid-cols-[minmax(0,1fr)_5rem] gap-x-4 gap-y-3 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-start">
     <div class="min-w-0">
-      <div class="mb-3">
-        <div class="flex items-baseline justify-between gap-4 whitespace-nowrap">
-          <h3 class="font-heading font-semibold text-lg text-foreground dark:text-foreground-dark truncate">{role}</h3>
-          <div class="text-foreground-muted dark:text-foreground-dark-muted text-sm font-mono whitespace-nowrap flex-shrink-0">{date}</div>
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="min-w-0 font-heading font-semibold text-lg leading-tight text-foreground dark:text-foreground-dark break-words">
+          {role}
+        </h3>
+        <div class="hidden shrink-0 pt-0.5 text-right text-sm font-mono text-foreground-muted dark:text-foreground-dark-muted sm:block">
+          {date}
         </div>
-        <div class="flex items-baseline justify-between gap-4 whitespace-nowrap">
+      </div>
+      <div class="mt-1 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <div class="min-w-0">
           {website ? (
             <a
               href={website}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-accent dark:text-accent-dark font-medium hover:underline truncate"
+              class="text-accent dark:text-accent-dark font-medium hover:underline break-words"
             >
               {company}
             </a>
           ) : (
-            <p class="text-accent dark:text-accent-dark font-medium truncate">{company}</p>
+            <p class="text-accent dark:text-accent-dark font-medium break-words">{company}</p>
           )}
+          <div class="mt-1 text-sm font-mono text-foreground-muted dark:text-foreground-dark-muted sm:hidden">
+            {date}
+          </div>
           {location && (
-            <div class="text-foreground-muted dark:text-foreground-dark-muted text-sm whitespace-nowrap flex-shrink-0">
+            <div class="text-sm text-foreground-muted dark:text-foreground-dark-muted sm:hidden">
               {location}
             </div>
           )}
         </div>
+        {location && (
+          <div class="hidden shrink-0 pt-0.5 text-right text-sm text-foreground-muted dark:text-foreground-dark-muted sm:block">
+            {location}
+          </div>
+        )}
       </div>
+    </div>
+    <div class="flex justify-end">
+      {logo && (
+        website ? (
+          <a
+            href={website}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Visit ${company} website`}
+            class="h-12 w-16 self-start rounded-md p-1 dark:bg-white sm:h-12 sm:w-20"
+          >
+            <img
+              src={logo}
+              alt={`${company} logo`}
+              class="h-full w-full object-contain opacity-80 dark:opacity-90"
+              loading="lazy"
+            />
+          </a>
+        ) : (
+          <div class="h-12 w-16 self-start rounded-md p-1 dark:bg-white sm:h-12 sm:w-20">
+            <img
+              src={logo}
+              alt={`${company} logo`}
+              class="h-full w-full object-contain opacity-80 dark:opacity-90"
+              loading="lazy"
+            />
+          </div>
+        )
+      )}
+    </div>
+    <div class="col-span-2">
       <ul class="list-disc pl-5 text-foreground-muted dark:text-foreground-dark-muted space-y-1.5 mb-4 text-sm">
         {description.map((item) => <li>{item}</li>)}
       </ul>
@@ -51,35 +94,6 @@ const { company, logo, website, role, date, location, description, tags } = Astr
           </span>
         ))}
       </div>
-    </div>
-    <div class="flex flex-col gap-2 sm:items-end sm:text-right">
-      {logo && (
-        website ? (
-          <a
-            href={website}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Visit ${company} website`}
-            class="w-20 h-12 flex items-center justify-end rounded-md p-1 dark:bg-white"
-          >
-            <img
-              src={logo}
-              alt={`${company} logo`}
-              class="max-w-full max-h-full object-contain opacity-80 dark:opacity-90"
-              loading="lazy"
-            />
-          </a>
-        ) : (
-          <div class="w-20 h-12 flex items-center justify-end rounded-md p-1 dark:bg-white">
-            <img
-              src={logo}
-              alt={`${company} logo`}
-              class="max-w-full max-h-full object-contain opacity-80 dark:opacity-90"
-              loading="lazy"
-            />
-          </div>
-        )
-      )}
     </div>
   </div>
 </div>
