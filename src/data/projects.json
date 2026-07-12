@@ -24,27 +24,39 @@
     "date": "Ongoing"
   },
   {
-    "title": "Computer Science Flashcards",
-    "description": "Spaced repetition built on principles of cognitive science to learn Computer Science fundamentals.",
+    "title": "X Bookmark Injector",
+    "description": "A Chromium extension that resurfaces a random saved X bookmark at the top of your For You feed.",
     "highlights": [
-      "FSRS algorithm (superior to Anki's SM-2) adapts card intervals to personal learning patterns",
-      "Cross-device sync via Supabase, offline support as a PWA, and 30-day review history dashboard"
+      "Manifest V3 extension that reuses X's own logged-in GraphQL session to sync, de-duplicate, and rank bookmarks, then injects one as a native-looking post — zero backend, zero telemetry, all state local to the browser profile",
+      "Durable delete/undo saga survives service-worker restarts with a fail-closed response schema; 290 passing unit, integration, and race tests"
     ],
-    "tags": ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
-    "github": "https://github.com/wilsonsfh/cs-flashcards",
-    "live": "https://cs-flashcards-ruby.vercel.app",
-    "date": "Mar 2026"
+    "tags": ["Chromium MV3", "JavaScript", "esbuild", "Vitest"],
+    "github": "https://github.com/wilsonsfh/x-bookmark-injector",
+    "live": "",
+    "date": "Ongoing"
   },
   {
-    "title": "Concept Visualizer",
-    "description": "Visual learn technical concepts through AI-powered step-through animated node graph.",
+    "title": "TradingSignalandHelper",
+    "description": "A local, paper-first US-stock signal desk with a human-in-the-loop trade helper.",
     "highlights": [
-      "Covers only computer science domains in networking, algorithms, databases, and system design",
-      "AI explanations (Groq llama-3.3-70b) rendered as interactive React Flow graphs with Dagre auto-layout"
+      "Turns price candles into BUY/SELL/HOLD calls via an EMA-crossover strategy, then routes each through a review-ticket dashboard showing take-profit, stop-loss, and live broker state before any order is confirmed",
+      "Production-minded order lifecycle — SQLite persistence, restart recovery, cross-process duplicate protection, replay-resistant webhooks, and a moomoo/OpenD paper-trading adapter; 152 tests, mock-first by default"
     ],
-    "tags": ["Next.js", "Tailwind CSS", "React Flow", "Redis", "Groq API"],
-    "github": "https://github.com/wilsonsfh/concept-visualizer",
-    "live": "https://concept-visualizer-seven.vercel.app/",
-    "date": "Mar 2026"
+    "tags": ["Python", "Flask", "SQLite", "yfinance", "moomoo / OpenD"],
+    "github": "https://github.com/wilsonsfh/TradingSignalandHelper",
+    "live": "",
+    "date": "Ongoing"
+  },
+  {
+    "title": "AppleNotestoX",
+    "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
+    "highlights": [
+      "Exports selected Apple Notes to a local Markdown wiki or Notion with in-order inline media and source-stamped origins, plus on-device (Apple Speech) video transcription with keyframes",
+      "Pairs the synthesized wiki with a dependency-free study app — SM-2 flashcards, a force-directed concept map, and narrated recaps"
+    ],
+    "tags": ["Swift 6", "SwiftUI", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
+    "github": "https://github.com/wilsonsfh/AppleNotestoX",
+    "live": "",
+    "date": "Ongoing"
   }
 ]
