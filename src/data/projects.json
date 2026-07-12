@@ -58,5 +58,17 @@
     "github": "https://github.com/wilsonsfh/AppleNotestoX",
     "live": "",
     "date": "Ongoing"
+  },
+  {
+    "title": "Concept Visualizer",
+    "description": "Visual learn technical concepts through AI-powered step-through animated node graph.",
+    "highlights": [
+      "Covers only computer science domains in networking, algorithms, databases, and system design",
+      "AI explanations (Groq llama-3.3-70b) rendered as interactive React Flow graphs with Dagre auto-layout"
+    ],
+    "tags": ["Next.js", "Tailwind CSS", "React Flow", "Redis", "Groq API"],
+    "github": "https://github.com/wilsonsfh/concept-visualizer",
+    "live": "https://concept-visualizer-seven.vercel.app/",
+    "date": "Mar 2026"
   }
 ]
