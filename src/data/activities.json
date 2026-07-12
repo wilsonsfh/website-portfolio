@@ -1,5 +1,14 @@
 [
   {
+    "title": "Hackathons",
+    "role": "Lead Co-organiser & Competitor",
+    "date": "",
+    "descriptions": [
+      "Community Building: Lead co-organiser of 'Sup Build2026 Hackathon, a premier competition in Singapore targeting students and early career builders to create tasteful, meaningful products that actually scale.",
+      "Competitions: AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, SAP Cloud Accelerated Learning Experience 2025."
+    ]
+  },
+  {
     "title": "ItsRainingRaincoats",
     "role": "Product Manager",
     "date": "Sep 2025 – Nov 2025",
@@ -12,7 +21,7 @@
     "role": "Microsoft Student Ambassador · Perplexity Student Growth Partner",
     "date": "",
     "descriptions": [
-      "Microsoft Student Ambassador (Jan 2026 – Present): Collaborating with 10 student ambassadors to drive 100,000 Copilot Chat student activations in Singapore, by organising technical workshops and events.",
+      "Microsoft Student Ambassador (Jan 2026 – Jun 2026): Collaborating with 10 student ambassadors to drive 100,000 Copilot Chat student activations in Singapore, by organising technical workshops and events.",
       "Perplexity Student Growth Partner (Aug – Dec 2025): Drove campus adoption and awareness of the AI-powered Comet Browser through community engagement."
     ]
   },
@@ -22,14 +31,6 @@
     "date": "Aug 2024 – Aug 2025",
     "descriptions": [
       "Represented 6000+ computing students, led a 72-strong team, and raised $54,450 through partnerships."
-    ]
-  },
-  {
-    "title": "Hackathons",
-    "role": "5+ Hackathon Participations",
-    "date": "",
-    "descriptions": [
-      "Active hackathon participant across various themes including software, maritime, and social impact. Notable participations include Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, GGEF Open Hack Singapore 2024 and NUS-RightShip Hackathon 2024."
     ]
   }
 ]
