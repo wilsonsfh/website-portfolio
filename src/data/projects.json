@@ -33,6 +33,7 @@
     "tags": ["Chromium MV3", "JavaScript", "esbuild", "Vitest"],
     "github": "https://github.com/wilsonsfh/x-bookmark-injector",
     "live": "https://x-bookmark-injector-demo.wilsonsfh.workers.dev",
+    "livePseudo": true,
     "date": "Ongoing"
   },
   {
@@ -57,6 +58,7 @@
     "tags": ["Swift 6", "SwiftUI", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
     "github": "https://github.com/wilsonsfh/AppleNotestoX",
     "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
+    "livePseudo": true,
     "date": "Ongoing"
   },
   {
