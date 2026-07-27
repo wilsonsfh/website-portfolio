@@ -1,0 +1,19 @@
+src/data/projects.json
+  s_3650e4b56507fe::t_395d0972c7ae79 55-56,58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "11c820da9e55bbfead96c6b00241c5f8ea5341c5",
+  "prompts": {},
+  "sessions": {
+    "s_3650e4b56507fe": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_070957bd0ffeczeB1be97AIpUJ",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "wilsonsfh <74759808+wilsonsfh@users.noreply.github.com>"
+    }
+  }
+}
