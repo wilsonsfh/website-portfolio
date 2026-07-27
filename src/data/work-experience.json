@@ -4,13 +4,13 @@
     "logo": "/images/logos/cloudflare.png",
     "website": "https://www.cloudflare.com/",
     "logoDarkBg": true,
-    "role": "Software Engineering Intern",
+    "role": "Solutions Engineering Intern",
     "date": "May 2026 - Present",
     "location": "Singapore, Singapore",
     "description": [
-      "Built software across multiple projects to evaluate clients against Cloudflare security products, supporting Customer Engineering teams throughout the sales pipeline and in advising clients on security solutions."
+      "Building software tools and showcasing tech demo to support sales pipeline for APJC Customer Engineers."
     ],
-    "tags": ["Workers AI"]
+    "tags": ["Zero Trust", "Workers", "Durable Objects", "KV"]
   },
   {
     "company": "Glints",
