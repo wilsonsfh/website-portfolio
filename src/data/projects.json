@@ -52,10 +52,10 @@
     "title": "AppleNotestoX",
     "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
     "highlights": [
-      "Exports selected Apple Notes to a local Markdown wiki or Notion with in-order inline media and source-stamped origins, plus on-device (Apple Speech) video transcription with keyframes",
-      "Pairs the synthesized wiki with a dependency-free study app — SM-2 flashcards, a force-directed concept map, and narrated recaps"
+      "Built a macOS webapp that exports Apple Notes content to a Markdown format and Notion, preserving inline media and traceability with source note identifier and date",
+      "Equipped on-device video transcription with Apple Speech and AVFoundation keyframes, feeding an AI-synthesized wiki that doubles as a study app with flashcards and narrated recaps of personal notes"
     ],
-    "tags": ["Swift 6", "SwiftUI", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
+    "tags": ["SwiftUI", "AppleScript", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
     "github": "https://github.com/wilsonsfh/AppleNotestoX",
     "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
     "livePseudo": true,
