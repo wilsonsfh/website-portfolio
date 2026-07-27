@@ -1,0 +1,19 @@
+src/data/work-experience.json
+  s_3650e4b56507fe::t_714bda2700d7e5 7,11,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "137a2d148046a62a5959df254381f91a0d7865d4",
+  "prompts": {},
+  "sessions": {
+    "s_3650e4b56507fe": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_070957bd0ffeczeB1be97AIpUJ",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "wilsonsfh <74759808+wilsonsfh@users.noreply.github.com>"
+    }
+  }
+}
