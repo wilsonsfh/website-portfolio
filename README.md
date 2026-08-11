@@ -4,6 +4,14 @@ Hi, I'm Wilson, a Computer Science undergrad at NUS. This is my personal site to
 
 **→ [wilsonsoon-website-portfolio.vercel.app](https://wilsonsoon-website-portfolio.vercel.app/)**
 
+## Status
+
+**Last reviewed: 2026-08-11 — Done — maintenance only**
+
+- Live and deployed to Vercel; recent commits are content refreshes (projects, roles, links), not feature work.
+- `npm run build` succeeds (verified 2026-08-11); no lint/test scripts configured.
+- Only uncommitted paths are stray pnpm lockfiles (`pnpm-lock.yaml`, `pnpm-workspace.yaml`) — incidental, not real work.
+
 ---
 
 ## Motivation behind tech stack
