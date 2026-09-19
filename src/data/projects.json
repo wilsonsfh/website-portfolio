@@ -1,27 +1,15 @@
 [
   {
-    "title": "ClearerToday",
-    "description": "AI speech coach for enunciation practice and adaptive pronunciation feedback.",
+    "title": "AppleNotestoX",
+    "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
     "highlights": [
-      "Built an AI speech coach for enunciation based on analysis of phoneme-level mouth-shape gaps with MediaPipe Face Mesh and ElevenLabs transcription",
-      "Developed an adaptive feedback loop that stores persistent user gap profiles in Convex to rerank future guidance, retrieving live pronunciation references with Exa and generating next-drill instructions scored primarily by OpenAI frontier model."
+      "Built a macOS webapp that exports Apple Notes content to a Markdown format and Notion, preserving inline media and traceability with source note identifier and date",
+      "Equipped on-device video transcription with Apple Speech and AVFoundation keyframes, feeding an AI-synthesized wiki that doubles as a study app with flashcards and narrated recaps of personal notes"
     ],
-    "tags": ["Next.js", "React", "TypeScript", "Convex", "MediaPipe Face Mesh", "ElevenLabs", "Exa"],
-    "github": "https://github.com/wilsonsfh/ClearerToday",
-    "live": "",
-    "date": "Ongoing"
-  },
-  {
-    "title": "CorrectiveRehabApp",
-    "description": "End-to-end biomechanical analysis pipeline for gym exercises.",
-    "highlights": [
-      "Detects 8 lift-specific form issues (knee valgus, hip shift, butt wink, forward lean, etc.) with 0–100 symmetry scores and severity grading per rep across 6 exercises",
-      "Mobile skeleton visualizer renders react-native-svg overlays (24 joint connections, teal/orange/red severity coloring) with a side-by-side session diff view classifying issues as improved/regressed/resolved/new"
-    ],
-    "tags": ["React Native", "Expo", "FastAPI", "MediaPipe", "Google Cloud Run", "Supabase", "PostgreSQL"],
-    "github": "https://github.com/wilsonsfh/CorrectiveRehabApp",
-    "live": "",
-    "date": "Ongoing"
+    "tags": ["SwiftUI", "AppleScript", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
+    "github": "https://github.com/wilsonsfh/AppleNotestoX",
+    "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
+    "livePseudo": true
   },
   {
     "title": "X Bookmark Injector",
@@ -33,8 +21,7 @@
     "tags": ["Chromium MV3", "JavaScript", "esbuild", "Vitest"],
     "github": "https://github.com/wilsonsfh/x-bookmark-injector",
     "live": "https://x-bookmark-injector-demo.wilsonsfh.workers.dev",
-    "livePseudo": true,
-    "date": "Ongoing"
+    "livePseudo": true
   },
   {
     "title": "TradingSignalandHelper",
@@ -45,21 +32,29 @@
     ],
     "tags": ["Python", "Flask", "SQLite", "yfinance", "moomoo / OpenD"],
     "github": "https://github.com/wilsonsfh/TradingSignalandHelper",
-    "live": "",
-    "date": "Ongoing"
+    "live": ""
   },
   {
-    "title": "AppleNotestoX",
-    "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
+    "title": "ClearerToday",
+    "description": "AI speech coach for enunciation practice and adaptive pronunciation feedback.",
     "highlights": [
-      "Built a macOS webapp that exports Apple Notes content to a Markdown format and Notion, preserving inline media and traceability with source note identifier and date",
-      "Equipped on-device video transcription with Apple Speech and AVFoundation keyframes, feeding an AI-synthesized wiki that doubles as a study app with flashcards and narrated recaps of personal notes"
+      "Built an AI speech coach for enunciation based on analysis of phoneme-level mouth-shape gaps with MediaPipe Face Mesh and ElevenLabs transcription",
+      "Developed an adaptive feedback loop that stores persistent user gap profiles in Convex to rerank future guidance, retrieving live pronunciation references with Exa and generating next-drill instructions scored primarily by OpenAI frontier model."
     ],
-    "tags": ["SwiftUI", "AppleScript", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
-    "github": "https://github.com/wilsonsfh/AppleNotestoX",
-    "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
-    "livePseudo": true,
-    "date": "Ongoing"
+    "tags": ["Next.js", "React", "TypeScript", "Convex", "MediaPipe Face Mesh", "ElevenLabs", "Exa"],
+    "github": "https://github.com/wilsonsfh/ClearerToday",
+    "live": ""
+  },
+  {
+    "title": "CorrectiveRehabApp",
+    "description": "End-to-end biomechanical analysis pipeline for gym exercises.",
+    "highlights": [
+      "Detects 8 lift-specific form issues (knee valgus, hip shift, butt wink, forward lean, etc.) with 0–100 symmetry scores and severity grading per rep across 6 exercises",
+      "Mobile skeleton visualizer renders react-native-svg overlays (24 joint connections, teal/orange/red severity coloring) with a side-by-side session diff view classifying issues as improved/regressed/resolved/new"
+    ],
+    "tags": ["React Native", "Expo", "FastAPI", "MediaPipe", "Google Cloud Run", "Supabase", "PostgreSQL"],
+    "github": "https://github.com/wilsonsfh/CorrectiveRehabApp",
+    "live": ""
   },
   {
     "title": "Concept Visualizer",
