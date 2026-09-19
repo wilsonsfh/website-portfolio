@@ -8,7 +8,10 @@
     "date": "May 2026 - Present",
     "location": "Singapore, Singapore",
     "description": [
-      "Building software tools and showcasing tech demo to support sales pipeline for APJC Customer Engineers."
+      "Delivered technical demos to senior Solutions Engineering leadership at a cross-regional meeting of 80+ SEs, shadowed SEs on live customer engagements, and supported outbound client acquisition at a regional client summit",
+      "Built a security assessment tool that automates analysis of client accounts against Cloudflare's WAF, SSL/TLS, Rate Limiting, and Bot Management products, giving SEs discovery and upsell talking points and a simpler way to convey remediations to clients",
+      "Scoped and shipped scoring improvements across those products from SE user research, now used across client accounts and still active post-handover",
+      "Built a browser-based Linux desktop on Cloudflare Containers powering a hands-on lab series, letting clients and SEs configure and test security policies without a VM or local install"
     ],
     "tags": ["Zero Trust", "Workers", "Durable Objects", "KV"]
   },
@@ -20,9 +23,9 @@
     "date": "Dec 2025 – Apr 2026",
     "location": "Singapore, Singapore & Jakarta, Indonesia",
     "description": [
-      "Conducted user research and analysed product metrics using SQL and Metabase to drive data-informed decisions for feature prioritisation",
-      "Collaborated with cross-functional engineering teams to define product requirements and scope technical solutions for platform improvements",
-      "Synthesised qualitative and quantitative insights from user interviews and analytics dashboards to inform product roadmap planning"
+      "Led user research interviews with jobseekers and SME employers to map hiring behaviour and needs, with findings used by PM and Engineering teams to prioritise features for localisation and expansion into Singapore and Malaysia",
+      "Represented Glints at school events and industry sharing sessions to gather direct product feedback and engage potential clients",
+      "Grew jobseeker DAU by more than 2x through data-driven experiments and partnerships, and wrote SQL queries in Metabase to prioritise scope and cut manual database lookup time"
     ],
     "tags": ["SQL", "Metabase", "User Research", "Product Analytics"]
   },
