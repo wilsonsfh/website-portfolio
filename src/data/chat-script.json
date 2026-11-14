@@ -1,0 +1,96 @@
+{
+  "opening": [
+    { "text": "hey, i'm wilson 👋" },
+    { "text": "cs student at nus, based in singapore" },
+    { "text": "i'm into building all things tech and aesthetics", "needsReview": true },
+    { "text": "most recently i was a solutions engineering intern at cloudflare (may - aug 2026)" },
+    { "text": "built a browser-based linux desktop on cloudflare containers there, for a hands-on lab series", "needsReview": true },
+    { "text": "before that i interned in product at glints, where i grew jobseeker dau by more than 2x through experiments and partnerships" },
+    { "text": "i also do photography 📷", "photo": 0, "photoAlt": "a photo from wilson's photo reel" },
+    { "text": "other stuff i'm into: exploring tea brands and freestyle dancing" },
+    { "text": "currently learning guitar, rock climbing and volleyball" },
+    { "text": "and i was vp of external relations at nus students' computing club, repping 6000+ computing students" },
+    { "text": "i build side projects too, like x bookmark injector and clearertoday", "needsReview": true },
+    { "text": "that's the quick version. tap a question below, or ask me something" },
+    {
+      "text": "or just read the page:",
+      "links": [{ "label": "the full page ↓", "href": "#main", "card": true }]
+    }
+  ],
+  "topics": [
+    {
+      "id": "work",
+      "question": "what do you work on?",
+      "keywords": ["work", "job", "intern", "cloudflare", "glints", "experience", "career", "role", "employ", "solutions engineer", "product manage"],
+      "answers": [
+        { "text": "i've done a few internships. most recent was solutions engineering at cloudflare (may - aug 2026)" },
+        { "text": "i built a security assessment tool there that analyses client accounts against waf, ssl/tls, rate limiting and bot management", "needsReview": true },
+        { "text": "before that: product management at glints, doing user research interviews and writing sql in metabase" },
+        { "text": "and software engineering at nus enterprise's mvp studio, on a web app for researchers to analyse bird patterns (react, django, birdnet)", "needsReview": true }
+      ]
+    },
+    {
+      "id": "projects",
+      "question": "projects?",
+      "keywords": ["project", "build", "built", "side project", "app", "code", "applenotes", "bookmark", "clearertoday", "trading", "rehab", "visualizer", "demo"],
+      "answers": [
+        { "text": "applenotestox: a local-first macos pipeline that turns apple notes into a reviewable knowledge wiki" },
+        { "text": "x bookmark injector: a chromium extension that resurfaces a random saved x bookmark in your for you feed" },
+        { "text": "clearertoday: an ai speech coach for enunciation practice. also concept visualizer, which animates cs concepts as node graphs", "needsReview": true },
+        {
+          "text": "code and demos are on github, and there are more in the projects row on the page",
+          "links": [{ "label": "github.com/wilsonsfh", "href": "https://github.com/wilsonsfh" }]
+        }
+      ]
+    },
+    {
+      "id": "outside",
+      "question": "outside work?",
+      "keywords": ["outside", "free time", "hobby", "hobbies", "fun", "tea", "danc", "photo", "guitar", "climb", "volleyball", "interest", "music", "sport"],
+      "answers": [
+        { "text": "in my free time i like exploring tea brands, freestyle dancing and photography" },
+        { "text": "here's one from the reel", "photo": 1, "photoAlt": "a photo from wilson's photo reel" },
+        { "text": "and i'm learning guitar, rock climbing and volleyball right now" },
+        { "text": "i believe the best software is built by people who bring diverse perspectives, so i like having my own stories to bring", "needsReview": true }
+      ]
+    },
+    {
+      "id": "community",
+      "question": "community?",
+      "keywords": ["community", "club", "student", "ambassador", "hackathon", "school", "nus", "computing", "microsoft", "perplexity", "leadership", "lead", "society", "activit"],
+      "answers": [
+        { "text": "i was vp of external relations at nus students' computing club (aug 2024 - aug 2025): represented 6000+ computing students, led a 72-strong team and raised $54,450 through partnerships" },
+        { "text": "i was a microsoft student ambassador and a perplexity student growth partner too" },
+        { "text": "and i've done hackathons: ai engineer hackathon singapore 2026, tinyfish hackathon singapore 2026, cursor hackathon singapore 2025 and a few more" }
+      ]
+    },
+    {
+      "id": "contact",
+      "question": "how do i reach you?",
+      "keywords": ["contact", "reach", "email", "e-mail", "mail", "linkedin", "github", "twitter", "hire", "message", "connect", "touch", "talk"],
+      "answers": [
+        {
+          "text": "email's easiest:",
+          "links": [{ "label": "wilionsoon2010@gmail.com", "href": "mailto:wilionsoon2010@gmail.com" }]
+        },
+        {
+          "text": "i'm also on",
+          "links": [
+            { "label": "linkedin", "href": "https://linkedin.com/in/wilsonsfh" },
+            { "label": "github", "href": "https://github.com/wilsonsfh" },
+            { "label": "x", "href": "https://x.com/wilsonsfh_" }
+          ]
+        }
+      ]
+    }
+  ],
+  "fallback": {
+    "text": "i haven't written an answer for that yet. the contact links are the best way to ask me directly:",
+    "links": [
+      { "label": "email", "href": "mailto:wilionsoon2010@gmail.com" },
+      { "label": "linkedin", "href": "https://linkedin.com/in/wilsonsfh" },
+      { "label": "github", "href": "https://github.com/wilsonsfh" }
+    ],
+    "needsReview": true
+  }
+}
