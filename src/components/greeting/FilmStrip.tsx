@@ -19,27 +19,22 @@ function buildSet(): Photo[] {
 const SET = buildSet();
 
 type Props = {
-  /** Auto-scroll runs once true (and never under reduced motion). */
-  running: boolean;
+  /** True only in the dwell range: the strip auto-scrolls and can be dragged. Otherwise it holds its offset. */
+  activeRef: { current: boolean };
   reduced: boolean;
   /** 0 = rolled up, 1 = fully unrolled; drives the roll position and the paper reveal. */
   progress: MotionValue<number>;
-  /** Every pointer down on the strip (used to finish the unroll). */
-  onPress: () => void;
   /** Visitor took the strip. */
   onControl: () => void;
-  /** Vertical touch swipe: treated as scroll, moves on. */
-  onSwipeAway: () => void;
   /** True while the pointer is down on the strip. */
   downRef: { current: boolean };
 };
 
-export default function FilmStrip({ running, reduced, progress, onPress, onControl, onSwipeAway, downRef }: Props) {
+export default function FilmStrip({ activeRef, reduced, progress, onControl, downRef }: Props) {
   const track = useRef<HTMLDivElement>(null);
   const hit = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const roll = useRef<HTMLDivElement>(null);
-  const targetV = useRef(0); // px/s the strip eases toward when free
   const s = useRef({
     x: 0, // offset within one set, kept in [-L, 0)
     v: 0, // px/s
@@ -53,10 +48,6 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
     moved: false,
     controlled: false,
   });
-
-  useEffect(() => {
-    targetV.current = running && !reduced ? -AUTO_SPEED : 0;
-  }, [running, reduced]);
 
   // Measure one cell; centre the first frame in the viewport.
   useLayoutEffect(() => {
@@ -101,8 +92,10 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
     const frame = (now: number) => {
       const dt = Math.min(now - last, 50);
       last = now;
-      if (!st.dragging) {
-        const tv = targetV.current;
+      if (!st.dragging && !activeRef.current) {
+        st.v = 0; // outside the dwell range the strip holds its offset
+      } else if (!st.dragging) {
+        const tv = reduced ? 0 : -AUTO_SPEED; // px/s the strip eases toward when free
         st.v = tv + (st.v - tv) * Math.pow(DECAY, dt);
         if (Math.abs(st.v - tv) < 0.05) st.v = tv;
         st.x += (st.v * dt) / 1000;
@@ -114,12 +107,12 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [activeRef, reduced]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (!activeRef.current) return;
     const st = s.current;
-    onPress();
     hit.current?.setPointerCapture(e.pointerId);
     st.dragging = true;
     st.moved = false;
@@ -137,12 +130,6 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
   const onPointerMove = (e: React.PointerEvent) => {
     const st = s.current;
     if (!st.dragging) return;
-    const dy = e.clientY - st.startY;
-    if (e.pointerType === "touch" && !st.moved && Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(e.clientX - st.startX) * 1.5) {
-      release(e); // vertical swipe reads as scroll
-      onSwipeAway();
-      return;
-    }
     st.x += e.clientX - st.lastX; // 1:1 from the live position
     st.lastX = e.clientX;
     if (Math.abs(e.clientX - st.startX) > 6) st.moved = true;
@@ -162,12 +149,6 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
     st.v = fresh && dtMs > 0 ? ((e.clientX - a.x) / dtMs) * 1000 : 0;
   };
 
-  const onPointerCancel = (e: React.PointerEvent) => {
-    const st = s.current;
-    const vertical = e.pointerType === "touch" && st.dragging && !st.moved;
-    release(e);
-    if (vertical) onSwipeAway();
-  };
 
   return (
     <>
@@ -206,7 +187,7 @@ export default function FilmStrip({ running, reduced, progress, onPress, onContr
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={release}
-        onPointerCancel={onPointerCancel}
+        onPointerCancel={release}
       />
     </>
   );

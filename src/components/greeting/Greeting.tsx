@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, useMotionValue, type AnimationPlaybackControls } from "motion/react";
+import { useMotionValue } from "motion/react";
 import FilmStrip from "./FilmStrip";
+import { clamp01, easeOut, easeSlide, seg } from "./ease";
 import "./greeting.css";
 
 const SEEN_KEY = "intro-seen";
@@ -14,236 +15,185 @@ export function shouldPlayIntro(): boolean {
   }
 }
 
-const DOORS_CLOSED_MS = 1200;
-const DOORS_GONE_MS = 2500;
-const UNROLL_START_MS = 2000;
-const UNROLL_S = 1.5;
+// One scroll-derived progress value p (0..1) through the section; every part is a function of p.
+const DOORS: [number, number] = [0, 0.25];
+const UNROLL: [number, number] = [0.25, 0.55];
+const DWELL: [number, number] = [0.55, 0.82];
+const ZOOM: [number, number] = [0.82, 1];
+
+const DOOR_ANGLE = 80; // degrees
 const CAM_SCALE = 2.6;
 const CAM_ROTATE = -8; // degrees
-const IGNORED_KEYS = new Set(["Tab", "Shift", "Control", "Alt", "Meta", "CapsLock"]);
 
-const NEXT_AFTER_WATCHING_MS = 4000;
-const BOUNCE_FIRST_MS = 2500;
-const BOUNCE_EVERY_MS = 6000;
+type Zone = 0 | 1 | 2; // before dwell | dwell | zoom/after
 
-type Exit = null | "fade" | "zoom";
-
-export default function Greeting({ onDone }: { onDone: () => void }) {
-  const [reduced] = useState(
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-  const [open, setOpen] = useState(false); // doors swing
-  const [doorsGone, setDoorsGone] = useState(reduced);
-  const [ready, setReady] = useState(!reduced); // reduced motion: cross-fade in
-  const [running, setRunning] = useState(reduced); // unroll finished: auto-scroll starts
-  const downRef = useRef(false);
-  const [exit, setExit] = useState<Exit>(null);
-  const [zoom, setZoom] = useState<{ ox: number; oy: number; s: number } | null>(null);
-  const [nextOn, setNextOn] = useState(reduced);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const arrowRef = useRef<HTMLSpanElement>(null);
+export default function Greeting() {
+  const [reduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [zone, setZone] = useState<Zone>(reduced ? 1 : 0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
-  const unrollTimer = useRef<number>(0);
-  const unrollAnim = useRef<AnimationPlaybackControls | null>(null);
-  // One progress value (0 = rolled, 1 = unrolled) drives the roll, the reveal and the camera.
-  const progress = useMotionValue(reduced ? 1 : 0);
-  const exiting = useRef(false);
-  const doneTimer = useRef<number>(0);
+  const zoomRef = useRef<HTMLDivElement>(null);
+  const doorsRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLSpanElement>(null);
+  const unroll = useMotionValue(reduced ? 1 : 0); // eased local progress of the unroll range
+  const activeRef = useRef(reduced); // dwell: strip runs
+  const downRef = useRef(false);
+  const zoneRef = useRef<Zone>(reduced ? 1 : 0);
+  const zoomGeo = useRef<{ ox: number; oy: number; s: number } | null>(null);
 
-  // Mark as seen, lock page scroll while mounted.
-  useEffect(() => {
-    try {
-      sessionStorage.setItem(SEEN_KEY, "1");
-    } catch {
-      /* private mode: replays, acceptable */
+  // Everything below is written imperatively from p: transform/opacity/clip-path only.
+  const update = useCallback(() => {
+    const sec = sectionRef.current;
+    const stage = stageRef.current;
+    if (!sec || !stage || reduced) return;
+    const range = sec.offsetHeight - stage.offsetHeight;
+    const p = range > 0 ? clamp01(-sec.getBoundingClientRect().top / range) : 0;
+
+    // Doors
+    const d = easeSlide(seg(p, DOORS[0], DOORS[1]));
+    const doors = doorsRef.current;
+    if (doors) {
+      doors.style.visibility = d >= 1 ? "hidden" : "visible";
+      const [l, r] = doors.querySelectorAll<HTMLElement>(".gr-leaf");
+      l.style.transform = `rotateY(${DOOR_ANGLE * d}deg)`;
+      r.style.transform = `rotateY(${-DOOR_ANGLE * d}deg)`;
+      doors.querySelectorAll<HTMLElement>(".gr-shade").forEach((el) => {
+        el.style.opacity = String(0.55 * d);
+      });
+      const core = doors.querySelector<HTMLElement>(".gr-core");
+      if (core) {
+        core.style.transform = `scaleX(${1 + 89 * d})`;
+        core.style.opacity = String(1 - seg(d, 0.25, 1));
+      }
     }
-    const html = document.documentElement;
-    const prev = html.style.overflow;
-    html.style.overflow = "hidden";
-    const main = document.getElementById("main");
-    main?.setAttribute("inert", "");
-    return () => {
-      html.style.overflow = prev;
-      main?.removeAttribute("inert");
+
+    // Roll + reveal (FilmStrip subscribes) and camera pull-back, from the same local progress
+    const u = easeSlide(seg(p, UNROLL[0], UNROLL[1]));
+    unroll.set(u);
+    if (cameraRef.current) {
+      cameraRef.current.style.transform =
+        u >= 1
+          ? "none"
+          : `scale(${CAM_SCALE + (1 - CAM_SCALE) * u}) rotate(${CAM_ROTATE * (1 - u)}deg)`;
+    }
+
+    // Dwell + zone
+    activeRef.current = p >= DWELL[0] && p < DWELL[1];
+    const z: Zone = p < DWELL[0] ? 0 : p < DWELL[1] ? 1 : 2;
+    if (z !== zoneRef.current) {
+      zoneRef.current = z;
+      setZone(z);
+    }
+
+    // Zoom into the centre picture while the veil whitens to --bg
+    const zoom = zoomRef.current;
+    const veil = stage.querySelector<HTMLElement>(".gr-veil");
+    const zt = easeOut(seg(p, ZOOM[0], ZOOM[1]));
+    if (zoom && veil) {
+      if (zt <= 0) {
+        zoomGeo.current = null;
+        zoom.style.transform = "none";
+        veil.style.opacity = "0";
+      } else {
+        if (!zoomGeo.current) {
+          // strip holds its offset outside the dwell range, so this is stable until z returns to 0
+          zoom.style.transform = "none";
+          const cx = stage.clientWidth / 2;
+          let best: DOMRect | null = null;
+          let bestD = Infinity;
+          stage.querySelectorAll(".gr-frame").forEach((f) => {
+            const r = f.getBoundingClientRect();
+            const dist = Math.abs(r.left + r.width / 2 - cx);
+            if (dist < bestD) {
+              bestD = dist;
+              best = r;
+            }
+          });
+          const r = best as DOMRect | null;
+          const top = stage.getBoundingClientRect().top;
+          zoomGeo.current = r
+            ? {
+                ox: r.left + r.width / 2,
+                oy: r.top - top + r.height / 2,
+                s: Math.max(stage.clientWidth / r.width, stage.clientHeight / r.height) * 1.15,
+              }
+            : { ox: cx, oy: stage.clientHeight / 2, s: 4 };
+        }
+        const g = zoomGeo.current;
+        zoom.style.transformOrigin = `${g.ox}px ${g.oy}px`;
+        zoom.style.transform = `scale(${1 + (g.s - 1) * zt})`;
+        veil.style.opacity = String(1 - (1 - seg(zt, 0.29, 1)) ** 2);
+      }
+    }
+  }, [reduced, unroll]);
+
+  useLayoutEffect(() => {
+    update();
+    const onResize = () => {
+      zoomGeo.current = null;
+      update();
     };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [update]);
+
+  const toMain = useCallback((behavior: ScrollBehavior) => {
+    const sec = sectionRef.current;
+    if (!sec) return;
+    window.scrollTo({ top: sec.offsetTop + sec.offsetHeight, behavior });
   }, []);
 
-  // Door timeline (or the reduced-motion cross-fade).
-  useEffect(() => {
-    if (reduced) {
-      const raf = requestAnimationFrame(() => requestAnimationFrame(() => setReady(true)));
-      return () => cancelAnimationFrame(raf);
-    }
-    const t1 = window.setTimeout(() => setOpen(true), DOORS_CLOSED_MS);
-    const t2 = window.setTimeout(() => setDoorsGone(true), DOORS_GONE_MS);
-    unrollTimer.current = window.setTimeout(() => {
-      unrollAnim.current = animate(progress, 1, {
-        duration: UNROLL_S,
-        ease: [0.77, 0, 0.175, 1],
-        onComplete: () => setRunning(true),
-      });
-    }, UNROLL_START_MS);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(unrollTimer.current);
-      unrollAnim.current?.stop();
-    };
-  }, [reduced, progress]);
-
-  // Camera pull-back and levelling follow the same progress as the roll.
-  useLayoutEffect(() => {
-    const apply = (p: number) => {
-      const el = cameraRef.current;
-      if (!el) return;
-      el.style.transform =
-        p >= 1
-          ? "none"
-          : `scale(${CAM_SCALE + (1 - CAM_SCALE) * p}) rotate(${CAM_ROTATE * (1 - p)}deg)`;
-    };
-    apply(progress.get());
-    return progress.on("change", apply);
-  }, [progress]);
-
-  // Pressing the strip mid-unroll finishes the reveal at once; the visitor drags from the live position.
-  const finishUnroll = useCallback(() => {
-    if (progress.get() >= 1) return;
-    clearTimeout(unrollTimer.current);
-    unrollAnim.current?.stop();
-    progress.set(1);
-    setRunning(true);
-  }, [progress]);
-
-  useEffect(() => () => clearTimeout(doneTimer.current), []);
-
-  // Scale the scene into the frame nearest the centre while the veil whitens to --bg.
-  const advance = useCallback(
-    (kind?: "fade") => {
-      if (exiting.current) return;
-      exiting.current = true;
-      if (kind === "fade" || reduced || progress.get() < 1) {
-        setExit("fade");
-        doneTimer.current = window.setTimeout(onDone, 280);
-        return;
-      }
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      let best: DOMRect | null = null;
-      let bestD = Infinity;
-      rootRef.current?.querySelectorAll(".gr-frame").forEach((f) => {
-        const r = f.getBoundingClientRect();
-        const d = Math.abs(r.left + r.width / 2 - cx);
-        if (d < bestD) {
-          bestD = d;
-          best = r;
-        }
-      });
-      const r = best as DOMRect | null;
-      if (r) {
-        setZoom({
-          ox: r.left + r.width / 2,
-          oy: r.top + r.height / 2,
-          s: Math.max(window.innerWidth / r.width, window.innerHeight / r.height) * 1.15,
-        });
-      }
-      setExit("zoom");
-      doneTimer.current = window.setTimeout(onDone, 720);
-    },
-    [onDone, reduced, progress],
-  );
-
-  // Never a gate: wheel or any key moves on.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (IGNORED_KEYS.has(e.key)) return;
-      advance();
-    };
-    window.addEventListener("keydown", onKey);
-    const onWheel = () => advance();
-    window.addEventListener("wheel", onWheel, { passive: true });
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("wheel", onWheel);
-    };
-  }, [advance]);
-
-  // Next appears after 4s of watching if the visitor never takes control.
-  useEffect(() => {
-    if (reduced) return;
-    const t = window.setTimeout(() => setNextOn(true), UNROLL_START_MS + NEXT_AFTER_WATCHING_MS);
-    return () => clearTimeout(t);
-  }, [reduced]);
-
-  // Small arrow nudge: first after 2.5s on screen, then every 6s, paused while the pointer is down.
-  useEffect(() => {
-    if (!nextOn || reduced) return;
-    const nudge = () => {
-      if (downRef.current || exiting.current) return;
-      arrowRef.current?.animate(
-        [{ transform: "translateX(0)" }, { transform: "translateX(6px)", offset: 0.4 }, { transform: "translateX(0)" }],
-        { duration: 500, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
-      );
-    };
-    let iv = 0;
-    const first = window.setTimeout(() => {
-      nudge();
-      iv = window.setInterval(nudge, BOUNCE_EVERY_MS);
-    }, BOUNCE_FIRST_MS);
-    return () => {
-      clearTimeout(first);
-      clearInterval(iv);
-    };
-  }, [nextOn, reduced]);
-
-  const cls = ["gr-root", ready ? "is-ready" : "", exit ? `is-exit-${exit}` : ""]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <div className={cls} role="presentation" ref={rootRef}>
-      <div
-        className="gr-zoom"
-        style={
-          zoom
-            ? { transformOrigin: `${zoom.ox}px ${zoom.oy}px`, transform: `scale(${zoom.s})` }
-            : undefined
-        }
-      >
-        <div className="gr-camera" ref={cameraRef}>
-          <FilmStrip
-            running={running}
-            reduced={reduced}
-            progress={progress}
-            onPress={finishUnroll}
-            onControl={() => setNextOn(true)}
-            onSwipeAway={advance}
-            downRef={downRef}
-          />
+    <section
+      className={`gr-section${reduced ? " is-reduced" : ""}`}
+      ref={sectionRef}
+      aria-label="introduction"
+    >
+      <div className="gr-root" ref={stageRef}>
+        <div className="gr-zoom" ref={zoomRef}>
+          <div className="gr-camera" ref={cameraRef}>
+            <FilmStrip
+              activeRef={activeRef}
+              reduced={reduced}
+              progress={unroll}
+              onControl={() => {}}
+              downRef={downRef}
+            />
+          </div>
+          <div className="gr-vignette" />
+          <div className="gr-veil" />
         </div>
-        <div className="gr-vignette" />
-        <div className="gr-veil" />
-      </div>
 
-      {!doorsGone && (
-        <div className={`gr-doors${open ? " is-open" : ""}`} aria-hidden="true">
-          <div className="gr-core" />
-          <Leaf side="l" />
-          <Leaf side="r" />
+        {!reduced && (
+          <div className="gr-doors" ref={doorsRef} aria-hidden="true">
+            <div className="gr-core" />
+            <Leaf side="l" />
+            <Leaf side="r" />
+          </div>
+        )}
+
+        <div className={`gr-next${zone === 1 ? " is-on" : ""}`}>
+          <button type="button" className="gr-next-btn" onClick={() => toMain("smooth")}>
+            <span ref={arrowRef} className="gr-next-label">
+              next →
+            </span>
+          </button>
         </div>
-      )}
 
-      <div className={`gr-next${nextOn ? " is-on" : ""}`}>
-        <button type="button" className="gr-next-btn" onClick={() => advance()}>
-          <span ref={arrowRef} className="gr-next-label">
-            next →
-          </span>
+        <button
+          type="button"
+          className={`gr-skip${zone === 2 ? " is-off" : ""}`}
+          onClick={() => toMain("instant")}
+        >
+          skip
         </button>
       </div>
-
-      <button type="button" className="gr-skip" onClick={() => advance("fade")}>
-        skip
-      </button>
-    </div>
+    </section>
   );
 }
 

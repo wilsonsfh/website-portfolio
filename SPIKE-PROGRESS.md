@@ -1,4 +1,9 @@
-# Spike A: screening room (paper hand-scroll version)
+# Spike A: screening room (paper hand-scroll, scroll-linked section)
+
+## Scroll-linked rewrite (in progress)
+- M1 done: Greeting is a 320dvh section with a sticky 100dvh stage in normal flow before MainPage (no overlay, no unmount, no scroll lock, no inert). p = scroll progress through the section; doors 0-0.25, unroll+camera 0.25-0.55, dwell 0.55-0.82 (strip runs/drag only here), zoom+veil 0.82-1; all written imperatively from p with eased local progress, so scrolling up reverses. Skip/next just scroll to #main for now.
+- Next: M2 autoplay + return landing + next/skip rules; M3 reduced motion + dwell checks.
+- Notes below describe the earlier overlay version where they differ (press-during-unroll and zoom-exit-timer no longer exist).
 
 ## Done
 - Doors (unchanged): rotateY leaves hinged at outer edges, 1.2s closed then 1.0s open, warm seam light; skip, wheel/any key (not Tab/modifiers) advance; once per session via sessionStorage, `?intro=1` replays; page scroll locked while mounted.
