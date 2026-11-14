@@ -1,50 +1,39 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code in this repository.
 
-## Build & Development Commands
+## Commands
 
-- `npm run dev` — Start dev server at localhost:4321
-- `npm run build` — Build production site to `./dist/`
-- `npm run preview` — Preview built site locally
+- `npm run dev` — Vite dev server (default localhost:5173; pass `-- --port 4330 --strictPort`)
+- `npm run build` — `tsc -b && vite build` to `./dist/`
+- `npm run preview` — serve the built site
 
-No lint or test scripts are configured.
+No lint or test scripts. Never use `pkill`; stop a dev server you started by its PID.
 
-## Architecture
+## Stack
 
-Single-page portfolio website built with **Astro 5** and **Tailwind CSS 3**. No UI framework (React/Vue) — all components are `.astro` files with vanilla JS in inline `<script>` blocks.
+Vite + React 19 + TypeScript (strict) + Tailwind v4 via `@tailwindcss/vite` (CSS-first, no tailwind config file). The `motion` package is installed (`import { ... } from "motion/react"`) for greeting/intro animation; the base page does not use it.
 
-### Data Flow
+## Structure
 
-JSON files in `src/data/` (`work-experience.json`, `projects.json`, `activities.json`, `skills.json`, `photos.json`) are imported in `src/components/MainPage.astro`, which renders the whole v2 page inside `<main id="main">`. `src/pages/index.astro` is just Layout + MainPage. `photos.json` is the shared list of resized photos in `public/photos/reel/`. The v1 components (Navbar, Hero, About, cards, etc.) are still in `src/components/` but unused.
+- `index.html` — title/meta, flash-prevention colours, pre-paint theme script, `<div id="root">`.
+- `src/main.tsx` -> `src/App.tsx` -> `src/components/MainPage.tsx`.
+- `src/styles/global.css` — Tailwind import, `@theme` tokens, CSS variables, and all page styles (class names like `.row`, `.panel`).
+- `src/data/*.json` — `work-experience`, `projects`, `activities`, `skills`, `photos` (16 resized photos in `public/photos/reel/`, shared list for intros).
+- `public/` — fonts (Inter 400/500), images, `resume.pdf` (not linked).
 
-### Navigation
+## Page
 
-Single page, no navbar. Five rows (about, work, projects, activities, get in touch) are `<button aria-expanded aria-controls>` that expand in place via a CSS grid-rows (0fr/1fr) + opacity transition; several can be open at once. Mount anything that should sit in front of the page before or around `<main id="main">`.
+`MainPage` renders `<main id="main">`: name, one paragraph, five rows (about, work, projects, activities, get in touch), footer with theme toggle. Rows are `<button aria-expanded aria-controls>` inside `<h2>`; several can be open. Expand/collapse is a CSS transition on `grid-template-rows` 0fr/1fr plus opacity (220ms open, 160ms close, `cubic-bezier(0.23,1,0.32,1)`), interruptible; closed panels use `visibility: hidden`. Reduced motion keeps opacity only. Hover styles sit behind `@media (hover: hover) and (pointer: fine)`.
 
-### Styling System
+## Where a greeting mounts
 
-- **Dark mode**: `class` strategy in Tailwind config. Theme stored in `localStorage` (`theme`), toggled via `dark` class on `<html>` by the footer text toggle in `MainPage.astro`. An inline `<script>` in `Layout.astro` applies it before paint. Flash-prevention colours are an inline `<style>` in `Layout.astro`.
-- **CSS variables** (`src/styles/global.css`, imported in `Layout.astro`): `--bg`, `--fg`, `--muted`, `--line`, `--line-strong`, `--accent`; `:root.dark` overrides them. Light `#FCFCFC` / `#111`, dark `#0E0E0E` / `#EDEDED`. Accent purple `#6B5B95` (`#9B8CC4` in dark), only for link hover and focus rings.
-- **Tailwind colours** (`tailwind.config.mjs`) carry the same neutral values for the old components (`background`, `foreground`, `accent` families).
-- **Font**: Inter only (local woff2 in `public/fonts/`, weights 400/500). Lowercase convention for labels.
-- **Motion**: transitions only, `cubic-bezier(0.23,1,0.32,1)`, open 220ms, close 160ms, reduced motion keeps opacity only.
+`src/App.tsx` has a commented slot before `<MainPage />`. An intro should overlay the page (`position: fixed`), be skippable and never block it.
 
-### Client-Side Interactivity Patterns
+## Tokens and theme
 
-Vanilla JS in inline `<script>` tags (row toggles and theme toggle in `MainPage.astro`). The scroll-reveal, typewriter, carousel and section-navigation code belonged to the unused v1 components.
-
-### Component Pattern
-
-Components use TypeScript `Props` interfaces in frontmatter, receive data via props, and render with Astro's template syntax. Example:
-```astro
----
-interface Props {
-  company: string;
-  role: string;
-  tags: string[];
-}
-const { company, role, tags } = Astro.props;
----
-<div>...</div>
-```
+- Dark mode: `dark` class on `<html>`, stored in `localStorage.theme` (`"dark"` or `"light"`). `index.html` applies it before paint; the footer toggle in `MainPage.tsx` writes it. Tailwind `dark:` variant is `&:where(.dark, .dark *)`.
+- CSS variables in `global.css`: `--bg`, `--fg`, `--muted`, `--line`, `--line-strong`, `--accent`; `:root.dark` overrides. Light `#FCFCFC`/`#111111`, dark `#0E0E0E`/`#EDEDED`. Accent `#6B5B95` (`#9B8CC4` dark), used only for link hover and focus rings.
+- Same values as Tailwind tokens in `@theme` (`bg-background`, `text-foreground`, `text-accent`, ...). Keep `index.html` flash colours in sync.
+- Font: Inter only. Lowercase convention for labels. No gradients, shadows, cards, pills or monospace labels.
+- Motion: transitions over keyframes for anything re-triggerable; see docs/v2-research-notes.md in the main repo.

@@ -3,9 +3,10 @@
 ## Done
 - Astro version of the page (see git history up to 7001ba3).
 - Port M1: Astro removed; Vite 8 + React 19 + TS + Tailwind v4 (`@tailwindcss/vite`) + `motion` installed; page renders, build passes.
+- Port M2: page ported 1:1 to `MainPage.tsx` (React state for rows/theme, same CSS), CLAUDE.md rewritten, dev server check passed (id="root", MainPage.tsx 200).
 
 ## In progress
-- Port M2: parity check, CLAUDE.md rewrite.
+- none
 
 ## Next
 - Greeting agents mount in `src/App.tsx` slot.
