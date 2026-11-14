@@ -18,30 +18,33 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'JetBrains Mono';
-  src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
+  :root {
+    --bg: #FCFCFC;
+    --fg: #111111;
+    --muted: #6B6B6B;
+    --line: rgba(0, 0, 0, 0.1);
+    --line-strong: rgba(0, 0, 0, 0.3);
+    --accent: #6B5B95;
+  }
+
+  :root.dark {
+    --bg: #0E0E0E;
+    --fg: #EDEDED;
+    --muted: #8E8E8E;
+    --line: rgba(255, 255, 255, 0.12);
+    --line-strong: rgba(255, 255, 255, 0.3);
+    --accent: #9B8CC4;
+  }
+
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
   }
 
   body {
     @apply bg-background text-foreground font-body dark:bg-background-dark dark:text-foreground-dark;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
-  }
-
-  h2 {
-    text-transform: lowercase;
+    font-size: 16px;
+    line-height: 1.6;
   }
 }
 
