@@ -1,15 +1,16 @@
-# SPIKE-PROGRESS (base)
+# Spike A: screening room
 
 ## Done
-- Astro version of the page (see git history up to 7001ba3).
-- Port M1: Astro removed; Vite 8 + React 19 + TS + Tailwind v4 (`@tailwindcss/vite`) + `motion` installed; page renders, build passes.
-- Port M2: page ported 1:1 to `MainPage.tsx` (React state for rows/theme, same CSS), CLAUDE.md rewritten, dev server check passed (id="root", MainPage.tsx 200).
+- M1: overlay mounted in App slot; doors (rotateY leaves hinged at outer edges, swinging away; warm seam light widens); skip, wheel/any-key advance; sessionStorage once-per-session, `?intro=1` replays; reduced motion cross-fade; unmounts onto MainPage (250ms fade for now).
 
 ## In progress
-- none
+- nothing
 
 ## Next
-- Greeting agents mount in `src/App.tsx` slot.
+- M2 film strip + camera move; M3 Next button + zoom exit; M4 polish.
 
 ## Known issues
-- No resume link (v1 had none). Inter local files are 400/500 only. Browser check pending (done separately).
+- Scene is a placeholder rectangle.
+
+## Unknowns discovered
+- Nothing visually verified (no screenshots allowed).
