@@ -16,42 +16,23 @@ Single-page portfolio website built with **Astro 5** and **Tailwind CSS 3**. No 
 
 ### Data Flow
 
-JSON files in `src/data/` (`work-experience.json`, `projects.json`, `activities.json`, `skills.json`) are imported via ES modules in `src/pages/index.astro` and spread as props into card components. The index page composes all sections in order: Navbar → Hero → About → Work Experience → Projects → Activities → Blog (placeholder) → Contact.
+JSON files in `src/data/` (`work-experience.json`, `projects.json`, `activities.json`, `skills.json`, `photos.json`) are imported in `src/components/MainPage.astro`, which renders the whole v2 page inside `<main id="main">`. `src/pages/index.astro` is just Layout + MainPage. `photos.json` is the shared list of resized photos in `public/photos/reel/`. The v1 components (Navbar, Hero, About, cards, etc.) are still in `src/components/` but unused.
 
 ### Navigation
 
-File-based routing with a single page (`src/pages/index.astro`). In-page navigation uses anchor links (`#about`, `#work-experience`, `#projects`, etc.) with CSS smooth scrolling handled in `Layout.astro`.
-
-Floating prev/next section buttons are rendered in `index.astro` and controlled by the `sectionIds` array (`["hero", "about", "work-experience", "projects", "activities", "blog", "contact"]`). **Keep this array in sync** when adding or removing sections.
+Single page, no navbar. Five rows (about, work, projects, activities, get in touch) are `<button aria-expanded aria-controls>` that expand in place via a CSS grid-rows (0fr/1fr) + opacity transition; several can be open at once. Mount anything that should sit in front of the page before or around `<main id="main">`.
 
 ### Styling System
 
-- **Dark mode**: `class` strategy in Tailwind config. Theme stored in `localStorage`, toggled via `dark` class on `<html>`. An inline `<script>` in `Layout.astro` applies it before paint to avoid flash. Use `dark:` prefix for dark variants.
-- **Custom colors** defined in `tailwind.config.mjs`:
-  - `background` / `background-alt` — beige `#FAF7F2` / `#F0ECE3` (light)
-  - `background-dark` / `background-dark-alt` — dark navy `#1A1A2E` / `#16213E` (dark)
-  - `foreground` / `foreground-muted` — dark gray `#2D2D2D` / `#6B6B6B` (light)
-  - `foreground-dark` / `foreground-dark-muted` — `#E8E8E8` / `#A0A0B0` (dark)
-  - `accent` — purple `#6B5B95`, with `accent-hover`, `accent-light`, `accent-dark`, `accent-dark-light`, `accent-dark-hover` variants
-- **Max width**: `max-w-site` = 1152px.
-- **Fonts** (configured in `tailwind.config.mjs`):
-  - `font-heading` — Playfair Display (loaded from Google Fonts CDN in `Layout.astro`)
-  - `font-body` — Inter (local woff2 in `public/fonts/`)
-  - `font-mono` — JetBrains Mono (local woff2 in `public/fonts/`)
-- **Design convention**: lowercase text throughout (`lowercase` Tailwind class).
-- **`dot-grid-bg`** — a CSS utility class applied to alternating sections (About, Projects) for a subtle dot-grid background texture.
-- **Flash prevention**: `Layout.astro` includes inline `<style is:inline>` with hardcoded bg/text colors for `html:not(.dark)` and `html.dark` to prevent FOUC before Tailwind loads.
+- **Dark mode**: `class` strategy in Tailwind config. Theme stored in `localStorage` (`theme`), toggled via `dark` class on `<html>` by the footer text toggle in `MainPage.astro`. An inline `<script>` in `Layout.astro` applies it before paint. Flash-prevention colours are an inline `<style>` in `Layout.astro`.
+- **CSS variables** (`src/styles/global.css`, imported in `Layout.astro`): `--bg`, `--fg`, `--muted`, `--line`, `--line-strong`, `--accent`; `:root.dark` overrides them. Light `#FCFCFC` / `#111`, dark `#0E0E0E` / `#EDEDED`. Accent purple `#6B5B95` (`#9B8CC4` in dark), only for link hover and focus rings.
+- **Tailwind colours** (`tailwind.config.mjs`) carry the same neutral values for the old components (`background`, `foreground`, `accent` families).
+- **Font**: Inter only (local woff2 in `public/fonts/`, weights 400/500). Lowercase convention for labels.
+- **Motion**: transitions only, `cubic-bezier(0.23,1,0.32,1)`, open 220ms, close 160ms, reduced motion keeps opacity only.
 
 ### Client-Side Interactivity Patterns
 
-All client-side logic uses vanilla JS in inline `<script>` tags:
-- **Scroll reveal**: Intersection Observer in `index.astro` observes `.scroll-reveal`, `.scroll-reveal-left`, `.scroll-reveal-right` elements and adds `.revealed`. Use the `<ScrollReveal>` wrapper component for bottom-up reveals; apply directional classes directly for left/right reveals (the component only emits `scroll-reveal`).
-- **Typewriter effect**: `requestAnimationFrame` loop in `TypewriterText.astro`
-- **Photo carousel**: Infinite auto-scroll + drag with `requestAnimationFrame` in `About.astro`, includes lightbox modal triggered by clicking carousel items
-- **Mobile menu**: Hamburger toggle in `Navbar.astro`
-- **Section navigation**: Floating prev/next buttons in `index.astro` track the active section via `getBoundingClientRect`
-
-All animations respect `prefers-reduced-motion`.
+Vanilla JS in inline `<script>` tags (row toggles and theme toggle in `MainPage.astro`). The scroll-reveal, typewriter, carousel and section-navigation code belonged to the unused v1 components.
 
 ### Component Pattern
 
