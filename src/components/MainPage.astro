@@ -100,6 +100,7 @@ const ext = (href: string) =>
 
     <footer class="foot">
       <span class="meta">wilson soon, 2026</span>
+      <button type="button" class="foot-btn" id="theme-toggle" aria-label="switch to dark theme">dark</button>
     </footer>
   </div>
 </main>
@@ -111,6 +112,22 @@ const ext = (href: string) =>
       btn.setAttribute("aria-expanded", String(!open));
     });
   });
+
+  const toggle = document.getElementById("theme-toggle");
+  const root = document.documentElement;
+  const sync = () => {
+    const dark = root.classList.contains("dark");
+    if (toggle) {
+      toggle.textContent = dark ? "light" : "dark";
+      toggle.setAttribute("aria-label", dark ? "switch to light theme" : "switch to dark theme");
+    }
+  };
+  sync();
+  toggle?.addEventListener("click", () => {
+    const dark = root.classList.toggle("dark");
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch {}
+    sync();
+  });
 </script>
 
 <style is:global>
@@ -118,7 +135,7 @@ const ext = (href: string) =>
   .column { max-width: 620px; margin: 0 auto; padding: 96px 24px 64px; text-align: left; }
   @media (min-width: 768px) { .column { padding-top: 192px; } }
 
-  .name { font-size: 44px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em; text-transform: lowercase; }
+  .name { font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.03em; text-transform: lowercase; }
   .lede { margin-top: 20px; font-size: 17px; line-height: 1.65; max-width: 34em; }
   .intro { margin-bottom: 96px; }
 
@@ -129,7 +146,7 @@ const ext = (href: string) =>
   .row-btn {
     display: flex; align-items: center; justify-content: space-between; width: 100%;
     min-height: 52px; padding: 0; background: none; border: 0; color: inherit; cursor: pointer;
-    font: inherit; font-size: 17px; font-weight: 500; text-align: left; text-transform: lowercase;
+    font: inherit; font-size: 17px; font-weight: 400; text-align: left; text-transform: lowercase;
     border-radius: 4px;
   }
   .chev { color: var(--muted); transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1); }

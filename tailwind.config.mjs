@@ -6,16 +6,16 @@ export default {
     extend: {
       colors: {
         background: {
-          DEFAULT: '#FAF7F2',
-          alt: '#F0ECE3',
-          dark: '#1A1A2E',
-          'dark-alt': '#16213E',
+          DEFAULT: '#FCFCFC',
+          alt: '#F4F4F4',
+          dark: '#0E0E0E',
+          'dark-alt': '#161616',
         },
         foreground: {
-          DEFAULT: '#2D2D2D',
+          DEFAULT: '#111111',
           muted: '#6B6B6B',
-          dark: '#E8E8E8',
-          'dark-muted': '#A0A0B0',
+          dark: '#EDEDED',
+          'dark-muted': '#8E8E8E',
         },
         accent: {
           DEFAULT: '#6B5B95',
@@ -27,7 +27,7 @@ export default {
         },
       },
       fontFamily: {
-        heading: ['Playfair Display', 'Georgia', 'serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
