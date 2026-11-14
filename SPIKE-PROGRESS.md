@@ -1,18 +1,14 @@
 # SPIKE-PROGRESS (base)
 
 ## Done
-- M1: `MainPage.astro` with name, paragraph and five expanding rows from real data; used by `index.astro`; `global.css` now imported in Layout (it was never imported before).
-- M2: neutral palette (tailwind tokens, CSS vars, flash-prevention), Playfair request removed, footer text theme toggle, `src/data/photos.json`, resized photos committed.
-- M3: focus rings, reduced-motion path, 44px+ hit areas, CLAUDE.md updated. Dev server check: 5 aria-expanded buttons served.
+- Astro version of the page (see git history up to 7001ba3).
+- Port M1: Astro removed; Vite 8 + React 19 + TS + Tailwind v4 (`@tailwindcss/vite`) + `motion` installed; page renders, build passes.
 
 ## In progress
-- none
+- Port M2: parity check, CLAUDE.md rewrite.
 
 ## Next
-- Greeting agents mount in front of `<main id="main">`.
+- Greeting agents mount in `src/App.tsx` slot.
 
 ## Known issues
-- v1 does not link /resume.pdf, so the page does not either.
-- Inter local files are 400/500 only, so hierarchy uses size and 500.
-- Not visually checked (no screenshots per budget): 360px layout and dark mode are from CSS reasoning only.
-- Old v1 components and JetBrains/Poppins font files remain unused.
+- No resume link (v1 had none). Inter local files are 400/500 only. Browser check pending (done separately).

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Personal portfolio of Wilson Soon, a Computer Science undergraduate at NUS. Software engineer, product manager, dancer, and tea lover." />
+
+    <meta property="og:title" content="Wilson Soon" />
+    <meta property="og:description" content="Personal portfolio of Wilson Soon, a Computer Science undergraduate at NUS. Software engineer, product manager, dancer, and tea lover." />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" type="image/jpeg" href="/images/hero.jpg" />
+    <link rel="apple-touch-icon" href="/images/hero.jpg" />
+    <title>Wilson Soon</title>
+
+    <style>
+      html:not(.dark) { background-color: #FCFCFC; color: #111111; }
+      html.dark        { background-color: #0E0E0E; color: #EDEDED; }
+    </style>
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
