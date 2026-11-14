@@ -77,7 +77,7 @@
 
 .gr-root {
   --fw: clamp(240px, 38vw, 440px);
-  --gap: 14px;
+  --gap: 22px;
   --band: 28px;
   background: radial-gradient(ellipse at 50% 38%, #25232b 0%, #0a0a0d 70%);
 }
@@ -99,25 +99,32 @@
   bottom: 0;
   left: 0;
   width: max-content;
-  background-color: #121015;
-  border-block: 1px solid rgba(255, 255, 255, 0.06);
-  /* Sprocket holes, 12 per frame pitch so the loop seam is invisible. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12' preserveAspectRatio='none'%3E%3Crect x='5' y='2' width='12' height='8' rx='2' fill='%23cfc8b8' fill-opacity='0.85'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12' preserveAspectRatio='none'%3E%3Crect x='5' y='2' width='12' height='8' rx='2' fill='%23cfc8b8' fill-opacity='0.85'/%3E%3C/svg%3E");
-  background-repeat: repeat-x, repeat-x;
-  background-position: left 0 top 6px, left 0 bottom 6px;
-  background-size: calc((var(--fw) + var(--gap)) / 12) 12px;
+  background-color: #b8bdc5;
+  /* Two-row check in ink and the site accent along both edges; 14 tiles per frame pitch so the loop seam is invisible. */
+  background-image:
+    conic-gradient(#1d1b24 25%, #6b5b95 0 50%, #1d1b24 0 75%, #6b5b95 0),
+    conic-gradient(#1d1b24 25%, #6b5b95 0 50%, #1d1b24 0 75%, #6b5b95 0),
+    linear-gradient(#c4c9d0, #b2b8c0);
+  background-repeat: repeat-x, repeat-x, no-repeat;
+  background-position: left 0 top 5px, left 0 bottom 5px, 0 0;
+  background-size:
+    calc((var(--fw) + var(--gap)) / 14) 18px,
+    calc((var(--fw) + var(--gap)) / 14) 18px,
+    100% 100%;
 }
 .gr-cell {
   flex: none;
   width: calc(var(--fw) + var(--gap));
   padding: var(--band) calc(var(--gap) / 2);
 }
+/* Picture painted straight onto the paper with brushed, feathered left/right edges. */
 .gr-frame {
   width: 100%;
   height: calc(var(--fw) * 2 / 3);
-  background: #1c1b22; /* shows if a photo fails to load */
+  background: #9ea5af; /* shows if a photo fails to load */
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
 }
 .gr-frame img {
   display: block;

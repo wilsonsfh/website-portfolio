@@ -1,6 +1,7 @@
 # Spike A: screening room
 
 ## Done
+- Scroll v2 M1: film strip look replaced by cool-grey paper band, ink/accent two-row check borders (CSS conic-gradient), photos with feathered mask edges, 22px paper gaps. Unroll + small fixes follow.
 - M1: overlay in App slot; doors = two leaves hinged at outer edges, rotateY 80deg swinging away (CSS 3D, perspective 1800px), 1.2s closed then 1.0s with cubic-bezier(0.77,0,0.175,1); warm seam light widens and fades; skip, wheel/any-key (not Tab/modifiers) advance; sessionStorage once per session, `?intro=1` replays; reduced motion = no doors/camera/auto-scroll, 300ms cross-fade; page scroll locked while mounted.
 - M2: infinite film strip from photos.json (min 8, 3 copies), rAF writes transform, 60px/s linear auto-scroll starting at t=2.0s; drag 1:1 with pointer capture + pan-y; release velocity decays (0.998/ms) toward auto speed; camera scale(2.8) rotate(-8deg) -> none, 1.2s ease-out at t=2.0s; vertical touch swipe advances.
 - M3: Next button (fades in with 8px rise after first pointer down or 4s after camera start; arrow nudge at +2.5s then every 6s, paused while pointer down; press scale(0.97); 44px; safe-area insets). Zoom exit: scene scales into the frame nearest centre (700ms ease-out) while a --bg veil fades in, then unmounts. Before camera settles (t<3.3s) or under reduced motion or via skip, exit is a 250ms fade instead.
