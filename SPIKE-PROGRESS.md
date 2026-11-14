@@ -8,6 +8,9 @@
 - Reduced motion: section is a plain 100dvh block, unrolled draggable strip, no doors/camera/auto-scroll/autoplay, next visible at once; return visits land on #main.
 - Look: paper band, ink/accent check borders, feathered photos, roll with ember, failed-image placeholder (earlier milestones).
 
+## Fix: blank scroll after the zoom
+- `#main` now has `margin-top: -100dvh` (not in reduced motion), so the page sits under the end of the zoom. The zoom range fades the stage's opacity 1 -> 0 over the whole 0.82-1.0 range (veil removed); stage is `pointer-events: none` from p 0.82 and `visibility: hidden` from p 0.999, restored on the way back. Section is `pointer-events: none` (its box overlaps the page). Landing, `skip` and `next →` use scroll = section end minus stage height (p = 1), not `#main`'s old offset.
+
 ## In progress
 - nothing
 

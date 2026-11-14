@@ -22,14 +22,15 @@
   inset: 0;
 }
 
-/* Zoom into the centre picture: Greeting.tsx writes the zoom transform and the veil opacity from p. */
-.gr-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: var(--bg);
-  opacity: 0;
+/* The main page starts one viewport earlier so it sits under the end of the zoom; the stage fades out above it. */
+.gr-section {
+  pointer-events: none; /* its box overlaps the page; only the stage takes events */
+}
+.gr-root {
+  pointer-events: auto;
+}
+.gr-section:not(.is-reduced) + #main {
+  margin-top: -100dvh;
 }
 
 /* ---------- Camera and film strip ---------- */

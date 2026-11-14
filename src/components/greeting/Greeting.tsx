@@ -21,6 +21,7 @@ const UNROLL: [number, number] = [0.25, 0.55];
 const DWELL: [number, number] = [0.55, 0.82];
 const ZOOM: [number, number] = [0.82, 1];
 
+const END_P = 0.999; // at (or within a hair of) 1 the stage is hidden and inert
 const DOOR_ANGLE = 80; // degrees
 const CAM_SCALE = 2.6;
 const CAM_ROTATE = -8; // degrees
@@ -96,15 +97,17 @@ export default function Greeting() {
       setZone(z);
     }
 
-    // Zoom into the centre picture while the veil whitens to --bg
+    // Zoom into the centre picture while the whole stage fades out over the whole range, revealing
+    // the main page, which sits underneath (pulled up by one viewport in CSS).
     const zoom = zoomRef.current;
-    const veil = stage.querySelector<HTMLElement>(".gr-veil");
     const zt = easeOut(seg(p, ZOOM[0], ZOOM[1]));
-    if (zoom && veil) {
+    stage.style.opacity = String(1 - seg(p, ZOOM[0], ZOOM[1]));
+    stage.style.visibility = p >= END_P ? "hidden" : "visible";
+    stage.style.pointerEvents = p >= ZOOM[0] ? "none" : "auto";
+    if (zoom) {
       if (zt <= 0) {
         zoomGeo.current = null;
         zoom.style.transform = "none";
-        veil.style.opacity = "0";
       } else {
         if (!zoomGeo.current) {
           // strip holds its offset outside the dwell range, so this is stable until z returns to 0
@@ -133,10 +136,17 @@ export default function Greeting() {
         const g = zoomGeo.current;
         zoom.style.transformOrigin = `${g.ox}px ${g.oy}px`;
         zoom.style.transform = `scale(${1 + (g.s - 1) * zt})`;
-        veil.style.opacity = String(1 - (1 - seg(zt, 0.29, 1)) ** 2);
       }
     }
   }, [reduced, unroll]);
+
+  // Scroll position where p = 1 and the main page is fully in view (the page is pulled up under the stage).
+  const mainScroll = useCallback(() => {
+    const sec = sectionRef.current;
+    const stage = stageRef.current;
+    if (!sec || !stage) return 0;
+    return sec.offsetTop + sec.offsetHeight - (reduced ? 0 : stage.offsetHeight);
+  }, [reduced]);
 
   // Before first paint: land at the top (first visit) or at #main (return visit), so nothing shifts.
   useLayoutEffect(() => {
@@ -145,11 +155,8 @@ export default function Greeting() {
     } catch {
       /* ignore */
     }
-    const sec = sectionRef.current;
-    if (!sec) return;
-    const top = first ? 0 : sec.offsetTop + sec.offsetHeight;
-    window.scrollTo({ top, behavior: "instant" });
-  }, [first]);
+    window.scrollTo({ top: first ? 0 : mainScroll(), behavior: "instant" });
+  }, [first, mainScroll]);
 
   useEffect(() => {
     try {
@@ -241,11 +248,10 @@ export default function Greeting() {
     };
   }, [nextOn, reduced]);
 
-  const toMain = useCallback((behavior: ScrollBehavior) => {
-    const sec = sectionRef.current;
-    if (!sec) return;
-    window.scrollTo({ top: sec.offsetTop + sec.offsetHeight, behavior });
-  }, []);
+  const toMain = useCallback(
+    (behavior: ScrollBehavior) => window.scrollTo({ top: mainScroll(), behavior }),
+    [mainScroll],
+  );
 
   return (
     <section
@@ -265,7 +271,6 @@ export default function Greeting() {
             />
           </div>
           <div className="gr-vignette" />
-          <div className="gr-veil" />
         </div>
 
         {!reduced && (
