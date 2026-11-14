@@ -15,16 +15,18 @@ function useClock() {
 }
 
 function useViewport() {
-  const [vp, setVp] = useState({ w: window.innerWidth, h: window.innerHeight });
+  // w: viewport width (matches the css breakpoint), cw: width without a classic scrollbar (what the section really is)
+  const read = () => ({ w: window.innerWidth, cw: document.documentElement.clientWidth, h: window.innerHeight });
+  const [vp, setVp] = useState(read);
   useEffect(() => {
-    const on = () => setVp({ w: window.innerWidth, h: window.innerHeight });
+    const on = () => setVp(read());
     window.addEventListener("resize", on);
     return () => window.removeEventListener("resize", on);
   }, []);
   return vp;
 }
 
-type Win = { id: AppId; x: number; y: number; z: number };
+type Win = { id: AppId; x: number; y: number; z: number; focus: boolean };
 const PHONE = 640;
 
 const size = (id: AppId, vw: number, vh: number) => {
@@ -33,25 +35,26 @@ const size = (id: AppId, vw: number, vh: number) => {
 };
 
 // a new window cascades gently from roughly the centre
-const place = (id: AppId, n: number, z: number): Win => {
-  const { w } = size(id, window.innerWidth, window.innerHeight);
-  return { id, x: Math.max(150, (window.innerWidth - w) / 2 + ((n % 5) - 2) * 36), y: BAR + 28 + (n % 5) * 30, z };
+const place = (id: AppId, n: number, z: number, focus: boolean): Win => {
+  const cw = document.documentElement.clientWidth;
+  const { w } = size(id, cw, window.innerHeight);
+  return { id, x: Math.max(150, (cw - w) / 2 + ((n % 5) - 2) * 36), y: BAR + 28 + (n % 5) * 30, z, focus };
 };
 
-export default function Desktop({ onPlain }: { onPlain: () => void }) {
+export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain: () => void; onPowerOff: () => void; focusOnMount: boolean }) {
   const clock = useClock();
   const root = useRef<HTMLDivElement>(null);
   const vp = useViewport();
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11)] : []));
+  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
 
   const open = (id: AppId) => {
     const z = ++zRef.current;
     setWins((ws) =>
       ws.some((w) => w.id === id)
         ? ws.map((w) => (w.id === id ? { ...w, z } : w))
-        : [...ws, place(id, ws.length, z)],
+        : [...ws, place(id, ws.length, z, true)],
     );
   };
   const focus = (id: AppId) => {
@@ -67,8 +70,8 @@ export default function Desktop({ onPlain }: { onPlain: () => void }) {
 
   // keep keyboard focus in the desktop after the power button unmounts
   useEffect(() => {
-    if (!root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
-  }, []);
+    if (focusOnMount && !root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ctx: Ctx = { open, exit: onPlain };
   const top = Math.max(0, ...wins.map((w) => w.z));
@@ -78,7 +81,10 @@ export default function Desktop({ onPlain }: { onPlain: () => void }) {
       <header className="dk-bar">
         <span>wilson</span>
         <span className="dk-clock">{clock}</span>
-        <button type="button" className="dk-plain" onClick={onPlain}>plain site →</button>
+        <span className="dk-right">
+          <button type="button" className="dk-plain" onClick={onPowerOff}>power off</button>
+          <button type="button" className="dk-plain" onClick={onPlain}>plain site →</button>
+        </span>
       </header>
 
       <nav className="dk-icons" aria-label="apps">
@@ -92,18 +98,21 @@ export default function Desktop({ onPlain }: { onPlain: () => void }) {
         ))}
       </nav>
 
+      <button type="button" className="gr-cue dk-cue" onClick={onPlain}>↓ plain site</button>
+
       <AnimatePresence>
         {wins.map((w) => {
           const a = appById(w.id);
-          const s = size(w.id, vp.w, vp.h);
+          const s = size(w.id, vp.cw, vp.h);
           return (
             <Window
               key={w.id}
               title={a.title}
               x={w.x} y={w.y} w={s.w} h={s.h} z={w.z}
-              vw={vp.w} vh={vp.h}
+              vw={vp.cw} vh={vp.h}
               active={w.z === top}
               phone={phone}
+              autoFocus={w.focus}
               flush={a.flush}
               onFocus={() => focus(w.id)}
               onClose={() => close(w.id)}

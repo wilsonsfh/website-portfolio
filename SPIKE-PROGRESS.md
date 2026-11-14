@@ -7,6 +7,12 @@
 - M4: focus handling (window/desktop/terminal input focus, focus returns to icon on close), 360px checked by reasoning.
 - Shared copy lives in `src/copy.ts` (MainPage imports it; output unchanged).
 
+## Follow-up: scrollable desktop (done, one commit for both milestones)
+- Desktop is now a `100dvh` `<section id="desktop">` in normal flow before `<main id="main">`; nothing unmounts; scroll lock and inert removed. Windows and phone sheets are absolute inside the section and clamped to it (width uses clientWidth).
+- `plain site →`, `↓ plain site` cue (bottom edge, off screen and desktop) and Escape smooth-scroll to `#main` (instant under reduced motion). Terminal `exit` too. Escape only acts while the desktop is still on screen.
+- `history.scrollRestoration = "manual"`. sessionStorage `greeting-b`: absent = first visit (top, power-off), `seen-off` / `seen-on` = return visit (useLayoutEffect jumps to top of #main; `seen-on` shows desktop already on, no boot, about.txt open on desktop widths without stealing focus). Scrolling past half a viewport also marks the visit as seen. `?intro=1` behaves like a first visit.
+- `power off` in the top bar returns the section to the power-off screen.
+
 ## In progress
 - nothing
 
@@ -14,6 +20,7 @@
 - Real-device check; decide if concept survives vs. plain page.
 
 ## Known issues
+- Follow-up unverified visually: return-visit landing, scroll behaviour over windows, top bar fit at 360px (grid auto/1fr/auto, two right buttons).
 - Nothing visually verified (no screenshots allowed): CRT timing, window cascade positions, photo strip sizing, phone layout.
 - On phone about.txt is not auto-opened (a sheet would hide the icons).
 - Photos have empty alt in photos.json; strip is labelled as a group only.

@@ -10,20 +10,20 @@ type Props = {
   title: string;
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
-  active: boolean; phone: boolean; flush?: boolean;
+  active: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
   onFocus: () => void; onClose: () => void; onMove: (x: number, y: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, flush, onFocus, onClose, onMove, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, flush, autoFocus, onFocus, onClose, onMove, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
 
   useEffect(() => {
     const r = root.current;
-    if (r && !r.contains(document.activeElement)) r.focus({ preventScroll: true });
-  }, []);
+    if (autoFocus && r && !r.contains(document.activeElement)) r.focus({ preventScroll: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // always kept inside the viewport, also after a resize
   const cx = clamp(x, 0, vw - w);
