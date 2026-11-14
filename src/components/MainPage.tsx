@@ -2,19 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import workExperience from "../data/work-experience.json";
 import projects from "../data/projects.json";
 import activities from "../data/activities.json";
-import skills from "../data/skills.json";
-
-const skillLine = Object.values(skills).flat().join(", ").toLowerCase();
-
-const contacts = [
-  { label: "email", href: "mailto:wilionsoon2010@gmail.com", text: "wilionsoon2010@gmail.com" },
-  { label: "github", href: "https://github.com/wilsonsfh", text: "wilsonsfh" },
-  { label: "x", href: "https://x.com/wilsonsfh_", text: "wilsonsfh_" },
-  { label: "linkedin", href: "https://linkedin.com/in/wilsonsfh", text: "wilsonsfh" },
-];
-
-const ext = (href: string) =>
-  href.startsWith("mailto") ? {} : { target: "_blank", rel: "noopener noreferrer" };
+import { skillLine, lede, aboutParagraphs, contacts, ext } from "../copy";
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -72,15 +60,12 @@ export default function MainPage() {
       <div className="column">
         <header className="intro">
           <h1 className="name">wilson.</h1>
-          <p className="lede">
-            based in singapore, studying computer science at the national university of singapore and passionate about building all things tech and aesthetics.
-          </p>
+          <p className="lede">{lede}</p>
         </header>
 
         <div className="rows">
           <Row label="about">
-            <p>i'm currently thinking about how to be a better individual contributor as a software engineer with AI. i'm also interested in product thinking and building something people want, and learning how to ace prioritisations of a hundred things.</p>
-            <p>in my free time, i like exploring tea brands, freestyle dancing and doing photography. i am also currently learning the guitar, rock climbing and volleyball. these build my own unique story, which i believe the best software is built by people who bring diverse perspectives to the table.</p>
+            {aboutParagraphs.map((t) => <p key={t}>{t}</p>)}
             <p className="meta">skills: {skillLine}</p>
           </Row>
 
