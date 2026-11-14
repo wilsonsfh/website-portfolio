@@ -25,10 +25,18 @@ const DOOR_ANGLE = 80; // degrees
 const CAM_SCALE = 2.6;
 const CAM_ROTATE = -8; // degrees
 
+const DOORS_CLOSED_MS = 1200; // first visit: hold on the closed doors, then autoplay
+const AUTOPLAY_MS = 2600; // window scroll from 0 to the start of the dwell range
+const NEXT_AFTER_WATCHING_MS = 4000;
+const BOUNCE_FIRST_MS = 2500;
+const BOUNCE_EVERY_MS = 6000;
+const IGNORED_KEYS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock"]);
+
 type Zone = 0 | 1 | 2; // before dwell | dwell | zoom/after
 
 export default function Greeting() {
   const [reduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [first] = useState(shouldPlayIntro); // first visit this session (or ?intro=1)
   const [zone, setZone] = useState<Zone>(reduced ? 1 : 0);
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -40,6 +48,8 @@ export default function Greeting() {
   const activeRef = useRef(reduced); // dwell: strip runs
   const downRef = useRef(false);
   const zoneRef = useRef<Zone>(reduced ? 1 : 0);
+  const [grabbed, setGrabbed] = useState(false);
+  const [watched, setWatched] = useState(false);
   const zoomGeo = useRef<{ ox: number; oy: number; s: number } | null>(null);
 
   // Everything below is written imperatively from p: transform/opacity/clip-path only.
@@ -128,6 +138,27 @@ export default function Greeting() {
     }
   }, [reduced, unroll]);
 
+  // Before first paint: land at the top (first visit) or at #main (return visit), so nothing shifts.
+  useLayoutEffect(() => {
+    try {
+      history.scrollRestoration = "manual";
+    } catch {
+      /* ignore */
+    }
+    const sec = sectionRef.current;
+    if (!sec) return;
+    const top = first ? 0 : sec.offsetTop + sec.offsetHeight;
+    window.scrollTo({ top, behavior: "instant" });
+  }, [first]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      /* private mode: replays, acceptable */
+    }
+  }, []);
+
   useLayoutEffect(() => {
     update();
     const onResize = () => {
@@ -141,6 +172,74 @@ export default function Greeting() {
       window.removeEventListener("resize", onResize);
     };
   }, [update]);
+
+  // First visit: after the doors have been closed for a moment, scroll the window itself to the start
+  // of the dwell range. Any input cancels it at once and leaves the visitor at the live position.
+  useEffect(() => {
+    if (!first || reduced) return;
+    let raf = 0;
+    let cancelled = false;
+    const events = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
+    const cancel = (e?: Event) => {
+      if (e instanceof KeyboardEvent && IGNORED_KEYS.has(e.key)) return;
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      events.forEach((n) => window.removeEventListener(n, cancel));
+    };
+    events.forEach((n) => window.addEventListener(n, cancel, { passive: true }));
+    const timer = window.setTimeout(() => {
+      const sec = sectionRef.current;
+      const stage = stageRef.current;
+      if (!sec || !stage) return;
+      const from = window.scrollY;
+      const target = (sec.offsetHeight - stage.offsetHeight) * DWELL[0];
+      const t0 = performance.now();
+      let last = from;
+      const tick = (now: number) => {
+        if (cancelled) return;
+        // Something else moved the page (scrollbar drag, keyboard focus): back off.
+        if (Math.abs(window.scrollY - last) > 2) return cancel();
+        const t = clamp01((now - t0) / AUTOPLAY_MS);
+        window.scrollTo({ top: from + (target - from) * t, behavior: "instant" });
+        last = window.scrollY;
+        if (t < 1) raf = requestAnimationFrame(tick);
+        else cancel();
+      };
+      raf = requestAnimationFrame(tick);
+    }, DOORS_CLOSED_MS);
+    return cancel;
+  }, [first, reduced]);
+
+  // next → shows in the dwell range once the visitor grabs the strip, or after 4s of watching.
+  const nextReady = reduced || grabbed || watched;
+  useEffect(() => {
+    if (zone !== 1 || nextReady) return;
+    const t = window.setTimeout(() => setWatched(true), NEXT_AFTER_WATCHING_MS);
+    return () => clearTimeout(t);
+  }, [zone, nextReady]);
+  const nextOn = zone === 1 && nextReady;
+
+  // Small arrow nudge: first 2.5s after it appears, then every 6s, paused while the pointer is down.
+  useEffect(() => {
+    if (!nextOn || reduced) return;
+    const nudge = () => {
+      if (downRef.current) return;
+      arrowRef.current?.animate(
+        [{ transform: "translateX(0)" }, { transform: "translateX(6px)", offset: 0.4 }, { transform: "translateX(0)" }],
+        { duration: 500, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
+    };
+    let iv = 0;
+    const firstT = window.setTimeout(() => {
+      nudge();
+      iv = window.setInterval(nudge, BOUNCE_EVERY_MS);
+    }, BOUNCE_FIRST_MS);
+    return () => {
+      clearTimeout(firstT);
+      clearInterval(iv);
+    };
+  }, [nextOn, reduced]);
 
   const toMain = useCallback((behavior: ScrollBehavior) => {
     const sec = sectionRef.current;
@@ -161,7 +260,7 @@ export default function Greeting() {
               activeRef={activeRef}
               reduced={reduced}
               progress={unroll}
-              onControl={() => {}}
+              onControl={() => setGrabbed(true)}
               downRef={downRef}
             />
           </div>
@@ -177,7 +276,7 @@ export default function Greeting() {
           </div>
         )}
 
-        <div className={`gr-next${zone === 1 ? " is-on" : ""}`}>
+        <div className={`gr-next${nextOn ? " is-on" : ""}`}>
           <button type="button" className="gr-next-btn" onClick={() => toMain("smooth")}>
             <span ref={arrowRef} className="gr-next-label">
               next →
