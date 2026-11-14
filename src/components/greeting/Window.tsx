@@ -20,7 +20,10 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
 
-  useEffect(() => { root.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => {
+    const r = root.current;
+    if (r && !r.contains(document.activeElement)) r.focus({ preventScroll: true });
+  }, []);
 
   // always kept inside the viewport, also after a resize
   const cx = clamp(x, 0, vw - w);

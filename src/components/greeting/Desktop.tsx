@@ -40,6 +40,7 @@ const place = (id: AppId, n: number, z: number): Win => {
 
 export default function Desktop({ onPlain }: { onPlain: () => void }) {
   const clock = useClock();
+  const root = useRef<HTMLDivElement>(null);
   const vp = useViewport();
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
@@ -64,11 +65,16 @@ export default function Desktop({ onPlain }: { onPlain: () => void }) {
   const move = (id: AppId, x: number, y: number) =>
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, x, y } : w)));
 
+  // keep keyboard focus in the desktop after the power button unmounts
+  useEffect(() => {
+    if (!root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
+  }, []);
+
   const ctx: Ctx = { open, exit: onPlain };
   const top = Math.max(0, ...wins.map((w) => w.z));
 
   return (
-    <div className="dk">
+    <div className="dk" ref={root} tabIndex={-1}>
       <header className="dk-bar">
         <span>wilson</span>
         <span className="dk-clock">{clock}</span>

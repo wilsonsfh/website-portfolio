@@ -80,7 +80,6 @@ export default function Greeting() {
           className="gr-root"
           role="region"
           aria-label="desktop greeting"
-          initial={false}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
         >
