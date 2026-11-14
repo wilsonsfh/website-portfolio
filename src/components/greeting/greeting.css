@@ -5,8 +5,9 @@
   inset: 0;
   z-index: 100;
   overflow: hidden;
-  background: #0a0a0d;
   overscroll-behavior: contain;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Reduced motion mounts transparent and cross-fades in. */
@@ -30,15 +31,95 @@
   inset: 0;
 }
 
-.gr-placeholder {
+/* ---------- Camera and film strip ---------- */
+
+/* Opens as a close-up on one tilted frame; pulls back and levels out once .is-settled lands. */
+.gr-camera {
+  transform: scale(2.8) rotate(-8deg);
+  transform-origin: 50% 50%;
+}
+.gr-camera.is-settled {
+  transform: none;
+  transition: transform 1200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gr-camera,
+  .gr-camera.is-settled {
+    transform: none;
+    transition: none;
+  }
+}
+
+.gr-vignette {
   position: absolute;
-  left: 50%;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.gr-root {
+  --fw: clamp(240px, 38vw, 440px);
+  --gap: 14px;
+  --band: 28px;
+  background: radial-gradient(ellipse at 50% 38%, #25232b 0%, #0a0a0d 70%);
+}
+
+.gr-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
   top: 50%;
-  width: 200px;
-  height: 280px;
-  margin: -140px 0 0 -100px;
-  border: 10px solid #1b1b20;
-  background: #2a2a31;
+  height: calc(var(--fw) * 2 / 3 + var(--band) * 2);
+  margin-top: calc((var(--fw) * 2 / 3 + var(--band) * 2) / -2);
+  overflow: hidden;
+  pointer-events: none;
+}
+.gr-track {
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: max-content;
+  background-color: #121015;
+  border-block: 1px solid rgba(255, 255, 255, 0.06);
+  /* Sprocket holes, 12 per frame pitch so the loop seam is invisible. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12' preserveAspectRatio='none'%3E%3Crect x='5' y='2' width='12' height='8' rx='2' fill='%23cfc8b8' fill-opacity='0.85'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12' preserveAspectRatio='none'%3E%3Crect x='5' y='2' width='12' height='8' rx='2' fill='%23cfc8b8' fill-opacity='0.85'/%3E%3C/svg%3E");
+  background-repeat: repeat-x, repeat-x;
+  background-position: left 0 top 6px, left 0 bottom 6px;
+  background-size: calc((var(--fw) + var(--gap)) / 12) 12px;
+}
+.gr-cell {
+  flex: none;
+  width: calc(var(--fw) + var(--gap));
+  padding: var(--band) calc(var(--gap) / 2);
+}
+.gr-frame {
+  width: 100%;
+  height: calc(var(--fw) * 2 / 3);
+  background: #1c1b22; /* shows if a photo fails to load */
+  overflow: hidden;
+}
+.gr-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Full-viewport drag surface. */
+.gr-hit {
+  position: absolute;
+  inset: -50%;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.gr-hit:active {
+  cursor: grabbing;
 }
 
 /* ---------- Doors: two leaves hinged at their outer edges, swinging away ---------- */

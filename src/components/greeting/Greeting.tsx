@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import FilmStrip from "./FilmStrip";
 import "./greeting.css";
 
 const SEEN_KEY = "intro-seen";
@@ -14,6 +15,7 @@ export function shouldPlayIntro(): boolean {
 
 const DOORS_CLOSED_MS = 1200;
 const DOORS_GONE_MS = 2500;
+const CAMERA_START_MS = 2000;
 const IGNORED_KEYS = new Set(["Tab", "Shift", "Control", "Alt", "Meta", "CapsLock"]);
 
 type Exit = null | "fade";
@@ -25,6 +27,8 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
   const [open, setOpen] = useState(false); // doors swing
   const [doorsGone, setDoorsGone] = useState(reduced);
   const [ready, setReady] = useState(!reduced); // reduced motion: cross-fade in
+  const [running, setRunning] = useState(reduced); // camera + auto-scroll start
+  const downRef = useRef(false);
   const [exit, setExit] = useState<Exit>(null);
   const exiting = useRef(false);
   const doneTimer = useRef<number>(0);
@@ -52,9 +56,11 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
     }
     const t1 = window.setTimeout(() => setOpen(true), DOORS_CLOSED_MS);
     const t2 = window.setTimeout(() => setDoorsGone(true), DOORS_GONE_MS);
+    const t3 = window.setTimeout(() => setRunning(true), CAMERA_START_MS);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [reduced]);
 
@@ -88,9 +94,16 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
   return (
     <div className={cls} role="presentation">
       <div className="gr-zoom">
-        <div className="gr-camera">
-          <div className="gr-placeholder" />
+        <div className={`gr-camera${running ? " is-settled" : ""}`}>
+          <FilmStrip
+            running={running}
+            reduced={reduced}
+            onControl={() => {}}
+            onSwipeAway={advance}
+            downRef={downRef}
+          />
         </div>
+        <div className="gr-vignette" />
       </div>
 
       {!doorsGone && (
