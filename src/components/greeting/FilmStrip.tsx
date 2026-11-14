@@ -111,6 +111,12 @@ export default function FilmStrip({ running, reduced, onControl, onSwipeAway, do
   const onPointerMove = (e: React.PointerEvent) => {
     const st = s.current;
     if (!st.dragging) return;
+    const dy = e.clientY - st.startY;
+    if (e.pointerType === "touch" && !st.moved && Math.abs(dy) > 24 && Math.abs(dy) > Math.abs(e.clientX - st.startX) * 1.5) {
+      release(e); // vertical swipe reads as scroll
+      onSwipeAway();
+      return;
+    }
     st.x += e.clientX - st.lastX; // 1:1 from the live position
     st.lastX = e.clientX;
     if (Math.abs(e.clientX - st.startX) > 6) st.moved = true;
