@@ -1,26 +1,23 @@
-# Spike A: screening room
+# Spike A: screening room (paper hand-scroll version)
 
 ## Done
-- Scroll v2 M1: film strip look replaced by cool-grey paper band, ink/accent two-row check borders (CSS conic-gradient), photos with feathered mask edges, 22px paper gaps. Unroll + small fixes follow.
-- M1: overlay in App slot; doors = two leaves hinged at outer edges, rotateY 80deg swinging away (CSS 3D, perspective 1800px), 1.2s closed then 1.0s with cubic-bezier(0.77,0,0.175,1); warm seam light widens and fades; skip, wheel/any-key (not Tab/modifiers) advance; sessionStorage once per session, `?intro=1` replays; reduced motion = no doors/camera/auto-scroll, 300ms cross-fade; page scroll locked while mounted.
-- M2: infinite film strip from photos.json (min 8, 3 copies), rAF writes transform, 60px/s linear auto-scroll starting at t=2.0s; drag 1:1 with pointer capture + pan-y; release velocity decays (0.998/ms) toward auto speed; camera scale(2.8) rotate(-8deg) -> none, 1.2s ease-out at t=2.0s; vertical touch swipe advances.
-- M3: Next button (fades in with 8px rise after first pointer down or 4s after camera start; arrow nudge at +2.5s then every 6s, paused while pointer down; press scale(0.97); 44px; safe-area insets). Zoom exit: scene scales into the frame nearest centre (700ms ease-out) while a --bg veil fades in, then unmounts. Before camera settles (t<3.3s) or under reduced motion or via skip, exit is a 250ms fade instead.
-- M4: placeholder frame colour if a photo 404s (img hidden); 360px layout by clamp(240px,38vw,440px) frames; reasoning-only timing pass.
+- Doors (unchanged): rotateY leaves hinged at outer edges, 1.2s closed then 1.0s open, warm seam light; skip, wheel/any key (not Tab/modifiers) advance; once per session via sessionStorage, `?intro=1` replays; page scroll locked while mounted.
+- Scroll M1 (look): cool-grey paper band (same in both themes), two-row ink/accent `#6B5B95` check borders via CSS conic-gradient, photos with feathered left/right mask edges, 22px paper gaps, photos.json loop (min 8, 3 copies), failed-image placeholder.
+- Scroll M2 (unroll): one Motion value `progress` (0..1, 1.5s, cubic-bezier(0.77,0,0.175,1), starts t=2.0s as doors open) drives (a) `clip-path: inset` on the paper band, (b) `translateX` + `scaleX` squash (1 -> 0.65) on the roll, (c) camera scale 2.6 -> 1 and rotate -8deg -> 0 (origin 30% 50%). Roll = shaded paper cylinder, wooden knobs 16px beyond the band, ember line on its left edge. Auto-scroll (60px/s linear) starts on completion. Pressing the strip mid-unroll sets progress to 1 (everything snaps) and drag follows from the live position. Reduced motion: progress starts at 1, no roll, no camera, no auto-scroll, cross-fade only.
+- Scroll M3 (fixes): label `next →`; `#main` gets `inert` while the overlay is mounted, removed on unmount. Zoom exit now keys off progress === 1 (earlier exits fade).
+- Drag with pointer capture and release momentum decaying toward auto speed; next button after first press or 4s after unroll start; zoom into centre frame with --bg veil, 700ms.
 
 ## In progress
 - nothing
 
 ## Next
-- Look at it in a real browser and on a phone; tune door angle/light, strip size, auto-scroll speed.
+- Real-browser look: roll width, ember intensity, paper tone, camera origin; phone check.
 
 ## Known issues
 - Nothing visually verified.
-- Tab keys are ignored for "any key", so keyboard users can Tab to Next; focus can still wander to MainPage behind the overlay (not made inert).
-- iOS Safari may ignore html overflow:hidden; overlay is fixed with overscroll-behavior: contain.
+- iOS Safari may ignore html overflow:hidden.
 
 ## Unknowns discovered
-- Zoom exit needs the camera settled (else frame position drifts), so early scroll/keys get a plain fade, not the signature zoom.
-- Whitening is a full-screen veil, not only the centre frame.
-- Touch vertical swipe: relied on pointercancel plus a manual dy check; untested on device.
-- Arrow nudge uses WAAPI keyframes on an inner span (button itself only uses transform transitions).
-- Intro is ~6s before Next appears for a passive visitor.
+- Camera is eased by the same in-out curve as the roll (slow start/end), not ease-out.
+- Snap on press mid-unroll is abrupt (camera and roll jump); no blend.
+- Roll edge uses clientWidth read per frame (cheap, but a layout read).

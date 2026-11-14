@@ -1,9 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import type { MotionValue } from "motion/react";
 import photoData from "../../data/photos.json";
 
 const AUTO_SPEED = 60; // px/s, constant (linear)
 const DECAY = 0.998; // per ms, momentum decay toward the auto velocity
 const MIN_SET = 8;
+const ROLL_START = 0.24; // roll's left edge as a fraction of the view width at the start
+const ROLL_SQUASH = 0.35; // the roll thins by this much by the end
 
 type Photo = { src: string; alt: string };
 
@@ -19,6 +22,10 @@ type Props = {
   /** Auto-scroll runs once true (and never under reduced motion). */
   running: boolean;
   reduced: boolean;
+  /** 0 = rolled up, 1 = fully unrolled; drives the roll position and the paper reveal. */
+  progress: MotionValue<number>;
+  /** Every pointer down on the strip (used to finish the unroll). */
+  onPress: () => void;
   /** Visitor took the strip. */
   onControl: () => void;
   /** Vertical touch swipe: treated as scroll, moves on. */
@@ -27,9 +34,11 @@ type Props = {
   downRef: { current: boolean };
 };
 
-export default function FilmStrip({ running, reduced, onControl, onSwipeAway, downRef }: Props) {
+export default function FilmStrip({ running, reduced, progress, onPress, onControl, onSwipeAway, downRef }: Props) {
   const track = useRef<HTMLDivElement>(null);
   const hit = useRef<HTMLDivElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  const roll = useRef<HTMLDivElement>(null);
   const targetV = useRef(0); // px/s the strip eases toward when free
   const s = useRef({
     x: 0, // offset within one set, kept in [-L, 0)
@@ -68,6 +77,22 @@ export default function FilmStrip({ running, reduced, onControl, onSwipeAway, do
     return () => ro.disconnect();
   }, []);
 
+  // Reveal (clip-path on the paper) and roll (transform) are both written from the one progress value,
+  // so the roll's left edge, where the paper leaves it, is the revealed edge by construction.
+  useLayoutEffect(() => {
+    const apply = (p: number) => {
+      const band = strip.current;
+      const r = roll.current;
+      if (!band || !r) return;
+      const w = band.clientWidth;
+      const edge = p >= 1 ? w + 8 : w * ROLL_START + (w + 8 - w * ROLL_START) * p;
+      band.style.clipPath = `inset(0 ${Math.max(0, w - edge)}px 0 0)`;
+      r.style.transform = `translate3d(${edge}px,0,0) scaleX(${1 - ROLL_SQUASH * p})`;
+    };
+    apply(progress.get());
+    return progress.on("change", apply);
+  }, [progress]);
+
   // One rAF loop writes transform directly; no React state per frame.
   useEffect(() => {
     const st = s.current;
@@ -94,6 +119,7 @@ export default function FilmStrip({ running, reduced, onControl, onSwipeAway, do
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     const st = s.current;
+    onPress();
     hit.current?.setPointerCapture(e.pointerId);
     st.dragging = true;
     st.moved = false;
@@ -145,7 +171,8 @@ export default function FilmStrip({ running, reduced, onControl, onSwipeAway, do
 
   return (
     <>
-      <div className="gr-strip" aria-hidden="true">
+      <div className="gr-scroll" aria-hidden="true">
+        <div className="gr-strip" ref={strip}>
         <div className="gr-track" ref={track}>
           {[0, 1, 2].map((copy) =>
             SET.map((p, i) => (
@@ -164,6 +191,13 @@ export default function FilmStrip({ running, reduced, onControl, onSwipeAway, do
               </div>
             )),
           )}
+        </div>
+        </div>
+        <div className="gr-roll" ref={roll}>
+          <i className="gr-roll-body" />
+          <i className="gr-knob gr-knob-t" />
+          <i className="gr-knob gr-knob-b" />
+          <i className="gr-ember" />
         </div>
       </div>
       <div

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { animate, useMotionValue, type AnimationPlaybackControls } from "motion/react";
 import FilmStrip from "./FilmStrip";
 import "./greeting.css";
 
@@ -15,10 +16,12 @@ export function shouldPlayIntro(): boolean {
 
 const DOORS_CLOSED_MS = 1200;
 const DOORS_GONE_MS = 2500;
-const CAMERA_START_MS = 2000;
+const UNROLL_START_MS = 2000;
+const UNROLL_S = 1.5;
+const CAM_SCALE = 2.6;
+const CAM_ROTATE = -8; // degrees
 const IGNORED_KEYS = new Set(["Tab", "Shift", "Control", "Alt", "Meta", "CapsLock"]);
 
-const SETTLED_MS = CAMERA_START_MS + 1300; // camera move done; zoom exit only after this
 const NEXT_AFTER_WATCHING_MS = 4000;
 const BOUNCE_FIRST_MS = 2500;
 const BOUNCE_EVERY_MS = 6000;
@@ -32,14 +35,18 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
   const [open, setOpen] = useState(false); // doors swing
   const [doorsGone, setDoorsGone] = useState(reduced);
   const [ready, setReady] = useState(!reduced); // reduced motion: cross-fade in
-  const [running, setRunning] = useState(reduced); // camera + auto-scroll start
+  const [running, setRunning] = useState(reduced); // unroll finished: auto-scroll starts
   const downRef = useRef(false);
   const [exit, setExit] = useState<Exit>(null);
   const [zoom, setZoom] = useState<{ ox: number; oy: number; s: number } | null>(null);
   const [nextOn, setNextOn] = useState(reduced);
   const rootRef = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLSpanElement>(null);
-  const t0 = useRef(performance.now());
+  const cameraRef = useRef<HTMLDivElement>(null);
+  const unrollTimer = useRef<number>(0);
+  const unrollAnim = useRef<AnimationPlaybackControls | null>(null);
+  // One progress value (0 = rolled, 1 = unrolled) drives the roll, the reveal and the camera.
+  const progress = useMotionValue(reduced ? 1 : 0);
   const exiting = useRef(false);
   const doneTimer = useRef<number>(0);
 
@@ -53,8 +60,11 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
     const html = document.documentElement;
     const prev = html.style.overflow;
     html.style.overflow = "hidden";
+    const main = document.getElementById("main");
+    main?.setAttribute("inert", "");
     return () => {
       html.style.overflow = prev;
+      main?.removeAttribute("inert");
     };
   }, []);
 
@@ -66,13 +76,43 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
     }
     const t1 = window.setTimeout(() => setOpen(true), DOORS_CLOSED_MS);
     const t2 = window.setTimeout(() => setDoorsGone(true), DOORS_GONE_MS);
-    const t3 = window.setTimeout(() => setRunning(true), CAMERA_START_MS);
+    unrollTimer.current = window.setTimeout(() => {
+      unrollAnim.current = animate(progress, 1, {
+        duration: UNROLL_S,
+        ease: [0.77, 0, 0.175, 1],
+        onComplete: () => setRunning(true),
+      });
+    }, UNROLL_START_MS);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
+      clearTimeout(unrollTimer.current);
+      unrollAnim.current?.stop();
     };
-  }, [reduced]);
+  }, [reduced, progress]);
+
+  // Camera pull-back and levelling follow the same progress as the roll.
+  useLayoutEffect(() => {
+    const apply = (p: number) => {
+      const el = cameraRef.current;
+      if (!el) return;
+      el.style.transform =
+        p >= 1
+          ? "none"
+          : `scale(${CAM_SCALE + (1 - CAM_SCALE) * p}) rotate(${CAM_ROTATE * (1 - p)}deg)`;
+    };
+    apply(progress.get());
+    return progress.on("change", apply);
+  }, [progress]);
+
+  // Pressing the strip mid-unroll finishes the reveal at once; the visitor drags from the live position.
+  const finishUnroll = useCallback(() => {
+    if (progress.get() >= 1) return;
+    clearTimeout(unrollTimer.current);
+    unrollAnim.current?.stop();
+    progress.set(1);
+    setRunning(true);
+  }, [progress]);
 
   useEffect(() => () => clearTimeout(doneTimer.current), []);
 
@@ -81,8 +121,7 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
     (kind?: "fade") => {
       if (exiting.current) return;
       exiting.current = true;
-      const settled = performance.now() - t0.current >= SETTLED_MS;
-      if (kind === "fade" || reduced || !settled) {
+      if (kind === "fade" || reduced || progress.get() < 1) {
         setExit("fade");
         doneTimer.current = window.setTimeout(onDone, 280);
         return;
@@ -110,7 +149,7 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
       setExit("zoom");
       doneTimer.current = window.setTimeout(onDone, 720);
     },
-    [onDone, reduced],
+    [onDone, reduced, progress],
   );
 
   // Never a gate: wheel or any key moves on.
@@ -131,7 +170,7 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
   // Next appears after 4s of watching if the visitor never takes control.
   useEffect(() => {
     if (reduced) return;
-    const t = window.setTimeout(() => setNextOn(true), CAMERA_START_MS + NEXT_AFTER_WATCHING_MS);
+    const t = window.setTimeout(() => setNextOn(true), UNROLL_START_MS + NEXT_AFTER_WATCHING_MS);
     return () => clearTimeout(t);
   }, [reduced]);
 
@@ -170,10 +209,12 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
             : undefined
         }
       >
-        <div className={`gr-camera${running ? " is-settled" : ""}`}>
+        <div className="gr-camera" ref={cameraRef}>
           <FilmStrip
             running={running}
             reduced={reduced}
+            progress={progress}
+            onPress={finishUnroll}
             onControl={() => setNextOn(true)}
             onSwipeAway={advance}
             downRef={downRef}
@@ -194,7 +235,7 @@ export default function Greeting({ onDone }: { onDone: () => void }) {
       <div className={`gr-next${nextOn ? " is-on" : ""}`}>
         <button type="button" className="gr-next-btn" onClick={() => advance()}>
           <span ref={arrowRef} className="gr-next-label">
-            Next →
+            next →
           </span>
         </button>
       </div>

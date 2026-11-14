@@ -50,21 +50,9 @@
 
 /* ---------- Camera and film strip ---------- */
 
-/* Opens as a close-up on one tilted frame; pulls back and levels out once .is-settled lands. */
+/* Close-up on the roll, tilted. Greeting.tsx writes the transform from the unroll progress. */
 .gr-camera {
-  transform: scale(2.8) rotate(-8deg);
-  transform-origin: 50% 50%;
-}
-.gr-camera.is-settled {
-  transform: none;
-  transition: transform 1200ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-@media (prefers-reduced-motion: reduce) {
-  .gr-camera,
-  .gr-camera.is-settled {
-    transform: none;
-    transition: none;
-  }
+  transform-origin: 30% 50%;
 }
 
 .gr-vignette {
@@ -82,15 +70,61 @@
   background: radial-gradient(ellipse at 50% 38%, #25232b 0%, #0a0a0d 70%);
 }
 
-.gr-strip {
+.gr-scroll {
   position: absolute;
   left: 0;
   right: 0;
   top: 50%;
   height: calc(var(--fw) * 2 / 3 + var(--band) * 2);
   margin-top: calc((var(--fw) * 2 / 3 + var(--band) * 2) / -2);
-  overflow: hidden;
   pointer-events: none;
+}
+/* The paper band: clip-path reveals it as the roll travels. */
+.gr-strip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* The roll: paper cylinder on a wooden roller a little taller than the band. */
+.gr-roll {
+  --rw: clamp(40px, 5vw, 64px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--rw);
+  height: 100%;
+  transform-origin: 0 50%;
+}
+.gr-roll-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #5f656f 0%, #c9ced5 28%, #dfe3e8 42%, #aab0b9 68%, #565c66 100%);
+}
+.gr-knob {
+  position: absolute;
+  left: 30%;
+  width: 40%;
+  height: 16px;
+  background: linear-gradient(90deg, #3a2a1d, #8a6742 45%, #3a2a1d);
+}
+.gr-knob-t {
+  top: -16px;
+  border-radius: 3px 3px 0 0;
+}
+.gr-knob-b {
+  bottom: -16px;
+  border-radius: 0 0 3px 3px;
+}
+/* Thin warm ember where the paper leaves the roll. */
+.gr-ember {
+  position: absolute;
+  left: -1px;
+  top: 4%;
+  bottom: 4%;
+  width: 3px;
+  background: linear-gradient(transparent, #ffb066 20%, #ffd9a0 50%, #ffb066 80%, transparent);
+  box-shadow: 0 0 12px 3px rgba(255, 150, 70, 0.55);
 }
 .gr-track {
   display: flex;
