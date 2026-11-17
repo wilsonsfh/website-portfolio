@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import story from "../../data/story.json";
 import "./scrolls.css";
 
@@ -19,6 +19,13 @@ const STAGGER = 110;
 const CLOSE_MS = 320;
 const CLOSE_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
 const FADE_MS = 200;
+
+// drift: constant speed (linear), neighbours run opposite ways at slightly different speeds
+const DRIFT = 22; // px/s, plus 2 per lane
+const DECAY = 0.998; // per ms, flick momentum; travel = v/1000 * DECAY/(1-DECAY)
+const RESUME_MS = 2000; // after letting go
+const RAMP_MS = 500; // drift eases in and out of a pause
+const wrap = (x: number, L: number) => (L > 0 ? x - L * Math.ceil(x / L) : x); // into (-L, 0]; at exactly 0 stays 0
 
 // "2024-07-08" or "2024-07" -> "jul 2024"
 const fmt = (d: string) => {
@@ -72,19 +79,30 @@ function Cell({ item, ph, live, reduced }: { item: Item; ph: number; live: boole
   );
 }
 
-type LaneProps = { id: string; label: string; items: Item[]; ph: number; h: number; reduced: boolean };
+type LaneProps = {
+  id: string; label: string; items: Item[]; ph: number; h: number; reduced: boolean;
+  index: number; driftOn: { current: boolean };
+};
 
-function Lane({ id, label, items, ph, h, reduced }: LaneProps) {
+function Lane({ id, label, items, ph, h, reduced, index, driftOn }: LaneProps) {
   const view = useRef<HTMLDivElement>(null);
   const first = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
   const [reps, setReps] = useState(3);
+  const st = useRef({
+    x: 0, v: 0, g: 0, L: 0, resumeAt: 0, down: false, coast: false, hover: false,
+    lastX: 0, samples: [] as { t: number; x: number }[],
+  });
 
   // enough copies that the track always covers the viewport: one copy is the loop length
   useLayoutEffect(() => {
     const v = view.current;
     const f = first.current;
     if (!v || !f) return;
-    const measure = () => setReps(Math.max(2, Math.ceil(v.clientWidth / Math.max(f.offsetWidth, 1)) + 1));
+    const measure = () => {
+      st.current.L = f.offsetWidth;
+      setReps(Math.max(2, Math.ceil(v.clientWidth / Math.max(f.offsetWidth, 1)) + 1));
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(v);
@@ -92,13 +110,89 @@ function Lane({ id, label, items, ph, h, reduced }: LaneProps) {
     return () => ro.disconnect();
   }, [items.length, ph]);
 
+  // one rAF loop per lane writes the transform directly, no React state per frame
+  useEffect(() => {
+    const k = st.current;
+    const dir = index % 2 === 0 ? -1 : 1;
+    const speed = DRIFT + index * 2;
+    let raf = 0;
+    let last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(now - last, 50);
+      last = now;
+      if (!k.down) {
+        if (k.coast) {
+          k.x += (k.v * dt) / 1000;
+          k.v *= Math.pow(DECAY, dt);
+          if (Math.abs(k.v) < 8) { k.coast = false; k.resumeAt = now + RESUME_MS; }
+        } else {
+          const go = driftOn.current && !reduced && !document.hidden && !k.hover && now >= k.resumeAt;
+          k.g = Math.min(1, Math.max(0, k.g + (go ? dt : -dt) / RAMP_MS));
+          k.x += (dir * speed * k.g * dt) / 1000;
+        }
+      }
+      k.x = wrap(k.x, k.L);
+      if (track.current) track.current.style.transform = `translate3d(${k.x}px,0,0)`;
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [index, reduced, driftOn]);
+
+  // pointer down stops the drift; the track follows the pointer 1:1 from where it is
+  const down = (e: RPointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const k = st.current;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    k.down = true;
+    k.coast = false;
+    k.v = 0;
+    k.g = 0;
+    k.lastX = e.clientX;
+    k.samples = [{ t: e.timeStamp, x: e.clientX }];
+  };
+  const move = (e: RPointerEvent) => {
+    const k = st.current;
+    if (!k.down) return;
+    k.x += e.clientX - k.lastX;
+    k.lastX = e.clientX;
+    k.samples.push({ t: e.timeStamp, x: e.clientX });
+    while (k.samples.length > 2 && e.timeStamp - k.samples[0].t > 100) k.samples.shift();
+  };
+  const up = (e: RPointerEvent) => {
+    const k = st.current;
+    if (!k.down) return;
+    k.down = false;
+    const a = k.samples[0];
+    const dtMs = e.timeStamp - a.t;
+    const fresh = e.timeStamp - k.samples[k.samples.length - 1].t < 80; // held still before release = no flick
+    k.v = !reduced && fresh && dtMs > 0 ? ((e.clientX - a.x) / dtMs) * 1000 : 0;
+    k.coast = Math.abs(k.v) >= 8;
+    k.resumeAt = performance.now() + RESUME_MS;
+  };
+  const cancel = () => {
+    const k = st.current;
+    k.down = false;
+    k.resumeAt = performance.now() + RESUME_MS;
+  };
+  const hover = (on: boolean) => (e: RPointerEvent) => { if (e.pointerType === "mouse") st.current.hover = on; };
+
   return (
     <section className="sc-lane" aria-label={`${label} photos`} data-lane={id} style={{ height: h }}>
       <div className="sc-clip">
       <div className="sc-paper">
         <i className="sc-band" />
-        <div className="sc-view" ref={view}>
-          <div className="sc-track">
+        <div
+          className="sc-view"
+          ref={view}
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerCancel={cancel}
+          onPointerEnter={hover(true)}
+          onPointerLeave={hover(false)}
+        >
+          <div className="sc-track" ref={track}>
             {Array.from({ length: reps }, (_, c) => (
               <div className="sc-copy" key={c} ref={c === 0 ? first : undefined} aria-hidden={c > 0 ? true : undefined}>
                 {items.map((it) => <Cell key={it.id} item={it} ph={ph} live={c === 0} reduced={reduced} />)}
@@ -125,6 +219,7 @@ export default function Scrolls({ open, reduced, onClosed }: Props) {
   const [box, setBox] = useState({ w: 0, h: 0 });
   const anims = useRef<Animation[][]>([]); // per lane: [paper reveal, roller]
   const fade = useRef<Animation | undefined>(undefined);
+  const driftOn = useRef(false); // true once the roll-out has finished
   const run = useRef(0); // latest run wins; a stale run's completion does nothing
 
   // left edge clears the icon column on desktop; lanes fill the rest
@@ -146,6 +241,7 @@ export default function Scrolls({ open, reduced, onClosed }: Props) {
     const el = root.current;
     if (!el) return;
     const id = ++run.current;
+    driftOn.current = false;
     const done: Animation[] = [];
     if (reduced) {
       const from = Number(getComputedStyle(el).opacity);
@@ -179,7 +275,11 @@ export default function Scrolls({ open, reduced, onClosed }: Props) {
       });
     }
     Promise.all(done.map((a) => a.finished)).then(
-      () => { if (id === run.current && !open) onClosed(); },
+      () => {
+        if (id !== run.current) return;
+        if (open) driftOn.current = true;
+        else onClosed();
+      },
       () => {},
     );
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -192,9 +292,11 @@ export default function Scrolls({ open, reduced, onClosed }: Props) {
   return (
     <div className={`sc${reduced ? " sc-reduced" : ""}`} ref={root}>
       <div className="sc-lanes">
-        {story.lanes.map((l) => (
+        {story.lanes.map((l, i) => (
           <Lane
             key={l.id}
+            index={i}
+            driftOn={driftOn}
             id={l.id}
             label={l.label}
             items={(story.items as Item[]).filter((i) => i.lane === l.id).sort(byDate)}
