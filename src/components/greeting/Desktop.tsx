@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import Window, { BAR } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
+import { getSoundOn, setSoundOn } from "./sound";
 
 const time = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -45,6 +46,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const clock = useClock();
   const root = useRef<HTMLDivElement>(null);
   const vp = useViewport();
+  const [sound, setSound] = useState(getSoundOn);
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
   const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
@@ -79,10 +81,27 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   return (
     <div className="dk" ref={root} tabIndex={-1}>
       <header className="dk-bar">
-        <span>wilson</span>
+        <span className="dk-name">wilson soon, 2026</span>
         <span className="dk-clock">{clock}</span>
         <span className="dk-right">
-          <button type="button" className="dk-plain" onClick={onPowerOff}>power off</button>
+          <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+              <path d="M12 3v8" />
+              <path d="M6.3 6.8a8 8 0 1 0 11.4 0" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="dk-plain dk-ibtn"
+            aria-label="sound"
+            aria-pressed={sound}
+            onClick={() => { setSoundOn(!sound); setSound(!sound); }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+              {sound ? <path d="M15.5 9a4 4 0 0 1 0 6 M18 6.5a7.5 7.5 0 0 1 0 11" /> : <path d="M16 9.5l5 5 M21 9.5l-5 5" />}
+            </svg>
+          </button>
           <button type="button" className="dk-plain" onClick={onPlain}>plain site →</button>
         </span>
       </header>
