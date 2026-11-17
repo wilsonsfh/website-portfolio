@@ -94,3 +94,26 @@ Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring vi
 - Filmstrip: original ratios, 56px (44px phone), 2px gaps, current thumb has wider gaps and full opacity (others 0.7). Own transform-based scroller: click jumps with a 240ms tween recentre, drag/wheel scrub with the thumb under the centre becoming current live, momentum projection then snap; keys recentre instantly. During a scrub the wide gap is switched off to avoid layout jitter.
 - Scroll fixes: lane height now accounts for a 44px foot strip (min picture 80px, then vertical scroll); the close button moved into that strip; the "plain site" cue sits in the same strip, so neither covers a lane. The close button now shows at all widths (the icon no longer toggles the scrolls).
 - Needs a browser check: everything above visually; strip jump when the current thumb's gaps change, slide/dismiss feel on a real phone, fullscreen inside the window, video drag area (gestures ignore the video element itself), light/dark contrast, 1512x690 lane fit.
+
+## Handover (2026-11-17 evening)
+Merged into `v2` and building: desktop M1 (top bar, power/sound icons, CRT off, Web Audio, tooltips, wallpaper),
+`(1) unread` messages app (all lines reviewed by Wilson), four-lane photo scrolls (greeting), 114 real photos via
+`npm run photos:add`, `plaintextversion.html` app, window manager (resize, minimize to dock, maximize), iCloud-style
+Photos app + viewer (`PhotosApp.tsx`, `PhotoViewer.tsx`) and scroll layout fixes.
+
+Verified in Chrome (desktop width): power on/off, tooltips, wallpaper, messages, scrolls with real photos, window
+resize/maximize/minimize/dock. NOT yet verified: Photos app + viewer + filmstrip (merged 600db4f), scroll layout fixes,
+375px phone (Chrome window can't go below 606px: load the site in a 375px iframe), reduced motion, iOS Safari, sounds.
+
+Next, in order:
+1. Browser-check the Photos app and scroll fixes (desktop + 375px iframe); fix what breaks.
+2. C1 (Wilson): remove Escape → plain site and the "↓ plain site" cue; no keyboard shortcut for plain site. Move the
+   top-bar "plain site →" text to a small icon placed like a macOS menu-bar item (toward the middle, not far right):
+   ask Wilson with 2-3 ASCII previews first. Return visitors land on the desktop. Keep MainPage below for crawlers.
+3. AI chat: build per `docs/ai-chat-decisions.md` (Workers AI + image button, Groq fallback, server-side keys only).
+   Show the knowledge file before deploying; deployment needs Wilson's `wrangler login` and Groq key.
+4. Captions: Wilson pastes `id = caption` lines from his caption editor; apply them to `src/data/story.json`.
+   Open: "laos overseas ___ hall programme" (voice note said "breakfast"; maybe Raffles?); L39 = life-052-undated needs a date.
+5. At the very end: Prompt 2 (docs/DESIGN-STORY.md + README) from Wilson's handover prompt.
+Gotcha: agent worktrees use a symlinked node_modules; never `git add -A` there (it once got committed).
+Merged worktrees still on disk: v2-desktop, v2-messages, v2-scroll, v2-plain, v2-windows, v2-photosapp (ask before removing).
