@@ -30,8 +30,9 @@ function useViewport() {
   return vp;
 }
 
-type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number }; // w/h: set once the visitor resizes
+type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean }; // w/h: set once the visitor resizes
 const PHONE = 640;
+const MAX_INSET = 8; // gap around a maximized window
 const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
 
 const size = (id: AppId, vw: number, vh: number) => {
@@ -88,6 +89,10 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const move = (id: AppId, x: number, y: number) =>
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, x, y } : w)));
 
+  const toggleMax = (id: AppId) => {
+    const z = ++zRef.current;
+    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, max: !w.max } : w)));
+  };
   const rect = (id: AppId, x: number, y: number, w: number, h: number) =>
     setWins((ws) => ws.map((win) => (win.id === id ? { ...win, x, y, w, h } : win)));
 
@@ -174,18 +179,22 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
       <AnimatePresence>
         {wins.map((w) => {
           const a = appById(w.id);
-          const s = sizeOf(w, vp.cw, vp.h);
+          const s = w.max && !phone
+            ? { x: MAX_INSET, y: BAR + MAX_INSET, w: vp.cw - 2 * MAX_INSET, h: vp.h - BAR - 2 * MAX_INSET }
+            : { x: w.x, y: w.y, ...sizeOf(w, vp.cw, vp.h) };
           return (
             <Window
               key={w.id}
               title={a.title}
-              x={w.x} y={w.y} w={s.w} h={s.h} z={w.z}
+              x={s.x} y={s.y} w={s.w} h={s.h} z={w.z}
               vw={vp.cw} vh={vp.h}
               active={w.z === top}
+              max={!!w.max && !phone}
               phone={phone}
               autoFocus={w.focus}
               flush={a.flush}
               onFocus={() => focus(w.id)}
+              onToggleMax={() => toggleMax(w.id)}
               onClose={() => close(w.id)}
               onMove={(x, y) => move(w.id, x, y)}
               onRect={(x, y, nw, nh) => rect(w.id, x, y, nw, nh)}

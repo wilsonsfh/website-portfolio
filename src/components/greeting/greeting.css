@@ -173,6 +173,7 @@
   font-size: 13px; text-transform: lowercase; cursor: grab; touch-action: none; user-select: none;
 }
 .dk-title:active { cursor: grabbing; }
+.dk-win[data-max="true"] .dk-title { cursor: default; }
 .dk-title-text { color: var(--muted); transition: color 160ms ease; }
 .dk-win[data-active="true"] .dk-title-text { color: var(--fg); }
 .dk-close {

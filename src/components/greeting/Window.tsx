@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 export const BAR = 40;
@@ -6,6 +6,7 @@ export const MIN_W = 280;
 export const MIN_H = 180;
 export const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
 const OUT = [0.23, 1, 0.32, 1] as const; // enter/exit
+const FLIP_MS = 240; // maximize / restore
 const DRAWER = [0.32, 0.72, 0, 1] as const;
 
 type Dir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
@@ -15,12 +16,12 @@ type Props = {
   title: string;
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
-  active: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
-  onFocus: () => void; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
+  active: boolean; max: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
+  onFocus: () => void; onToggleMax: () => void; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, flush, autoFocus, onFocus, onClose, onMove, onRect, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, max, phone, flush, autoFocus, onFocus, onToggleMax, onClose, onMove, onRect, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
@@ -31,9 +32,37 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
     if (autoFocus && r && !r.contains(document.activeElement)) r.focus({ preventScroll: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // maximize / restore: flip the outer box from its previous rect to the new one (transform only, no width/height transition)
+  const last = useRef({ x: x, y: y, w, h, max });
+  const flip = useRef<Animation | null>(null);
+
   // always kept inside the viewport, also after a resize
   const cx = clamp(x, 0, vw - w);
   const cy = clamp(y, BAR, vh - h);
+
+  useLayoutEffect(() => {
+    const r = root.current, p = last.current;
+    if (r && !phone && p.max !== max) {
+      let from = { x: p.x, y: p.y, w: p.w, h: p.h };
+      if (flip.current) { // interrupted: start from where the box visibly is
+        const b = r.getBoundingClientRect(), o = r.offsetParent!.getBoundingClientRect();
+        from = { x: b.left - o.left, y: b.top - o.top, w: b.width, h: b.height };
+        flip.current.cancel();
+      }
+      const a = reduce
+        ? r.animate([{ opacity: 0.5 }, { opacity: 1 }], { duration: 150, easing: "ease-out" })
+        : r.animate(
+            [
+              { transformOrigin: "0 0", transform: `translate3d(${from.x}px,${from.y}px,0) scale(${from.w / w},${from.h / h})` },
+              { transformOrigin: "0 0", transform: `translate3d(${cx}px,${cy}px,0) scale(1,1)` },
+            ],
+            { duration: FLIP_MS, easing: "cubic-bezier(0.23,1,0.32,1)" },
+          );
+      flip.current = a;
+      a.onfinish = a.oncancel = () => { if (flip.current === a) flip.current = null; };
+    }
+    last.current = { x: cx, y: cy, w, h, max };
+  });
 
   const motionProps = phone
     ? {
@@ -57,11 +86,11 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
       style={phone ? { zIndex: z } : { zIndex: z, width: w, height: h, transform: `translate3d(${cx}px,${cy}px,0)` }}
       onPointerDownCapture={() => { if (!active) onFocus(); }}
     >
-      <motion.div className="dk-win" data-active={active} {...motionProps}>
+      <motion.div className="dk-win" data-active={active} data-max={max} {...motionProps}>
         <div
           className="dk-title"
           onPointerDown={(e) => {
-            if (phone || e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
+            if (phone || max || e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
             e.currentTarget.setPointerCapture(e.pointerId);
             drag.current = { dx: e.clientX - cx, dy: e.clientY - cy };
           }}
@@ -72,6 +101,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
           }}
           onPointerUp={() => { drag.current = null; }}
           onPointerCancel={() => { drag.current = null; }}
+          onDoubleClick={(e) => { if (!phone && !(e.target as HTMLElement).closest("button")) onToggleMax(); }}
         >
           {phone && <button type="button" className="dk-back" onClick={onClose}>← back</button>}
           <span className="dk-title-text">{title}</span>
@@ -85,7 +115,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
         </div>
         <div className={`dk-body${flush ? " flush" : ""}`}>{children}</div>
       </motion.div>
-      {!phone && DIRS.map((dir) => (
+      {!phone && !max && DIRS.map((dir) => (
         <div
           key={dir}
           className="dk-rz"
