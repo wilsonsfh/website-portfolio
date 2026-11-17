@@ -134,7 +134,10 @@ Merged worktrees still on disk: v2-desktop, v2-messages, v2-scroll, v2-plain, v2
 4. Date editor: local HTML (like the caption editor) with each photo + date field, "copy changes" -> `id = date`
    lines; Wilson pastes them back; apply to story.json.
 5. (1) unread: remove the play/pause button; answers come from the AI model (step 3 backend) instead of the script.
-6. AI assistant: icon at top right of the bar; opens with a Siri-like glow animation + Spotlight-style input bar;
+6. AI assistant: own plain minimalistic AI icon (NOT a Siri icon) at top right of the bar; opens with a Siri-like glow animation + Spotlight-style input bar;
    answers from the same AI backend with a Siri-like loading animation (original implementation, no Apple assets).
 7. AI backend per docs/ai-chat-decisions.md (Workers AI + image button, Groq fallback). Show knowledge file before deploy.
 Process: Wilson asked for subagents per component, each in its own worktree; never `git add -A` there.
+Answers 2026-11-17: pool photo -> people (done d5b703a); (1) unread keeps the scripted opening (no play/pause), AI answers
+everything after; "generate image" in BOTH the assistant bar and (1) unread; AI UI waits until Wilson's `wrangler login`
+(build the Worker first). Subagents dispatched: plain-site, scrolls-stub, ai-worker, date-editor.
