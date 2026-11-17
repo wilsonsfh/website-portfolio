@@ -28,7 +28,7 @@ Include:
   people kept using it and building on it, because its source is open to the rest of the Cloudflare team.
   (No other numbers.)
 - Side fact: Wilson uses MCP servers and agent skills in his AI/agentic workflow, e.g. a Canvas MCP, a Socratic tutor
-  skill and a 4-step Karpathy-guidelines skill. ("kapate" in his voice note, read as Karpathy; confirm.)
+  skill and a 4-step Karpathy-guidelines skill. ("kapate" in his voice note: Karpathy, confirmed 2026-11-17.)
 
 Exclude: `concepts/docker-images-and-containers.md`, `concepts/linux-capabilities-and-tun-devices.md`,
 `concepts/hypervisors-type1-type2.md`, all other `concepts/` pages, `canvas-mcp` as a page, and everything else in the wiki.

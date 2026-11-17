@@ -106,13 +106,18 @@ resize/maximize/minimize/dock. NOT yet verified: Photos app + viewer + filmstrip
 375px phone (Chrome window can't go below 606px: load the site in a 375px iframe), reduced motion, iOS Safari, sounds.
 
 Next, in order:
-1. Browser-check the Photos app and scroll fixes (desktop + 375px iframe); fix what breaks.
-2. C1 (Wilson): remove Escape → plain site and the "↓ plain site" cue; no keyboard shortcut for plain site. Move the
+1. DONE 2026-11-17 (dccad8c): Photos app + scroll fixes checked in Chrome at 1512x746, a 375x700 iframe and a 900x450
+   iframe. Grid keys, Enter/Escape, viewer keys, mouse swipe, filmstrip jump, zoom/pan, info all work. Fixed: viewer
+   images rendered at natural size (pane `right:0` + auto grid rows), "← grid" wrapped, phone "unroll" hid the lanes
+   behind the sheet (z 3 vs 12+). Not checkable here: real touch (swipe-down dismiss, pinch), fullscreen, reduced motion,
+   iOS Safari. Open: on desktop "unroll" inside the Photos window unrolls the lanes behind that window (asked Wilson).
+2. C1 (Wilson picked B: icon right after "wilson soon, 2026"; remove the power-off screen's "plain site →" too) (Wilson): remove Escape → plain site and the "↓ plain site" cue; no keyboard shortcut for plain site. Move the
    top-bar "plain site →" text to a small icon placed like a macOS menu-bar item (toward the middle, not far right):
    ask Wilson with 2-3 ASCII previews first. Return visitors land on the desktop. Keep MainPage below for crawlers.
 3. AI chat: build per `docs/ai-chat-decisions.md` (Workers AI + image button, Groq fallback, server-side keys only).
    Show the knowledge file before deploying; deployment needs Wilson's `wrangler login` and Groq key.
-4. Captions: Wilson pastes `id = caption` lines from his caption editor; apply them to `src/data/story.json`.
+4. Captions: 68 applied (6104466). 5 sent empty (career-060, career-057, life-003, life-011, life-013): kept, asked.
+   Wilson edits dates himself next. Earlier: Wilson pastes `id = caption` lines from his caption editor; apply them to `src/data/story.json`.
    Open: "laos overseas ___ hall programme" (voice note said "breakfast"; maybe Raffles?); L39 = life-052-undated needs a date.
 5. At the very end: Prompt 2 (docs/DESIGN-STORY.md + README) from Wilson's handover prompt.
 Gotcha: agent worktrees use a symlinked node_modules; never `git add -A` there (it once got committed).
