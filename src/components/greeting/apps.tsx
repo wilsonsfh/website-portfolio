@@ -4,9 +4,10 @@ import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
 import photos from "../../data/photos.json";
 import Terminal from "./Terminal";
+import Messages from "./Messages";
 import { skillLine, lede, aboutParagraphs, contacts, ext } from "../../copy";
 
-export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "contact" | "terminal";
+export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "contact" | "terminal" | "messages";
 export type Ctx = { open: (id: AppId) => void; exit: () => void };
 
 function About() {
@@ -113,6 +114,7 @@ export const APPS: App[] = [
   { id: "photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 560, h: 380, flush: true, render: () => <Photos /> },
   { id: "contact", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 360, h: 240, render: () => <Contact /> },
   { id: "terminal", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 520, h: 340, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
+  { id: "messages", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 380, h: 460, flush: true, render: () => <Messages /> },
 ];
 
 export const appById = (id: AppId) => APPS.find((a) => a.id === id)!;

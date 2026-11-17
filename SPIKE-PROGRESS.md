@@ -37,3 +37,12 @@
 - A desktop adds a click and a window layer between a recruiter and the resume text; on phones sheets one-at-a-time work but cost more taps than the accordion.
 - Drag/stack only has value on pointer devices; on phones it is pure overhead.
 - Boot sequence is ~1.3s every first visit; must stay skippable.
+
+## Messages app
+
+- Spike C's thread ported as a desktop app, "(1) unread" (`src/components/greeting/Messages.tsx`, `messages.css`, `src/data/chat-script.json`), registered in `apps.tsx`.
+- Opening is 8 lines, about 6.7s (0.4s beat, 350-700ms typing, 120ms gaps), then chips + input. Chips are one scrolling row, input one line (~100px on phone).
+- Pause/resume button; auto-pauses while the visitor types and when the tab is hidden. Closing the window keeps state (module-level), reopening continues the queue.
+- Neutral matte ink bubbles via CSS variables switched on `:root.dark`. Reduced motion: opacity-only bubbles, static dots.
+- Content: dropped the internal-sounding Cloudflare security tool answer. 7 lines carry `needsReview` (3 kept from C, 2 new/changed Cloudflare lines, others unchanged).
+- Needs a browser check: phone height of chips+input, bubble contrast, scroll containment, pause on typing.
