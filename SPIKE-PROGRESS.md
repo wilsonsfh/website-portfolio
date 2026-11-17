@@ -122,3 +122,19 @@ Next, in order:
 5. At the very end: Prompt 2 (docs/DESIGN-STORY.md + README) from Wilson's handover prompt.
 Gotcha: agent worktrees use a symlinked node_modules; never `git add -A` there (it once got committed).
 Merged worktrees still on disk: v2-desktop, v2-messages, v2-scroll, v2-plain, v2-windows, v2-photosapp (ask before removing).
+
+## Handover (2026-11-17 night) — Wilson's new requests, supersede the list above where they overlap
+1. Data: `life-051-2026-10-14` ("utr, at the pool table") is not Wilson: move it out of the `me` lane. Blank captions stay.
+2. Plain site (C1, decided): small icon right after "wilson soon, 2026" (macOS menu position), tooltip/aria "plain site",
+   opens the plaintextversion window. Remove: Escape shortcut, both "↓ plain site" cues, power-off screen's
+   "plain site →". Return visitors land on the desktop. MainPage stays below for crawlers.
+3. Scrolls: "unroll" (Photos toolbar) minimizes open windows to the dock first (option 1). Rolled-up state is no
+   longer unmounted: lanes roll up right-to-left (current animation OK) and stop at a visible "flesh" stub just right
+   of the icon column (phone: left edge), clearly clickable/tappable to unroll again.
+4. Date editor: local HTML (like the caption editor) with each photo + date field, "copy changes" -> `id = date`
+   lines; Wilson pastes them back; apply to story.json.
+5. (1) unread: remove the play/pause button; answers come from the AI model (step 3 backend) instead of the script.
+6. AI assistant: icon at top right of the bar; opens with a Siri-like glow animation + Spotlight-style input bar;
+   answers from the same AI backend with a Siri-like loading animation (original implementation, no Apple assets).
+7. AI backend per docs/ai-chat-decisions.md (Workers AI + image button, Groq fallback). Show knowledge file before deploy.
+Process: Wilson asked for subagents per component, each in its own worktree; never `git add -A` there.
