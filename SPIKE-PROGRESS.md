@@ -47,3 +47,12 @@ Done (all builds pass):
 - `Tooltip.tsx`: 400ms first delay, neighbours instant until pointer is off all triggers for 300ms, typed at 22ms/char with 150ms opacity fade, hover (fine pointer, not touch) and focus-visible, aria-describedby to an sr-only copy, hides on scroll/resize. Copy for icons lives in `apps.tsx` (`tip`).
 
 Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring visibility during boot, actual audio loudness, wallpaper veil legibility on all 16 photos in both themes, tooltip placement and clamping at 360px, tooltip over windows (z-index 3000 inside the desktop).
+
+## Messages app
+
+- Spike C's thread ported as a desktop app, "(1) unread" (`src/components/greeting/Messages.tsx`, `messages.css`, `src/data/chat-script.json`), registered in `apps.tsx`.
+- Opening is 8 lines, about 6.7s (0.4s beat, 350-700ms typing, 120ms gaps), then chips + input. Chips are one scrolling row, input one line (~100px on phone).
+- Pause/resume button; auto-pauses while the visitor types and when the tab is hidden. Closing the window keeps state (module-level), reopening continues the queue.
+- Neutral matte ink bubbles via CSS variables switched on `:root.dark`. Reduced motion: opacity-only bubbles, static dots.
+- Content: dropped the internal-sounding Cloudflare security tool answer. 7 lines carry `needsReview` (3 kept from C, 2 new/changed Cloudflare lines, others unchanged).
+- Needs a browser check: phone height of chips+input, bubble contrast, scroll containment, pause on typing.
