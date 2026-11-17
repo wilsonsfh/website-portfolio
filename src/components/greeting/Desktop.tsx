@@ -96,7 +96,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ctx: Ctx = { open, exit: onPlain };
+  const ctx: Ctx = { open, exit: onPlain, unroll: toggleRolls };
   const top = Math.max(0, ...wins.map((w) => w.z));
 
   return (

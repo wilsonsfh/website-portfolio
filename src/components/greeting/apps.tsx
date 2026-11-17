@@ -8,7 +8,7 @@ import MainPage from "../MainPage";
 import { skillLine, lede, aboutParagraphs, contacts, ext } from "../../copy";
 
 export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "contact" | "terminal" | "messages" | "plain";
-export type Ctx = { open: (id: AppId) => void; exit: () => void };
+export type Ctx = { open: (id: AppId) => void; exit: () => void; unroll: () => void };
 
 function About() {
   return (
