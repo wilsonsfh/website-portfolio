@@ -6,7 +6,8 @@ export const MIN_W = 280;
 export const MIN_H = 180;
 export const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
 const OUT = [0.23, 1, 0.32, 1] as const; // enter/exit
-const FLIP_MS = 240; // maximize / restore
+const FLIP_MS = 240; // maximize / restore / out of the dock
+const MIN_MS = 200; // into the dock
 const DRAWER = [0.32, 0.72, 0, 1] as const;
 
 type Dir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
@@ -16,12 +17,12 @@ type Props = {
   title: string;
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
-  active: boolean; max: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
-  onFocus: () => void; onToggleMax: () => void; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
+  active: boolean; max: boolean; min: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
+  onFocus: () => void; onToggleMax: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, max, phone, flush, autoFocus, onFocus, onToggleMax, onClose, onMove, onRect, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, dockPt, onClose, onMove, onRect, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
@@ -35,6 +36,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, phon
   // maximize / restore: flip the outer box from its previous rect to the new one (transform only, no width/height transition)
   const last = useRef({ x: x, y: y, w, h, max });
   const flip = useRef<Animation | null>(null);
+  const wasMin = useRef(min);
 
   // always kept inside the viewport, also after a resize
   const cx = clamp(x, 0, vw - w);
@@ -64,6 +66,35 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, phon
     last.current = { x: cx, y: cy, w, h, max };
   });
 
+  // minimize: shrink and fade towards the dock entry; restore: grow back out of it. Hidden (visibility) once minimized.
+  useLayoutEffect(() => {
+    const r = root.current;
+    if (wasMin.current === min) return;
+    wasMin.current = min;
+    if (!r) return;
+    const cs = getComputedStyle(r);
+    const from = flip.current ? { transform: cs.transform, opacity: cs.opacity } : null; // interrupted: continue from where it is
+    flip.current?.cancel();
+    const rest = { transform: `translate3d(${cx}px,${cy}px,0)`, opacity: 1 };
+    const pt = dockPt();
+    let dock = rest;
+    if (pt && !reduce) {
+      const b = r.getBoundingClientRect(); // layout position (animation cancelled), so the centre is the resting one
+      dock = { transform: `translate3d(${cx + pt.x - (b.left + b.width / 2)}px,${cy + pt.y - (b.top + b.height / 2)}px,0) scale(0.9)`, opacity: 0 };
+    } else dock = { ...rest, opacity: 0 };
+    if (min) {
+      const a = r.animate([from ?? rest, dock], { duration: reduce ? 150 : MIN_MS, easing: "cubic-bezier(0.23,1,0.32,1)", fill: "forwards" });
+      flip.current = a;
+      a.onfinish = () => { if (flip.current === a) r.style.visibility = "hidden"; };
+    } else {
+      r.style.visibility = "";
+      const a = r.animate([from ?? dock, rest], { duration: reduce ? 150 : FLIP_MS, easing: "cubic-bezier(0.23,1,0.32,1)" });
+      flip.current = a;
+      a.onfinish = a.oncancel = () => { if (flip.current === a) flip.current = null; };
+      if (!r.contains(document.activeElement)) r.focus({ preventScroll: true });
+    }
+  }, [min]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const motionProps = phone
     ? {
         initial: { opacity: reduce ? 0 : 1, y: reduce ? 0 : "100%" },
@@ -82,6 +113,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, phon
       tabIndex={-1}
       role="dialog"
       aria-label={title}
+      inert={min}
       className={`dk-pos${phone ? " is-phone" : ""}`}
       style={phone ? { zIndex: z } : { zIndex: z, width: w, height: h, transform: `translate3d(${cx}px,${cy}px,0)` }}
       onPointerDownCapture={() => { if (!active) onFocus(); }}

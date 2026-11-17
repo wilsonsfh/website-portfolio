@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
 import Scrolls from "./Scrolls";
 import Wallpaper from "./Wallpaper";
@@ -30,7 +30,7 @@ function useViewport() {
   return vp;
 }
 
-type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean }; // w/h: set once the visitor resizes
+type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean; min?: boolean }; // w/h: set once the visitor resizes
 const PHONE = 640;
 const MAX_INSET = 8; // gap around a maximized window
 const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
@@ -72,9 +72,10 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const open = (id: AppId) => {
     if (id === "photos") return showRolls();
     const z = ++zRef.current;
+    dockPt(id); // remember where the entry is before it unmounts
     setWins((ws) =>
       ws.some((w) => w.id === id)
-        ? ws.map((w) => (w.id === id ? { ...w, z } : w))
+        ? ws.map((w) => (w.id === id ? { ...w, z, min: false } : w))
         : [...ws, place(id, ws.length, z, true)],
     );
   };
@@ -89,6 +90,17 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const move = (id: AppId, x: number, y: number) =>
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, x, y } : w)));
 
+  // centre of a window's dock entry in viewport coords; the last known one once the entry is gone
+  const dockPts = useRef<Partial<Record<AppId, { x: number; y: number }>>>({});
+  const dockPt = (id: AppId) => {
+    const b = document.getElementById(`dk-dock-${id}`)?.getBoundingClientRect();
+    if (b) dockPts.current[id] = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+    return dockPts.current[id] ?? null;
+  };
+  const minimize = (id: AppId) => {
+    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, min: true } : w)));
+    requestAnimationFrame(() => document.getElementById(`dk-dock-${id}`)?.focus({ preventScroll: true }));
+  };
   const toggleMax = (id: AppId) => {
     const z = ++zRef.current;
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, max: !w.max } : w)));
@@ -113,7 +125,8 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ctx: Ctx = { open, exit: onPlain };
-  const top = Math.max(0, ...wins.map((w) => w.z));
+  const top = Math.max(0, ...wins.filter((w) => phone || !w.min).map((w) => w.z));
+  const docked = phone ? [] : wins.filter((w) => w.min);
 
   return (
     <div className="dk" ref={root} tabIndex={-1}>
@@ -176,6 +189,35 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
       <button type="button" className="gr-cue dk-cue" onClick={onPlain}>↓ plain site</button>
 
+      <div className="dk-dock-row">
+        <AnimatePresence>
+          {docked.length > 0 && (
+            <motion.div
+              className="dk-dock"
+              role="toolbar"
+              aria-label="minimized windows"
+              initial={{ opacity: 0, y: reduce ? 0 : 8 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: [0.23, 1, 0.32, 1] } }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            >
+              {docked.map((w) => {
+                const a = appById(w.id);
+                return (
+                  <Tooltip key={w.id} text={`restore ${a.title}`}>{(t) => (
+                  <button type="button" id={`dk-dock-${w.id}`} className="dk-dock-item" onClick={() => open(w.id)} {...t}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d={a.glyph} />
+                    </svg>
+                    <span>{a.title}</span>
+                  </button>
+                  )}</Tooltip>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       <AnimatePresence>
         {wins.map((w) => {
           const a = appById(w.id);
@@ -190,11 +232,13 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
               vw={vp.cw} vh={vp.h}
               active={w.z === top}
               max={!!w.max && !phone}
+              min={!!w.min && !phone}
               phone={phone}
               autoFocus={w.focus}
               flush={a.flush}
               onFocus={() => focus(w.id)}
               onToggleMax={() => toggleMax(w.id)}
+              dockPt={() => dockPt(w.id)}
               onClose={() => close(w.id)}
               onMove={(x, y) => move(w.id, x, y)}
               onRect={(x, y, nw, nh) => rect(w.id, x, y, nw, nh)}
