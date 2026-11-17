@@ -71,9 +71,13 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE && !scrollsAutoOpen(focusOnMount) ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
-  const [rolls, setRolls] = useState({ mounted: false, open: false });
-  const showRolls = () => setRolls({ mounted: true, open: true });
-  const toggleRolls = () => setRolls((r) => (r.open ? { ...r, open: false } : { mounted: true, open: true }));
+  const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up to the clickable stub; the stub exists whenever the desktop is on
+  const showRolls = () => setRollsOpen(true);
+  // unrolling sends the open windows to the dock first (phone has sheets and no dock: lanes just cover them)
+  const toggleRolls = () => {
+    if (!rollsOpen && !phone) wins.filter((w) => !w.min).forEach((w) => minimize(w.id, false));
+    setRollsOpen(!rollsOpen);
+  };
 
   const open = (id: AppId) => {
     const z = ++zRef.current;
@@ -102,9 +106,9 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
     if (b) dockPts.current[id] = { x: b.left + b.width / 2, y: b.top + b.height / 2 };
     return dockPts.current[id] ?? null;
   };
-  const minimize = (id: AppId) => {
+  const minimize = (id: AppId, refocus = true) => {
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, min: true } : w)));
-    requestAnimationFrame(() => document.getElementById(`dk-dock-${id}`)?.focus({ preventScroll: true }));
+    if (refocus) requestAnimationFrame(() => document.getElementById(`dk-dock-${id}`)?.focus({ preventScroll: true }));
   };
   const toggleMax = (id: AppId) => {
     const z = ++zRef.current;
@@ -135,9 +139,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   return (
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
-      {rolls.mounted && (
-        <Scrolls open={rolls.open} reduced={!!reduce} onClosed={() => setRolls({ mounted: false, open: false })} onClose={toggleRolls} />
-      )}
+      <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} />
       <header className="dk-bar">
         <span className="dk-name">wilson soon, 2026</span>
         <span className="dk-clock">{clock}</span>
