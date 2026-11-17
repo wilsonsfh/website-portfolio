@@ -1,5 +1,11 @@
 # Spike B (desktop) progress
 
+## Handover to Claude (2026-11-15)
+- Wilson wants B (the desktop/website-lookalike concept) temporarily published at `https://wilsonsoon-website-portfolio.vercel.app/` while his Claude limit resets. B is now live there as Vercel production deployment `dpl_CcidsDXUvuPkddtqW2AwkB91qDWr`, deployed 2026-11-15 from the `v2` worktree's prebuilt static output. `src/App.tsx` mounts B's greeting before the plain main page. Local preview: `npm run dev -- --host 127.0.0.1 --port 4322 --strictPort` from this worktree.
+- The Vercel project still has an Astro framework preset, and `main` remains the old Astro site. This deployment used prebuilt Vite output without changing those settings or branches; a later production deployment from `main` can replace B. Adjust deployment settings deliberately when the final approach is chosen.
+- Continue the requested portfolio work with Wilson after the limit resets, keeping the concepts separate until he decides otherwise. B is preserved at `archive/spike-b-desktop`; A and C are preserved at `archive/spike-a-screening-room` and `archive/spike-c-messages`. The `v2` branch currently builds on B; `main` remains the original Astro site.
+- `npm run build` passed on 2026-11-15. The scrollable desktop follow-up still needs real-device and visual verification, including phone layout, return visits, scrolling over windows, and reduced motion. The older known-issues bullets below predate that follow-up where they conflict with it: scrolling back up returns to the desktop, and the main page is no longer inert.
+
 ## Done
 - M1: power-off screen, CRT line switch-on, 4-line boot text (~1.0s), desktop top bar (wilson, clock, plain site →), Escape/"plain site →" to MainPage, sessionStorage (`greeting-b`: plain|desktop), `?intro=1` forces power-off, reduced-motion fade path, page behind inert + no scroll.
 - M2: 6 icons + windows (about.txt, work, projects, activities, photos, contact) with real shared content; pointer-captured drag clamped to viewport; click-to-front; open scale .95 + fade 200ms ease-out, close 120ms; photos scroll-snap strip; phone (<640px) full-screen sheets under the top bar with "← back", 3-col icon grid, no drag.
