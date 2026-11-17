@@ -36,7 +36,7 @@ const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
-  return { w: Math.min(a.w, vw - 16), h: Math.min(a.h, vh - BAR - 16) };
+  return { w: Math.min(a.w, vw - 16), h: Math.min(a.hFrac ? Math.round(vh * a.hFrac) : a.h, vh - BAR - 16) };
 };
 
 // a new window cascades gently from roughly the centre
@@ -132,8 +132,8 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
             </svg>
           </button>
           )}</Tooltip>
-          <Tooltip text="skip to the plain site">{(t) => (
-            <button type="button" className="dk-plain" onClick={onPlain} {...t}>plain site →</button>
+          <Tooltip text="open the plain version">{(t) => (
+            <button type="button" className="dk-plain" onClick={() => open("plain")} {...t}>plain site →</button>
           )}</Tooltip>
         </span>
       </header>

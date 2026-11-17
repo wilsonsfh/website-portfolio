@@ -152,6 +152,7 @@
   transition: transform 160ms ease-out, background-color 160ms ease;
 }
 .dk-icon svg { color: var(--muted); }
+.dk-icon span { max-width: 100%; text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
 .dk-icon:active { transform: scale(0.97); }
 .dk-icon:focus-visible, .dk-close:focus-visible, .dk-back:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px;
