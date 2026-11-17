@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
+import Wallpaper from "./Wallpaper";
 import Window, { BAR } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
 import { getSoundOn, setSoundOn } from "./sound";
@@ -80,6 +81,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
   return (
     <div className="dk" ref={root} tabIndex={-1}>
+      <Wallpaper />
       <header className="dk-bar">
         <span className="dk-name">wilson soon, 2026</span>
         <span className="dk-clock">{clock}</span>
