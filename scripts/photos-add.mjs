@@ -2,7 +2,7 @@
 // Usage: npm run photos:add -- <file|folder> ... [--lane=career|people|me|scenery]
 // A file matches the story entry whose id equals its basename (e.g. career-012-2025-08-01.jpeg);
 // unknown files become new entries (lane from --lane or the name prefix, date from the name).
-// Images: HEIC goes through macOS `sips`, then sharp resizes to 1600px and writes WebP with all
+// Images: HEIC goes through macOS `sips`, then sharp resizes to 1200px and writes WebP with all
 // metadata (GPS included) stripped. Videos: ffmpeg writes a silent H.264 MP4 plus a WebP poster.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
@@ -29,7 +29,7 @@ if (!files.length) {
 }
 
 const tmp = mkdtempSync(join(tmpdir(), "photos-add-"));
-const MAX = 1600;
+const MAX = 1200;
 
 for (const file of files) {
   const ext = extname(file).toLowerCase();
@@ -61,7 +61,7 @@ for (const file of files) {
       src = join(tmp, `${id}.jpg`);
       execFileSync("sips", ["-s", "format", "jpeg", file, "--out", src], { stdio: "ignore" });
     }
-    const meta = await sharp(src)
+    const meta = await sharp(src, { failOn: "none" }) // some chat-app exports are truncated
       .rotate() // apply EXIF orientation
       .rotate(item.rotate ?? 0)
       .resize(MAX, MAX, { fit: "inside", withoutEnlargement: true })
