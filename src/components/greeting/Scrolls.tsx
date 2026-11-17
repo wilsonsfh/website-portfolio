@@ -212,9 +212,9 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn }: LaneProps) {
 // how far a running (or finished) roll animation has got, 0..1
 const progress = (a?: Animation) => (a ? Math.min(1, Math.max(0, Number(a.effect?.getComputedTiming().progress ?? 1))) : 0);
 
-type Props = { open: boolean; reduced: boolean; onClosed: () => void };
+type Props = { open: boolean; reduced: boolean; onClosed: () => void; onClose: () => void };
 
-export default function Scrolls({ open, reduced, onClosed }: Props) {
+export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const anims = useRef<Animation[][]>([]); // per lane: [paper reveal, roller]
@@ -306,6 +306,7 @@ export default function Scrolls({ open, reduced, onClosed }: Props) {
           />
         ))}
       </div>
+    <button type="button" className="sc-close" onClick={onClose} aria-label="roll up photos">×</button>
     </div>
   );
 }

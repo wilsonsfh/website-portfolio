@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
+import Scrolls from "./Scrolls";
 import Wallpaper from "./Wallpaper";
 import Window, { BAR } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
@@ -31,6 +32,7 @@ function useViewport() {
 
 type Win = { id: AppId; x: number; y: number; z: number; focus: boolean };
 const PHONE = 640;
+const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
@@ -53,7 +55,13 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const zRef = useRef(11);
   const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
 
+  const reduce = useReducedMotion();
+  const [rolls, setRolls] = useState({ mounted: false, open: false });
+  const showRolls = () => setRolls({ mounted: true, open: true });
+  const toggleRolls = () => setRolls((r) => (r.open ? { ...r, open: false } : { mounted: true, open: true }));
+
   const open = (id: AppId) => {
+    if (id === "photos") return showRolls();
     const z = ++zRef.current;
     setWins((ws) =>
       ws.some((w) => w.id === id)
@@ -77,12 +85,26 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
     if (focusOnMount && !root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // the first power-on of a session unrolls the photos once the screen has settled
+  useEffect(() => {
+    if (!focusOnMount) return;
+    try { if (sessionStorage.getItem(SCROLLS_KEY) !== null) return; } catch {}
+    const t = window.setTimeout(() => {
+      try { sessionStorage.setItem(SCROLLS_KEY, "1"); } catch {}
+      showRolls();
+    }, 400);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const ctx: Ctx = { open, exit: onPlain };
   const top = Math.max(0, ...wins.map((w) => w.z));
 
   return (
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
+      {rolls.mounted && (
+        <Scrolls open={rolls.open} reduced={!!reduce} onClosed={() => setRolls({ mounted: false, open: false })} onClose={toggleRolls} />
+      )}
       <header className="dk-bar">
         <span className="dk-name">wilson soon, 2026</span>
         <span className="dk-clock">{clock}</span>
@@ -118,8 +140,15 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
       <nav className="dk-icons" aria-label="apps">
         {APPS.map((a) => (
-          <Tooltip key={a.id} text={a.tip}>{(t) => (
-          <button type="button" id={`dk-icon-${a.id}`} className="dk-icon" onClick={() => open(a.id)} {...t}>
+          <Tooltip key={a.id} text={a.id === "photos" && rolls.open ? "roll them up" : a.tip}>{(t) => (
+          <button
+            type="button"
+            id={`dk-icon-${a.id}`}
+            className="dk-icon"
+            onClick={() => (a.id === "photos" ? toggleRolls() : open(a.id))}
+            aria-expanded={a.id === "photos" ? rolls.open : undefined}
+            {...t}
+          >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d={a.glyph} />
             </svg>

@@ -58,3 +58,18 @@
   background: var(--sc-paper); border: 1px solid var(--sc-rule);
 }
 .sc-reduced .sc-roll { display: none; }
+
+/* phone: the lanes cover the icons, so the scrolls carry their own close button */
+.sc-close { display: none; }
+@media (max-width: 639.98px) {
+  .sc { z-index: 3; }
+  .sc-lanes { pointer-events: auto; }
+  .sc-close {
+    position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px; display: grid; place-items: center; pointer-events: auto;
+    background: var(--sc-paper); color: var(--sc-ink); border: 1px solid var(--sc-rule); border-radius: 22px; font: inherit; font-size: 20px; cursor: pointer;
+    transition: transform 160ms ease-out;
+  }
+  .sc-close:active { transform: scale(0.97); }
+  .sc-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { .sc-close:active { transform: none; } }

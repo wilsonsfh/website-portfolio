@@ -56,3 +56,12 @@ Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring vi
 - Neutral matte ink bubbles via CSS variables switched on `:root.dark`. Reduced motion: opacity-only bubbles, static dots.
 - Content: dropped the internal-sounding Cloudflare security tool answer. 7 lines carry `needsReview` (3 kept from C, 2 new/changed Cloudflare lines, others unchanged).
 - Needs a browser check: phone height of chips+input, bubble contrast, scroll containment, pause on typing.
+
+## Photo scrolls (v2-scroll worktree)
+
+- After the first power-on of a session (sessionStorage `scrolls-b`), four paper lanes (career, people, me, scenery) unroll over the desktop. The `photos` icon toggles them (`aria-expanded`, tooltip "unroll my photos" / "roll them up"); the old photos window is gone, `open photos` in the terminal unrolls them. Phone has a 44px close button because the lanes cover the icons.
+- Data: `src/data/story.json` (lanes + items; `src` null = captioned placeholder card, `type: "video"` gets a muted looping `<video>` with a play badge). Items sort by date per lane. Component `Scrolls.tsx`, styles `scrolls.css`.
+- Roll-out: per lane `clip-path` reveal plus a travelling roller, both WAAPI, 900ms `cubic-bezier(0.32,0.72,0,1)`, 110ms stagger top first. Roll-up: together, 320ms `cubic-bezier(0.23,1,0.32,1)`, continues from the current progress if toggled mid-roll. Reduced motion: 200ms opacity fade, no roller.
+- Drift after the roll-out: linear, 22 + 2 per lane px/s, alternating direction, eased in/out over 500ms. Pointer down tracks 1:1 (pointer capture, `touch-action: pan-y`), release coasts with `v/1000 * 0.998/(1-0.998)`, drift resumes 2s later. Paused on mouse hover, hidden tab, reduced motion (no momentum either).
+- Placeholder cards show caption and date inside the card and have no caption underneath (avoids duplicating the text). Each lane renders enough copies to cover its width (2x or more), so 115 items means about 60 cells per lane; images use `loading="lazy"`.
+- Needs a browser check: roller/paper lockstep, picture heights at laptop size (about 138px at 900px tall), icon column clearance, light and dark paper, phone scroll and close button, drag/momentum feel, reduced motion, icons usable during unroll.
