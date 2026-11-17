@@ -72,3 +72,14 @@ Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring vi
 - `MainPage` got an `embedded` prop: renders a `div` without `id="main"` (no duplicate id or second main landmark), no `min-height: 100dvh`, tighter column padding (`.embedded` rules in `global.css`). Row ids now use `useId` (two instances would otherwise collide on `aria-controls`). The footer theme toggle follows `<html class>` via MutationObserver so both instances stay in sync.
 - Top-bar "plain site →" now opens/raises this window (`open("plain")`) instead of scrolling. The power-off screen's "plain site →", "↓ plain site" cue, terminal `exit` and Escape still scroll to `#main`.
 - Needs a browser check: icon label wrapping in the 88px icon (21 chars, wraps anywhere), window size and internal scroll, accordion inside the window, phone sheet, theme toggle in both places, dark mode.
+
+## Window management (v2-windows worktree)
+
+- Default size: windows open at the app's `w`/`h` (clamped to the desktop area; already true). Body is `overflow: auto` with `overscroll-behavior: contain`.
+- Resize: 8 invisible handles (6px edges, 12px corners) inside `.dk-pos`, pointer capture, 1:1, min 280x180, clamped to the desktop area, no animation. A resized size lives on the window state (`w`/`h`) and is clamped again on viewport resize.
+- Maximize: title-bar button or double-click on the title bar; fills the area below the top bar with an 8px inset. FLIP on the outer `.dk-pos` (WAAPI transform, 240ms `cubic-bezier(0.23,1,0.32,1)`); an interrupted flip restarts from the visible rect. Content is scaled during the flip (not counter-scaled). Reduced motion: 150ms opacity crossfade. Maximized windows can't be dragged or resized.
+- Minimize: window stays mounted (state kept), shrinks to 0.9 and fades while translating to its dock entry, 200ms; restore grows back out of the entry, 240ms (`cubic-bezier(0.23,1,0.32,1)` both). Reduced motion: opacity only, 150ms. Dock: bottom centre, only while something is minimized, matte neutral, 44px entries (glyph + title, tooltip "restore <title>"). Clicking an entry or the desktop icon (or the top-bar "plain site") restores and focuses. Minimized windows are `inert` and `visibility: hidden`.
+- Title-bar buttons: minimize, maximize/restore, close (inline SVG, tooltips, aria-labels, press 0.97, 40x36 visual, 44px tall hit area via `::after`). Phone sheets unchanged, no new controls.
+- Tooltip now renders through a portal to `document.body`: a fixed tooltip inside a transformed, overflow-hidden window was mispositioned and clipped.
+- Bug fix: about.txt no longer auto-opens on the first power-on while the photo scrolls auto-open.
+- Needs a browser check: FLIP look (text stretch), dock-entry targeting for first and later entries, tooltip placement over windows, corner handles vs title buttons, focus after minimize/restore, Photos app window (other worktree) with the new controls.
