@@ -141,3 +141,8 @@ Process: Wilson asked for subagents per component, each in its own worktree; nev
 Answers 2026-11-17: pool photo -> people (done d5b703a); (1) unread keeps the scripted opening (no play/pause), AI answers
 everything after; "generate image" in BOTH the assistant bar and (1) unread; AI UI waits until Wilson's `wrangler login`
 (build the Worker first). Subagents dispatched: plain-site, scrolls-stub, ai-worker, date-editor.
+Merged 2026-11-17: plain-site icon + cue/Escape/power-off link removal + desktop on return + no messages pause button
+(d368ef3); scrolls stub + unroll minimizes windows (c0d6a57). Checked in Chrome at 1512px: icon opens plaintextversion,
+roll-up leaves a stub right of the icons with tooltip, stub click minimizes windows to the dock and unrolls.
+Open: on phone the 64px stub at the left edge covers the first icon column (asked Wilson). Date editor for Wilson:
+scratchpad dates.html (session ebb81044); apply his `id = date` lines to story.json. AI worker agent still running (v2-ai).
