@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "wilson-portfolio-chat",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-17",
+  // no account_id here: wrangler takes it from `wrangler login`
+  "ai": { "binding": "AI" },
+  // knowledge.md is bundled as a text module
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  // Rate Limiting binding (needs wrangler >= 4.36). period must be 10 or 60.
+  "ratelimits": [
+    { "name": "RL_CHAT", "namespace_id": "7101", "simple": { "limit": 8, "period": 60 } },
+    { "name": "RL_IMAGE", "namespace_id": "7102", "simple": { "limit": 1, "period": 60 } }
+  ],
+  "vars": {
+    // comma-separated list of exact origins allowed by CORS
+    "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:4173",
+    "TEXT_MODEL": "@cf/google/gemma-4-26b-a4b-it",
+    "IMAGE_MODEL": "@cf/black-forest-labs/flux-1-schnell",
+    "GROQ_MODEL": "openai/gpt-oss-20b"
+  }
+  // GROQ_API_KEY is a secret: `wrangler secret put GROQ_API_KEY` (never put it here)
+}
