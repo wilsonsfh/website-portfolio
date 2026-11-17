@@ -7,15 +7,13 @@
       "text": "cs student at nus, based in singapore"
     },
     {
-      "text": "i'm into building all things tech and aesthetics",
-      "needsReview": true
+      "text": "i'm into building all things tech and aesthetics"
     },
     {
       "text": "most recently i was a solutions engineering intern at cloudflare (may - aug 2026)"
     },
     {
-      "text": "i built a browser-based linux desktop on cloudflare containers for a hands-on lab series",
-      "needsReview": true
+      "text": "i built a browser-based linux desktop using cloudflare containers, masque and cloudflare warp"
     },
     {
       "text": "before that i interned in product at glints, where i grew jobseeker dau by more than 2x"
@@ -51,15 +49,13 @@
           "text": "i've done a few internships. most recent was solutions engineering at cloudflare (may - aug 2026)"
         },
         {
-          "text": "there i built a browser-based linux desktop on cloudflare containers, so people could try security settings hands-on without a vm or local install",
-          "needsReview": true
+          "text": "there i built a browser-based linux desktop with cloudflare containers, masque and warp"
         },
         {
           "text": "before that: product management at glints, doing user research interviews and writing sql in metabase"
         },
         {
-          "text": "and software engineering at nus enterprise's mvp studio, on a web app for researchers to analyse bird patterns (react, django, birdnet)",
-          "needsReview": true
+          "text": "and software engineering at nus enterprise's mvp studio, on a web app for researchers (react, django)"
         }
       ]
     },
@@ -89,8 +85,7 @@
           "text": "x bookmark injector: a chromium extension that resurfaces a random saved x bookmark in your for you feed"
         },
         {
-          "text": "clearertoday: an ai speech coach for enunciation practice. also concept visualizer, which animates cs concepts as node graphs",
-          "needsReview": true
+          "text": "clearertoday: an ai speech coach for enunciation practice. also concept visualizer, which animates cs concepts as node graphs"
         },
         {
           "text": "code and demos are on github, and there are more in the projects row on the page",
@@ -135,8 +130,7 @@
           "text": "and i'm learning guitar, rock climbing and volleyball right now"
         },
         {
-          "text": "i believe the best software is built by people who bring diverse perspectives, so i like having my own stories to bring",
-          "needsReview": true
+          "text": "it keeps me curious, and that usually shows up in my work too"
         }
       ]
     },
@@ -234,7 +228,6 @@
         "label": "github",
         "href": "https://github.com/wilsonsfh"
       }
-    ],
-    "needsReview": true
+    ]
   }
 }
