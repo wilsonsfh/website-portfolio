@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import Desktop from "./Desktop";
+import { playOn, playOff } from "./sound";
 import "./greeting.css";
 
 // sessionStorage value: absent = first visit, "seen-off" = visited, "seen-on" = visited and powered on
@@ -67,6 +68,7 @@ export default function Greeting() {
   };
 
   const powerOn = () => {
+    playOn();
     write("seen-on");
     interactive.current = true;
     setOffFade(false);
@@ -83,6 +85,7 @@ export default function Greeting() {
   };
 
   const powerOff = () => {
+    playOff();
     timers.current.forEach(clearTimeout);
     timers.current = [];
     write("seen-off");
