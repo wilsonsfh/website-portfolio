@@ -146,3 +146,7 @@ Merged 2026-11-17: plain-site icon + cue/Escape/power-off link removal + desktop
 roll-up leaves a stub right of the icons with tooltip, stub click minimizes windows to the dock and unrolls.
 Open: on phone the 64px stub at the left edge covers the first icon column (asked Wilson). Date editor for Wilson:
 scratchpad dates.html (session ebb81044); apply his `id = date` lines to story.json. AI worker agent still running (v2-ai).
+AI worker merged (9eb3257): worker/ (Workers AI gemma-4-26b-a4b-it, flux-1-schnell images, Groq openai/gpt-oss-20b
+fallback on error 3036, per-IP rate limits, CORS env). Not deployed; model calls untested. Wilson is reviewing
+worker/knowledge.md (~6.5K tokens; Groq free 8K TPM means about 1 fallback request/min). Next after his review +
+`wrangler login` + Groq key: deploy, then assistant UI (own minimal AI icon) and (1) unread AI answers.
