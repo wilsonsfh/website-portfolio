@@ -11,6 +11,7 @@ const HELP = [
   "ls                   list files",
   "cat about.txt        read about.txt",
   "open <name>          open work, projects, activities, photos or contact",
+  "unroll               unroll or roll up the photo scrolls",
   "exit                 go to the plain site",
 ];
 
@@ -29,6 +30,9 @@ function run(cmd: string, ctx: Ctx): string[] {
         return [`opening ${arg}`];
       }
       return ["usage: open <work|projects|activities|photos|contact>"];
+    case "unroll":
+      ctx.unroll();
+      return ["unrolling the photo scrolls"];
     case "exit":
       ctx.exit();
       return [];

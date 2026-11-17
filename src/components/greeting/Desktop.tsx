@@ -61,7 +61,6 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const toggleRolls = () => setRolls((r) => (r.open ? { ...r, open: false } : { mounted: true, open: true }));
 
   const open = (id: AppId) => {
-    if (id === "photos") return showRolls();
     const z = ++zRef.current;
     setWins((ws) =>
       ws.some((w) => w.id === id)
@@ -140,13 +139,12 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
       <nav className="dk-icons" aria-label="apps">
         {APPS.map((a) => (
-          <Tooltip key={a.id} text={a.id === "photos" && rolls.open ? "roll them up" : a.tip}>{(t) => (
+          <Tooltip key={a.id} text={a.tip}>{(t) => (
           <button
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
-            onClick={() => (a.id === "photos" ? toggleRolls() : open(a.id))}
-            aria-expanded={a.id === "photos" ? rolls.open : undefined}
+            onClick={() => open(a.id)}
             {...t}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
