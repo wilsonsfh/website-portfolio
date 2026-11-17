@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import Tooltip from "./Tooltip";
 import story from "../../data/story.json";
 import "./scrolls.css";
 
@@ -20,6 +21,8 @@ const STAGGER = 110;
 const CLOSE_MS = 320;
 const CLOSE_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
 const FADE_MS = 200;
+const STUB = 64; // visible width of a rolled-up lane: label spool plus a sliver of paper on its roller
+const ROLLER = 14; // width of the travelling roller bar
 
 // drift: constant speed (linear), neighbours run opposite ways at slightly different speeds
 const DRIFT = 22; // px/s, plus 2 per lane
@@ -83,10 +86,10 @@ function Cell({ item, ph, live, reduced }: { item: Item; ph: number; live: boole
 
 type LaneProps = {
   id: string; label: string; items: Item[]; ph: number; h: number; reduced: boolean;
-  index: number; driftOn: { current: boolean };
+  index: number; driftOn: { current: boolean }; woke: boolean;
 };
 
-function Lane({ id, label, items, ph, h, reduced, index, driftOn }: LaneProps) {
+function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LaneProps) {
   const view = useRef<HTMLDivElement>(null);
   const first = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -195,7 +198,7 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn }: LaneProps) {
           onPointerLeave={hover(false)}
         >
           <div className="sc-track" ref={track}>
-            {Array.from({ length: reps }, (_, c) => (
+            {woke && Array.from({ length: reps }, (_, c) => (
               <div className="sc-copy" key={c} ref={c === 0 ? first : undefined} aria-hidden={c > 0 ? true : undefined}>
                 {items.map((it) => <Cell key={it.id} item={it} ph={ph} live={c === 0} reduced={reduced} />)}
               </div>
@@ -211,18 +214,25 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn }: LaneProps) {
   );
 }
 
-// how far a running (or finished) roll animation has got, 0..1
-const progress = (a?: Animation) => (a ? Math.min(1, Math.max(0, Number(a.effect?.getComputedTiming().progress ?? 1))) : 0);
+// how far the paper is revealed right now (0 rolled up .. 1 out), read from the running animation's effect
+const revealed = (clip: HTMLElement) => {
+  const m = /inset\([^ ]+ ([\d.]+)%/.exec(getComputedStyle(clip).clipPath);
+  return m ? 1 - Number(m[1]) / 100 : 1;
+};
 
-type Props = { open: boolean; reduced: boolean; onClosed: () => void; onClose: () => void };
+type Props = { open: boolean; reduced: boolean; onToggle: () => void };
 
-export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
+const el_focus = (root: HTMLElement | null, sel: string) => root?.querySelector<HTMLElement>(sel)?.focus({ preventScroll: true });
+
+export default function Scrolls({ open, reduced, onToggle }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const anims = useRef<Animation[][]>([]); // per lane: [paper reveal, roller]
   const fade = useRef<Animation | undefined>(undefined);
   const driftOn = useRef(false); // true once the roll-out has finished
   const run = useRef(0); // latest run wins; a stale run's completion does nothing
+  const [woke, setWoke] = useState(open); // the photos only render once they have been unrolled
+  if (open && !woke) setWoke(true);
 
   // left edge clears the icon column on desktop; lanes fill the rest
   useLayoutEffect(() => {
@@ -239,52 +249,63 @@ export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
   }, []);
 
   // WAAPI, so the roll stays smooth while the page is busy. Toggling mid-roll continues from where it is.
-  useLayoutEffect(() => {
+  // Rolled up is not 0: the paper stops at STUB wide so the stub stays on screen. `instant` snaps there (mount, resize).
+  const roll = (instant: boolean) => {
     const el = root.current;
     if (!el) return;
     const id = ++run.current;
     driftOn.current = false;
     const done: Animation[] = [];
-    if (reduced) {
-      const from = Number(getComputedStyle(el).opacity);
-      const a = el.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: FADE_MS, easing: "ease-out", fill: "both" });
-      fade.current?.cancel();
-      fade.current = a;
-      done.push(a);
-    } else {
-      el.querySelectorAll<HTMLElement>(".sc-lane").forEach((lane, i) => {
-        const clip = lane.querySelector<HTMLElement>(".sc-clip");
-        const roll = lane.querySelector<HTMLElement>(".sc-roll");
-        if (!clip || !roll) return;
-        const prev = anims.current[i];
-        const from = prev ? progress(prev[0]) : 0;
+    el.querySelectorAll<HTMLElement>(".sc-lane").forEach((lane, i) => {
+      const clip = lane.querySelector<HTMLElement>(".sc-clip");
+      const paper = lane.querySelector<HTMLElement>(".sc-paper");
+      const roller = lane.querySelector<HTMLElement>(".sc-roll");
+      if (!clip || !paper || !roller) return;
+      const prev = anims.current[i];
+      let next: Animation[];
+      if (reduced) {
         const to = open ? 1 : 0;
+        const from = prev && !instant ? Number(getComputedStyle(paper).opacity) : to;
+        next = [paper.animate([{ opacity: from }, { opacity: to }], { duration: instant ? 0 : FADE_MS, easing: "ease-out", fill: "both" })];
+      } else {
+        const lo = (STUB - ROLLER) / Math.max(lane.offsetWidth - ROLLER, 1); // reveal fraction at which the roller's right edge sits at STUB
+        const to = open ? 1 : lo;
+        const from = prev && !instant ? revealed(clip) : to;
         const opts: KeyframeAnimationOptions = {
-          duration: Math.max(1, (open ? OPEN_MS : CLOSE_MS) * Math.abs(to - from)),
-          delay: open && from === 0 ? i * STAGGER : 0,
+          duration: instant ? 0 : Math.max(1, (open ? OPEN_MS : CLOSE_MS) * Math.min(1, Math.abs(to - from) / (1 - lo))),
+          delay: open && !instant && Math.abs(from - lo) < 0.001 ? i * STAGGER : 0,
           easing: open ? OPEN_EASE : CLOSE_EASE,
           fill: "both",
         };
         const reveal = (p: number) => ({ clipPath: `inset(0 ${(1 - p) * 100}% 0 0)` });
         const travel = (p: number) => ({ transform: `translateX(${p * 100}%)` });
-        const next = [
+        next = [
           clip.animate([reveal(from), reveal(to)], opts),
-          roll.animate([travel(from), travel(to)], opts),
+          roller.animate([travel(from), travel(to)], opts),
         ];
-        prev?.forEach((a) => a.cancel());
-        anims.current[i] = next;
-        done.push(...next);
-      });
-    }
+      }
+      prev?.forEach((a) => a.cancel());
+      anims.current[i] = next;
+      done.push(...next);
+    });
     Promise.all(done.map((a) => a.finished)).then(
-      () => {
-        if (id !== run.current) return;
-        if (open) driftOn.current = true;
-        else onClosed();
-      },
+      () => { if (id === run.current && open) driftOn.current = true; },
       () => {},
     );
+  };
+
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    roll(first.current);
+    // keyboard: unrolling moves focus to the close button, rolling up back to the stub (both unmount/hide the one that had it)
+    if (!first.current) el_focus(root.current, open ? ".sc-close" : ".sc-stub");
+    first.current = false;
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // the lanes' width changed: a rolled-up stub is re-measured, an unrolled one needs nothing
+  useLayoutEffect(() => {
+    if (!open && !first.current) roll(true);
+  }, [box.w]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const n = story.lanes.length;
   const fit = Math.floor((box.h - FOOT - PAD * 2 - GAP * (n - 1)) / n);
@@ -292,8 +313,8 @@ export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
   const ph = laneH - CHROME;
 
   return (
-    <div className={`sc${reduced ? " sc-reduced" : ""}`} ref={root}>
-      <div className="sc-lanes">
+    <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root}>
+      <div className="sc-lanes" inert={!open}>
         {story.lanes.map((l, i) => (
           <Lane
             key={l.id}
@@ -305,11 +326,17 @@ export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
             ph={ph}
             h={laneH}
             reduced={reduced}
+            woke={woke}
           />
         ))}
       </div>
+      {!open && (
+        <Tooltip text="unroll my photos">{(t) => (
+          <button type="button" className="sc-stub" onClick={onToggle} aria-label="unroll my photos" aria-expanded={false} {...t} />
+        )}</Tooltip>
+      )}
       <div className="sc-foot">
-        <button type="button" className="sc-close" onClick={onClose} aria-label="roll up photos">×</button>
+        <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>
       </div>
     </div>
   );
