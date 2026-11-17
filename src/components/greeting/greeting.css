@@ -181,6 +181,16 @@
 }
 .dk-close:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) { .dk-close:hover { color: var(--fg); } }
+/* resize handles: invisible, centred on the window border (6px edges, 12px corners) */
+.dk-rz { position: absolute; z-index: 2; touch-action: none; }
+.dk-rz[data-d="n"] { top: -3px; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.dk-rz[data-d="s"] { bottom: -3px; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.dk-rz[data-d="e"] { right: -3px; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.dk-rz[data-d="w"] { left: -3px; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.dk-rz[data-d="ne"] { top: -4px; right: -4px; width: 12px; height: 12px; cursor: nesw-resize; }
+.dk-rz[data-d="sw"] { bottom: -4px; left: -4px; width: 12px; height: 12px; cursor: nesw-resize; }
+.dk-rz[data-d="nw"] { top: -4px; left: -4px; width: 12px; height: 12px; cursor: nwse-resize; }
+.dk-rz[data-d="se"] { bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: nwse-resize; }
 .dk-body { flex: 1; min-height: 0; overflow: auto; padding: 16px 18px 20px; overscroll-behavior: contain; }
 .dk-body.flush { padding: 0; overflow: hidden; display: flex; }
 .dk-prose { display: flex; flex-direction: column; gap: 14px; font-size: 15px; line-height: 1.65; }

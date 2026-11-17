@@ -2,23 +2,29 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 export const BAR = 40;
-const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
+export const MIN_W = 280;
+export const MIN_H = 180;
+export const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
 const OUT = [0.23, 1, 0.32, 1] as const; // enter/exit
 const DRAWER = [0.32, 0.72, 0, 1] as const;
+
+type Dir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+const DIRS: Dir[] = ["n", "s", "e", "w", "ne", "nw", "se", "sw"];
 
 type Props = {
   title: string;
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
   active: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
-  onFocus: () => void; onClose: () => void; onMove: (x: number, y: number) => void;
+  onFocus: () => void; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, flush, autoFocus, onFocus, onClose, onMove, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, flush, autoFocus, onFocus, onClose, onMove, onRect, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const rz = useRef<{ dir: Dir; px: number; py: number; x: number; y: number; w: number; h: number } | null>(null);
 
   useEffect(() => {
     const r = root.current;
@@ -79,6 +85,31 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, phone, fl
         </div>
         <div className={`dk-body${flush ? " flush" : ""}`}>{children}</div>
       </motion.div>
+      {!phone && DIRS.map((dir) => (
+        <div
+          key={dir}
+          className="dk-rz"
+          data-d={dir}
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            rz.current = { dir, px: e.clientX, py: e.clientY, x: cx, y: cy, w, h };
+          }}
+          onPointerMove={(e) => {
+            const r = rz.current;
+            if (!r) return;
+            const dx = e.clientX - r.px, dy = e.clientY - r.py;
+            let { x, y, w: nw, h: nh } = r;
+            if (r.dir.includes("e")) nw = clamp(r.w + dx, MIN_W, vw - r.x);
+            if (r.dir.includes("w")) { x = clamp(r.x + dx, 0, r.x + r.w - MIN_W); nw = r.x + r.w - x; }
+            if (r.dir.includes("s")) nh = clamp(r.h + dy, MIN_H, vh - r.y);
+            if (r.dir.includes("n")) { y = clamp(r.y + dy, BAR, r.y + r.h - MIN_H); nh = r.y + r.h - y; }
+            onRect(x, y, nw, nh);
+          }}
+          onPointerUp={() => { rz.current = null; }}
+          onPointerCancel={() => { rz.current = null; }}
+        />
+      ))}
     </div>
   );
 }

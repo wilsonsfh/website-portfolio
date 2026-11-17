@@ -3,7 +3,7 @@ import { AnimatePresence, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
 import Scrolls from "./Scrolls";
 import Wallpaper from "./Wallpaper";
-import Window, { BAR } from "./Window";
+import Window, { BAR, MIN_W, MIN_H, clamp } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
 import { getSoundOn, setSoundOn } from "./sound";
 
@@ -30,13 +30,21 @@ function useViewport() {
   return vp;
 }
 
-type Win = { id: AppId; x: number; y: number; z: number; focus: boolean };
+type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number }; // w/h: set once the visitor resizes
 const PHONE = 640;
 const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
   return { w: Math.min(a.w, vw - 16), h: Math.min(a.hFrac ? Math.round(vh * a.hFrac) : a.h, vh - BAR - 16) };
+};
+
+const sizeOf = (win: Win, vw: number, vh: number) => {
+  const d = size(win.id, vw, vh);
+  return {
+    w: win.w === undefined ? d.w : clamp(win.w, Math.min(MIN_W, vw), vw),
+    h: win.h === undefined ? d.h : clamp(win.h, Math.min(MIN_H, vh - BAR), vh - BAR),
+  };
 };
 
 // a new window cascades gently from roughly the centre
@@ -79,6 +87,9 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   };
   const move = (id: AppId, x: number, y: number) =>
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, x, y } : w)));
+
+  const rect = (id: AppId, x: number, y: number, w: number, h: number) =>
+    setWins((ws) => ws.map((win) => (win.id === id ? { ...win, x, y, w, h } : win)));
 
   // keep keyboard focus in the desktop after the power button unmounts
   useEffect(() => {
@@ -163,7 +174,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
       <AnimatePresence>
         {wins.map((w) => {
           const a = appById(w.id);
-          const s = size(w.id, vp.cw, vp.h);
+          const s = sizeOf(w, vp.cw, vp.h);
           return (
             <Window
               key={w.id}
@@ -177,6 +188,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
               onFocus={() => focus(w.id)}
               onClose={() => close(w.id)}
               onMove={(x, y) => move(w.id, x, y)}
+              onRect={(x, y, nw, nh) => rect(w.id, x, y, nw, nh)}
             >
               {a.render(ctx)}
             </Window>
