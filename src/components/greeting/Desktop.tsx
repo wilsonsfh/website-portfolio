@@ -35,6 +35,12 @@ const PHONE = 640;
 const MAX_INSET = 8; // gap around a maximized window
 const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
 
+// true on the first power-on of a session, when the photo scrolls unroll by themselves
+const scrollsAutoOpen = (focusOnMount: boolean) => {
+  if (!focusOnMount) return false;
+  try { return sessionStorage.getItem(SCROLLS_KEY) === null; } catch { return true; }
+};
+
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
   return { w: Math.min(a.w, vw - 16), h: Math.min(a.hFrac ? Math.round(vh * a.hFrac) : a.h, vh - BAR - 16) };
@@ -62,7 +68,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const [sound, setSound] = useState(getSoundOn);
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
+  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE && !scrollsAutoOpen(focusOnMount) ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
   const [rolls, setRolls] = useState({ mounted: false, open: false });
@@ -115,8 +121,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
   // the first power-on of a session unrolls the photos once the screen has settled
   useEffect(() => {
-    if (!focusOnMount) return;
-    try { if (sessionStorage.getItem(SCROLLS_KEY) !== null) return; } catch {}
+    if (!scrollsAutoOpen(focusOnMount)) return;
     const t = window.setTimeout(() => {
       try { sessionStorage.setItem(SCROLLS_KEY, "1"); } catch {}
       showRolls();
