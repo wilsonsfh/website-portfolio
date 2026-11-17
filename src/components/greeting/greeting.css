@@ -20,10 +20,13 @@
   position: absolute; inset: 0; z-index: 2; background: #0a0a0a; color: #ededed;
   opacity: 1; transition: opacity 220ms ease-out;
 }
+.gr-screen.under { z-index: 0; transition: none; }
+.gr-screen.fade-in { animation: gr-fade-in 200ms ease-out both; }
+@keyframes gr-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .gr-screen.leave { opacity: 0; pointer-events: none; }
 .gr-off {
   position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 20px;
+  align-items: center; justify-content: center; gap: 20px; opacity: 1;
 }
 .gr-power {
   width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%;
@@ -31,6 +34,17 @@
   transition: transform 160ms ease-out, border-color 160ms ease;
 }
 .gr-power:active { transform: scale(0.97); }
+/* ring flash on press: shown once the screen is in the boot phase (the button stays mounted, fading out) */
+.gr-power { position: relative; }
+.gr-ring {
+  position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #ededed; opacity: 0; pointer-events: none;
+}
+.gr-off.gone .gr-ring { animation: gr-ring 300ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@keyframes gr-ring {
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.9); }
+}
+.gr-off.gone { opacity: 0; pointer-events: none; transition: opacity 180ms ease-out 120ms; }
 .gr-power:focus-visible, .gr-plain:focus-visible { outline: 2px solid #9b8cc4; outline-offset: 3px; }
 .gr-hint { font-size: 14px; color: #8e8e8e; }
 .gr-plain {
@@ -62,6 +76,25 @@
 @keyframes gr-line {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
+}
+
+/* crt off: the picture squashes to a line, the line shrinks to a dot, the dot fades (~420ms, faster than switch-on) */
+.gr-crt { position: absolute; inset: 0; z-index: 1; }
+.gr-crt.closing { animation: gr-squash 420ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@keyframes gr-squash {
+  0% { clip-path: inset(0 0 0 0); }
+  45% { clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0); }
+  46%, 100% { clip-path: inset(50% 50% 50% 50%); }
+}
+.gr-glow-off {
+  position: absolute; inset: 0; z-index: 3; background: #ededed; pointer-events: none;
+  animation: gr-line-off 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes gr-line-off {
+  0%, 30% { clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0); opacity: 0; }
+  45% { clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0); opacity: 1; }
+  75% { clip-path: inset(calc(50% - 1px) calc(50% - 1px) calc(50% - 1px) calc(50% - 1px)); opacity: 1; }
+  100% { clip-path: inset(calc(50% - 1px) calc(50% - 1px) calc(50% - 1px) calc(50% - 1px)); opacity: 0; }
 }
 
 /* desktop */
@@ -174,5 +207,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .gr-screen { transition: opacity 200ms ease-out; }
+  .gr-off.gone { transition: none; }
+  .gr-off.gone .gr-ring { animation: none; }
   .gr-power:active, .gr-plain:active, .dk-plain:active, .dk-icon:active, .dk-close:active, .dk-back:active { transform: none; }
 }

@@ -5,7 +5,7 @@ import "./greeting.css";
 
 // sessionStorage value: absent = first visit, "seen-off" = visited, "seen-on" = visited and powered on
 const KEY = "greeting-b";
-type Phase = "off" | "boot" | "desktop";
+type Phase = "off" | "boot" | "desktop" | "closing"; // closing = crt collapse after power off
 
 const read = () => {
   try { return sessionStorage.getItem(KEY); } catch { return null; }
@@ -32,6 +32,7 @@ export default function Greeting() {
   });
   const [phase, setPhase] = useState<Phase>(init.on ? "desktop" : "off");
   const [veil, setVeil] = useState(!init.on);
+  const [offFade, setOffFade] = useState(false); // reduced motion: the dark screen fades in after power off
   const timers = useRef<number[]>([]);
   const interactive = useRef(false); // true once the visitor has powered on in this page load
   const wantPowerFocus = useRef(!init.returning);
@@ -68,6 +69,7 @@ export default function Greeting() {
   const powerOn = () => {
     write("seen-on");
     interactive.current = true;
+    setOffFade(false);
     if (reduce) {
       setPhase("desktop");
       timers.current.push(window.setTimeout(() => setVeil(false), 240));
@@ -85,8 +87,14 @@ export default function Greeting() {
     timers.current = [];
     write("seen-off");
     wantPowerFocus.current = true;
-    setPhase("off");
     setVeil(true);
+    if (reduce) {
+      setOffFade(true);
+      setPhase("off");
+      return;
+    }
+    setPhase("closing");
+    timers.current.push(window.setTimeout(() => setPhase("off"), 420));
   };
 
   // Escape = plain site, but only while the desktop is still on screen
@@ -102,14 +110,17 @@ export default function Greeting() {
 
   return (
     <section id="desktop" className="gr-root" aria-label="desktop greeting">
-      {phase === "desktop" && (
-        <Desktop onPlain={plain} onPowerOff={powerOff} focusOnMount={interactive.current} />
+      {(phase === "desktop" || phase === "closing") && (
+        <div className={`gr-crt${phase === "closing" ? " closing" : ""}`} inert={phase === "closing"}>
+          <Desktop onPlain={plain} onPowerOff={powerOff} focusOnMount={interactive.current} />
+        </div>
       )}
+      {phase === "closing" && <div className="gr-glow-off" aria-hidden="true" />}
       {veil && (
-        <div className={`gr-screen${phase === "desktop" ? " leave" : ""}`}>
+        <div className={`gr-screen${phase === "desktop" ? " leave" : ""}${phase === "closing" ? " under" : ""}${offFade ? " fade-in" : ""}`}>
           <button type="button" className="gr-plain" onClick={plain}>plain site →</button>
-          {phase === "off" && (
-            <div className="gr-off">
+          {(phase === "off" || phase === "boot") && (
+            <div className={`gr-off${phase === "boot" ? " gone" : ""}`} inert={phase === "boot"}>
               <button
                 type="button"
                 className="gr-power"
@@ -122,6 +133,7 @@ export default function Greeting() {
                   }
                 }}
               >
+                <span className="gr-ring" aria-hidden="true" />
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
                   <path d="M12 3v8" />
                   <path d="M6.3 6.8a8 8 0 1 0 11.4 0" />
