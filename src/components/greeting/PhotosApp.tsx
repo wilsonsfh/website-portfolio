@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useReducedMotion } from "motion/react";
 import type { Ctx } from "./apps";
 import { ALBUMS, ITEMS, fmtDate, fmtMonth, inAlbum, monthKey, type Item } from "./photosData";
+import PhotoViewer from "./PhotoViewer";
 import "./photos.css";
 
 const COMPACT = 640; // window width under which the sidebar becomes a segmented control
@@ -16,6 +18,8 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
   const [square, setSquare] = useState(true);
   const [density, setDensity] = useState(1);
   const [cur, setCur] = useState(0);
+  const [viewing, setViewing] = useState(false);
+  const reduce = !!useReducedMotion();
   const compact = width < COMPACT;
 
   const items = useMemo(() => ITEMS.filter((i) => inAlbum(i, album)), [album]);
@@ -101,6 +105,17 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
     focusTile(next);
   };
 
+  // closing the viewer puts the ring back on the tile that was last shown
+  const wasViewing = useRef(false);
+  useEffect(() => {
+    if (wasViewing.current && !viewing) {
+      const el = tileEl(cur);
+      el?.focus({ preventScroll: true });
+      el?.scrollIntoView({ block: "nearest", behavior: "auto" });
+    }
+    wasViewing.current = viewing;
+  }, [viewing]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // a freshly opened window puts the ring on the first tile so the arrow keys work straight away
   useEffect(() => { tileEl(0)?.focus({ preventScroll: true }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -108,14 +123,14 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
 
   return (
     <div className={`ph${compact ? " compact" : ""}`} ref={root} style={{ "--ph-size": `${SIZES[density]}px` } as CSSProperties}>
-      <nav className="ph-side" aria-label="albums">
+      <nav className="ph-side" aria-label="albums" inert={viewing}>
         {ALBUMS.map((a) => (
           <button key={a.id} type="button" className="ph-album" aria-pressed={a.id === album} onClick={() => setAlbum(a.id)}>
             {a.label}
           </button>
         ))}
       </nav>
-      <div className="ph-main">
+      <div className="ph-main" inert={viewing}>
         <div className="ph-bar">
           <h2 className="ph-title">{label}<span>{items.length} {items.length === 1 ? "item" : "items"}</span></h2>
           <label className="ph-field">
@@ -151,7 +166,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
                       tabIndex={i === cur ? 0 : -1}
                       aria-label={`${it.caption}, ${fmtDate(it.date)}${it.type === "video" ? ", video" : ""}`}
                       style={{ "--ar": it.w / it.h } as CSSProperties}
-                      onClick={() => setCur(i)}
+                      onClick={() => { setCur(i); setViewing(true); }}
                     >
                       <img src={it.type === "video" ? it.poster ?? "" : it.src ?? ""} alt="" loading="lazy" decoding="async" draggable={false} />
                       {it.type === "video" && <span className="ph-play" aria-hidden="true">▶</span>}
@@ -164,6 +179,9 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
           {!items.length && <p className="ph-empty">nothing here yet</p>}
         </div>
       </div>
+      {viewing && items[cur] && (
+        <PhotoViewer items={items} index={cur} onIndex={setCur} onClose={() => setViewing(false)} reduced={reduce} compact={compact} />
+      )}
     </div>
   );
 }
