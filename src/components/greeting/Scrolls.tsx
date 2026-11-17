@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPoi
 import story from "../../data/story.json";
 import "./scrolls.css";
 
-type Item = { id: string; lane: string; date: string; caption: string; type: string; src: string | null; poster: string | null; w: number; h: number };
+type Item = { id: string; lane: string; date: string | null; caption: string; type: string; src: string | null; poster: string | null; w: number; h: number };
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 const PHONE = 640;
@@ -28,12 +28,13 @@ const RAMP_MS = 500; // drift eases in and out of a pause
 const wrap = (x: number, L: number) => (L > 0 ? x - L * Math.ceil(x / L) : x); // into (-L, 0]; at exactly 0 stays 0
 
 // "2024-07-08" or "2024-07" -> "jul 2024"
-const fmt = (d: string) => {
+const fmt = (d: string | null) => {
+  if (!d) return "";
   const [y, m] = d.split("-");
   return `${MONTHS[Number(m) - 1] ?? ""} ${y}`.trim();
 };
 
-const byDate = (a: Item, b: Item) => a.date.localeCompare(b.date);
+const byDate = (a: Item, b: Item) => (a.date ?? "9999").localeCompare(b.date ?? "9999"); // undated last
 
 function Picture({ item, live, reduced }: { item: Item; live: boolean; reduced: boolean }) {
   if (!item.src) {
