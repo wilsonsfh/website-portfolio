@@ -65,3 +65,10 @@ Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring vi
 - Drift after the roll-out: linear, 22 + 2 per lane px/s, alternating direction, eased in/out over 500ms. Pointer down tracks 1:1 (pointer capture, `touch-action: pan-y`), release coasts with `v/1000 * 0.998/(1-0.998)`, drift resumes 2s later. Paused on mouse hover, hidden tab, reduced motion (no momentum either).
 - Placeholder cards show caption and date inside the card and have no caption underneath (avoids duplicating the text). Each lane renders enough copies to cover its width (2x or more), so 115 items means about 60 cells per lane; images use `loading="lazy"`.
 - Needs a browser check: roller/paper lockstep, picture heights at laptop size (about 138px at 900px tall), icon column clearance, light and dark paper, phone scroll and close button, drag/momentum feel, reduced motion, icons usable during unroll.
+
+## plaintextversion.html (v2-plain worktree)
+
+- New desktop icon `plaintextversion.html` (tooltip "the boring version, all of it", app id `plain` in `apps.tsx`) opens `<MainPage embedded />` in a window: 640px wide, 80% of viewport height (clamped, new optional `hFrac` on `App`), body scrolls internally. Phone: full-screen sheet like the others.
+- `MainPage` got an `embedded` prop: renders a `div` without `id="main"` (no duplicate id or second main landmark), no `min-height: 100dvh`, tighter column padding (`.embedded` rules in `global.css`). Row ids now use `useId` (two instances would otherwise collide on `aria-controls`). The footer theme toggle follows `<html class>` via MutationObserver so both instances stay in sync.
+- Top-bar "plain site →" now opens/raises this window (`open("plain")`) instead of scrolling. The power-off screen's "plain site →", "↓ plain site" cue, terminal `exit` and Escape still scroll to `#main`.
+- Needs a browser check: icon label wrapping in the 88px icon (21 chars, wraps anywhere), window size and internal scroll, accordion inside the window, phone sheet, theme toggle in both places, dark mode.

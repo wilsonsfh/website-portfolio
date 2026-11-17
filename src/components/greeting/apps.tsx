@@ -4,9 +4,10 @@ import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
 import Terminal from "./Terminal";
 import Messages from "./Messages";
+import MainPage from "../MainPage";
 import { skillLine, lede, aboutParagraphs, contacts, ext } from "../../copy";
 
-export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "contact" | "terminal" | "messages";
+export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "contact" | "terminal" | "messages" | "plain";
 export type Ctx = { open: (id: AppId) => void; exit: () => void };
 
 function About() {
@@ -92,6 +93,7 @@ export type App = {
   glyph: string; // svg path data, 24x24 stroke icon
   w: number;
   h: number;
+  hFrac?: number; // height as a fraction of the viewport (overrides h, still clamped)
   flush?: boolean; // no body padding
   render: (ctx: Ctx) => ReactNode;
 };
@@ -105,6 +107,7 @@ export const APPS: App[] = [
   { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 360, h: 240, render: () => <Contact /> },
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 520, h: 340, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
   { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 380, h: 460, flush: true, render: () => <Messages /> },
+  { id: "plain", tip: "the boring version, all of it", title: "plaintextversion.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 640, h: 560, hFrac: 0.8, render: () => <MainPage embedded /> },
 ];
 
 export const appById = (id: AppId) => APPS.find((a) => a.id === id)!;
