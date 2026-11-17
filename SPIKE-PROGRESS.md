@@ -37,3 +37,13 @@
 - A desktop adds a click and a window layer between a recruiter and the resume text; on phones sheets one-at-a-time work but cost more taps than the accordion.
 - Drag/stack only has value on pointer devices; on phones it is pure overhead.
 - Boot sequence is ~1.3s every first visit; must stay skippable.
+
+## M1 desktop (v2-desktop worktree)
+Done (all builds pass):
+- Top bar: "wilson soon, 2026", clock, power icon button, sound icon button (aria-pressed), "plain site →". Press scale 0.97 / 160ms on all.
+- Power button press: scale 0.97 plus a 300ms expanding ring (button stays mounted, inert, fading during boot so the ring is visible). Power off: CRT collapse 420ms (picture to a line at 45%, line to a dot, dot fades); reduced motion = 200ms opacity fade in both directions.
+- `sound.ts`: Web Audio only, context created lazily in click handlers. Static burst on power on (peak gain 0.12, ~550ms decay), sine glide 660 to 220Hz (~120ms, peak 0.09) on power off. Toggle persisted in localStorage `v2-sound` (default on). Sound ignores reduced motion.
+- `Wallpaper.tsx`: random start, next photo every 40s, decoded before fading, 1200ms opacity crossfade (200ms reduced), timer paused while tab hidden; veil rgba(232,229,224,.62) light / rgba(10,10,10,.68) dark. Contrast computed by hand (worst case black or white photo under the veil gives roughly 6:1 or better for labels), not measured in browser.
+- `Tooltip.tsx`: 400ms first delay, neighbours instant until pointer is off all triggers for 300ms, typed at 22ms/char with 150ms opacity fade, hover (fine pointer, not touch) and focus-visible, aria-describedby to an sr-only copy, hides on scroll/resize. Copy for icons lives in `apps.tsx` (`tip`).
+
+Unverified visually: top bar fit at 360px, CRT collapse look and timing, ring visibility during boot, actual audio loudness, wallpaper veil legibility on all 16 photos in both themes, tooltip placement and clamping at 360px, tooltip over windows (z-index 3000 inside the desktop).

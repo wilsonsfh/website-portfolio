@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
+import Tooltip from "./Tooltip";
 import Wallpaper from "./Wallpaper";
 import Window, { BAR } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
@@ -86,36 +87,45 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
         <span className="dk-name">wilson soon, 2026</span>
         <span className="dk-clock">{clock}</span>
         <span className="dk-right">
-          <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off">
+          <Tooltip text="switch off">{(t) => (
+          <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
               <path d="M12 3v8" />
               <path d="M6.3 6.8a8 8 0 1 0 11.4 0" />
             </svg>
           </button>
+          )}</Tooltip>
+          <Tooltip text={sound ? "sound on" : "sound off"}>{(t) => (
           <button
             type="button"
             className="dk-plain dk-ibtn"
             aria-label="sound"
             aria-pressed={sound}
             onClick={() => { setSoundOn(!sound); setSound(!sound); }}
+            {...t}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
               {sound ? <path d="M15.5 9a4 4 0 0 1 0 6 M18 6.5a7.5 7.5 0 0 1 0 11" /> : <path d="M16 9.5l5 5 M21 9.5l-5 5" />}
             </svg>
           </button>
-          <button type="button" className="dk-plain" onClick={onPlain}>plain site →</button>
+          )}</Tooltip>
+          <Tooltip text="skip to the plain site">{(t) => (
+            <button type="button" className="dk-plain" onClick={onPlain} {...t}>plain site →</button>
+          )}</Tooltip>
         </span>
       </header>
 
       <nav className="dk-icons" aria-label="apps">
         {APPS.map((a) => (
-          <button key={a.id} type="button" id={`dk-icon-${a.id}`} className="dk-icon" onClick={() => open(a.id)}>
+          <Tooltip key={a.id} text={a.tip}>{(t) => (
+          <button type="button" id={`dk-icon-${a.id}`} className="dk-icon" onClick={() => open(a.id)} {...t}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d={a.glyph} />
             </svg>
             <span>{a.title}</span>
           </button>
+          )}</Tooltip>
         ))}
       </nav>
 
