@@ -515,7 +515,7 @@ export default function PhotoViewer({ items, index, onIndex, onClose, reduced, c
     else if (k === "Escape") { if (bare) setBare(false); else onClose(); }
     else return;
     e.preventDefault();
-    e.stopPropagation(); // Escape must not reach the desktop's "plain site" shortcut
+    e.stopPropagation(); // handled keys must not reach other listeners
   };
 
   const panes = [-1, 0, 1].map((k) => ({ k, it: items[idx + k] })).filter((p) => p.it);

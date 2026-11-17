@@ -139,7 +139,17 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
         <Scrolls open={rolls.open} reduced={!!reduce} onClosed={() => setRolls({ mounted: false, open: false })} onClose={toggleRolls} />
       )}
       <header className="dk-bar">
-        <span className="dk-name">wilson soon, 2026</span>
+        <span className="dk-left">
+          <span className="dk-name">wilson soon, 2026</span>
+          <Tooltip text="plain site">{(t) => (
+          <button type="button" className="dk-plain dk-ibtn" onClick={() => open("plain")} aria-label="plain site" {...t}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 3.5h8l4 4v13H6z" />
+              <path d="M9 12h6 M9 15.5h6" />
+            </svg>
+          </button>
+          )}</Tooltip>
+        </span>
         <span className="dk-clock">{clock}</span>
         <span className="dk-right">
           <Tooltip text="switch off">{(t) => (
@@ -165,9 +175,6 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
             </svg>
           </button>
           )}</Tooltip>
-          <Tooltip text="open the plain version">{(t) => (
-            <button type="button" className="dk-plain" onClick={() => open("plain")} {...t}>plain site →</button>
-          )}</Tooltip>
         </span>
       </header>
 
@@ -189,8 +196,6 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
           )}</Tooltip>
         ))}
       </nav>
-
-      <button type="button" className="gr-cue dk-cue" onClick={onPlain}>↓ plain site</button>
 
       <div className="dk-dock-row">
         <AnimatePresence>

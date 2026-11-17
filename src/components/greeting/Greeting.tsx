@@ -16,7 +16,6 @@ const write = (v: string) => {
 };
 const forced = () => new URLSearchParams(location.search).get("intro") === "1";
 const mainEl = () => document.getElementById("main");
-const mainTop = () => (mainEl()?.getBoundingClientRect().top ?? 0) + window.scrollY;
 
 const BOOT = [
   "wilson-os 0.1",
@@ -40,11 +39,11 @@ export default function Greeting() {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  // landing position: first visit at the power-off screen, return visit at the top of #main
+  // landing position: always the top (desktop or power-off screen); #main stays below
   useLayoutEffect(() => {
     history.scrollRestoration = "manual";
-    window.scrollTo({ top: init.returning ? mainTop() : 0, behavior: "instant" });
-  }, [init.returning]);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   // scrolling past the desktop also counts as having visited
   useEffect(() => {
@@ -100,17 +99,6 @@ export default function Greeting() {
     timers.current.push(window.setTimeout(() => setPhase("off"), 420));
   };
 
-  // Escape = plain site, but only while the desktop is still on screen
-  const plainRef = useRef(plain);
-  plainRef.current = plain;
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && window.scrollY < mainTop() - 1) plainRef.current();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   return (
     <section id="desktop" className="gr-root" aria-label="desktop greeting">
       {(phase === "desktop" || phase === "closing") && (
@@ -121,7 +109,6 @@ export default function Greeting() {
       {phase === "closing" && <div className="gr-glow-off" aria-hidden="true" />}
       {veil && (
         <div className={`gr-screen${phase === "desktop" ? " leave" : ""}${phase === "closing" ? " under" : ""}${offFade ? " fade-in" : ""}`}>
-          <button type="button" className="gr-plain" onClick={plain}>plain site →</button>
           {(phase === "off" || phase === "boot") && (
             <div className={`gr-off${phase === "boot" ? " gone" : ""}`} inert={phase === "boot"}>
               <button
@@ -155,7 +142,6 @@ export default function Greeting() {
               </ul>
             </>
           )}
-          <button type="button" className="gr-cue" onClick={plain}>↓ plain site</button>
         </div>
       )}
     </section>

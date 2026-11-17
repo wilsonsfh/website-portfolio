@@ -59,12 +59,10 @@ export default function Messages() {
   const [items, setItems] = useState<Item[]>(saved.items);
   const [asked, setAsked] = useState<string[]>(saved.asked);
   const [typing, setTyping] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [draft, setDraft] = useState("");
   const log = useRef<HTMLDivElement>(null);
   const stuck = useRef(true);
   const timer = useRef<ReturnType<typeof setTimeout> | 0>(0);
-  const manual = useRef(false); // paused by the visitor's button: only the button resumes
   const auto = useRef(false); // paused by typing / hidden tab: resumes by itself
   const playing = useRef(false);
 
@@ -96,9 +94,7 @@ export default function Messages() {
   };
 
   const sync = () => {
-    const should = !manual.current && !auto.current;
-    setPaused(!should);
-    if (!should) stop();
+    if (auto.current) stop();
     else if (!playing.current) tick(0);
   };
 
@@ -107,8 +103,8 @@ export default function Messages() {
     if (topic) { saved.asked = [...saved.asked, topic.id]; setAsked(saved.asked); }
     saved.queue = [...(topic ? topic.answers : [S.fallback])];
     stop();
-    sync(); // a question never starts playback the visitor paused
-    if (!manual.current) tick(FIRST);
+    sync();
+    tick(FIRST);
   };
 
   useEffect(() => {
@@ -142,7 +138,6 @@ export default function Messages() {
   };
 
   const remaining = S.topics.filter((t) => !asked.includes(t.id));
-  const done = !saved.queue.length;
 
   return (
     <div className="ms">
@@ -160,16 +155,6 @@ export default function Messages() {
           ))}
         </div>
         <form className="ms-form" onSubmit={submit}>
-          <button
-            type="button" className="ms-pause" aria-pressed={paused}
-            aria-label={paused ? "resume conversation" : "pause conversation"}
-            disabled={done && !paused}
-            onClick={() => { manual.current = !manual.current; auto.current = false; sync(); }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              {paused ? <path d="M4 2.5v11l9-5.5z" /> : <path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" />}
-            </svg>
-          </button>
           <label className="ms-sr" htmlFor="ms-input">ask wilson something</label>
           <input id="ms-input" value={draft} maxLength={120} autoComplete="off" placeholder="ask something…" onChange={(e) => onDraft(e.target.value)} />
           <button type="submit" className="ms-send" disabled={!draft.trim()}>send</button>

@@ -10,7 +10,7 @@ const GAP = 8; // between lanes
 const PAD = 8; // around the lanes
 const CHROME = 60; // lane height minus picture height: bands, padding, caption
 const MIN_PIC = 80; // smallest picture height before the lanes scroll instead of squeezing
-const FOOT = 44; // strip under the lanes: holds the close button and leaves the "plain site" cue clear
+const FOOT = 44; // strip under the lanes: holds the close button and keeps the strip clear of the lanes
 const ITEM_GAP = 16;
 
 // roll out: drawer-style ease, staggered top first; roll up: together, faster, enter/exit ease
