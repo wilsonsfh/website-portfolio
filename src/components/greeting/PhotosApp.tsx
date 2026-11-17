@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Ctx } from "./apps";
 import { ALBUMS, ITEMS, fmtDate, fmtMonth, inAlbum, monthKey, type Item } from "./photosData";
 import "./photos.css";
@@ -53,6 +53,57 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
     setCur(g.start);
   };
 
+  const tileEl = (i: number) => scroller.current?.querySelector<HTMLElement>(`[data-i="${i}"]`) ?? null;
+
+  // roving focus: move the ring, keep the tile in view (instant, so key repeat never animates)
+  const focusTile = (i: number) => {
+    setCur(i);
+    const el = tileEl(i);
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: "nearest", behavior: "auto" });
+  };
+
+  // up/down: the tile in the next row (by layout, so it works for squares and original ratios) nearest in x
+  const vertical = (from: number, dir: 1 | -1) => {
+    const a = tileEl(from)?.getBoundingClientRect();
+    if (!a) return from;
+    const cx = a.left + a.width / 2;
+    let rowTop: number | null = null;
+    let best = from;
+    let bestD = Infinity;
+    for (let i = from + dir; i >= 0 && i < items.length; i += dir) {
+      const r = tileEl(i)?.getBoundingClientRect();
+      if (!r) break;
+      if (rowTop === null) {
+        if (Math.abs(r.top - a.top) < 2) continue; // still the same row
+        rowTop = r.top;
+      } else if (Math.abs(r.top - rowTop) >= 2) break;
+      const d = Math.abs(r.left + r.width / 2 - cx);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  };
+
+  const onKeyDown = (e: ReactKeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || !items.length) return;
+    const last = items.length - 1;
+    const next =
+      e.key === "ArrowRight" ? Math.min(cur + 1, last)
+      : e.key === "ArrowLeft" ? Math.max(cur - 1, 0)
+      : e.key === "ArrowDown" ? vertical(cur, 1)
+      : e.key === "ArrowUp" ? vertical(cur, -1)
+      : e.key === "Home" ? 0
+      : e.key === "End" ? last
+      : null;
+    if (next === null) return;
+    e.preventDefault();
+    focusTile(next);
+  };
+
+  // a freshly opened window puts the ring on the first tile so the arrow keys work straight away
+  useEffect(() => { tileEl(0)?.focus({ preventScroll: true }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const label = ALBUMS.find((a) => a.id === album)!.label;
 
   return (
@@ -84,7 +135,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
           </label>
           <button type="button" className="ph-btn" onClick={ctx.unroll}>unroll</button>
         </div>
-        <div className="ph-scroll" ref={scroller}>
+        <div className="ph-scroll" ref={scroller} onKeyDown={onKeyDown}>
           {groups.map((g) => (
             <section key={g.key} className="ph-group">
               <h3 className="ph-head" data-g={g.key}>{fmtMonth(g.key === "undated" ? null : g.key)}</h3>
