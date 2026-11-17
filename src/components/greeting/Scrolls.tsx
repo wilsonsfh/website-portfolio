@@ -6,10 +6,11 @@ type Item = { id: string; lane: string; date: string | null; caption: string; ty
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 const PHONE = 640;
-const GAP = 10; // between lanes
-const PAD = 10; // around the lanes
-const CHROME = 64; // lane height minus picture height: bands, padding, caption
-const MIN_PIC = 120; // smallest picture height before a phone scrolls instead of squeezing
+const GAP = 8; // between lanes
+const PAD = 8; // around the lanes
+const CHROME = 60; // lane height minus picture height: bands, padding, caption
+const MIN_PIC = 80; // smallest picture height before the lanes scroll instead of squeezing
+const FOOT = 44; // strip under the lanes: holds the close button and leaves the "plain site" cue clear
 const ITEM_GAP = 16;
 
 // roll out: drawer-style ease, staggered top first; roll up: together, faster, enter/exit ease
@@ -286,7 +287,7 @@ export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const n = story.lanes.length;
-  const fit = Math.floor((box.h - PAD * 2 - GAP * (n - 1)) / n);
+  const fit = Math.floor((box.h - FOOT - PAD * 2 - GAP * (n - 1)) / n);
   const laneH = Math.max(fit, MIN_PIC + CHROME);
   const ph = laneH - CHROME;
 
@@ -307,7 +308,9 @@ export default function Scrolls({ open, reduced, onClosed, onClose }: Props) {
           />
         ))}
       </div>
-    <button type="button" className="sc-close" onClick={onClose} aria-label="roll up photos">×</button>
+      <div className="sc-foot">
+        <button type="button" className="sc-close" onClick={onClose} aria-label="roll up photos">×</button>
+      </div>
     </div>
   );
 }
