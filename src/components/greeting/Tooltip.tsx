@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type PointerEvent, type ReactNode } from "react";
 import { useReducedMotion } from "motion/react";
 
@@ -92,11 +93,12 @@ export default function Tooltip({ text, children }: { text: string; children: (p
     <>
       {children(props)}
       <span id={id} className="sr-only">{text}</span>
-      {open && (
+      {open && createPortal( // body-level: a fixed tooltip inside a transformed, clipped window would be mispositioned and cut off
         <span ref={tip} className={`tt${open.instant ? " instant" : ""}`} aria-hidden="true">
           <span className="tt-ghost">{text}</span>
           <span className="tt-typed">{text.slice(0, typed)}</span>
-        </span>
+        </span>,
+        document.body,
       )}
     </>
   );

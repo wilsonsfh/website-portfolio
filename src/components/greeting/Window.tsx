@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import Tooltip from "./Tooltip";
 
 export const BAR = 40;
 export const MIN_W = 280;
@@ -18,11 +19,11 @@ type Props = {
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
   active: boolean; max: boolean; min: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
-  onFocus: () => void; onToggleMax: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
+  onFocus: () => void; onToggleMax: () => void; onMinimize: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, dockPt, onClose, onMove, onRect, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, onMinimize, dockPt, onClose, onMove, onRect, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
@@ -138,11 +139,29 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min,
           {phone && <button type="button" className="dk-back" onClick={onClose}>← back</button>}
           <span className="dk-title-text">{title}</span>
           {!phone && (
-            <button type="button" className="dk-close" aria-label={`close ${title}`} onClick={onClose}>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-                <path d="M2 2l8 8M10 2l-8 8" />
-              </svg>
-            </button>
+            <div className="dk-wbtns">
+              <Tooltip text="minimize">{(t) => (
+                <button type="button" className="dk-wbtn" aria-label={`minimize ${title}`} onClick={onMinimize} {...t}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                    <path d="M2 9h8" />
+                  </svg>
+                </button>
+              )}</Tooltip>
+              <Tooltip text={max ? "restore" : "maximize"}>{(t) => (
+                <button type="button" className="dk-wbtn" aria-label={`${max ? "restore" : "maximize"} ${title}`} onClick={onToggleMax} {...t}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    {max ? <path d="M4.5 2.5h5v5 M2.5 4.5h5v5h-5z" /> : <rect x="2" y="2" width="8" height="8" rx="1" />}
+                  </svg>
+                </button>
+              )}</Tooltip>
+              <Tooltip text="close">{(t) => (
+                <button type="button" className="dk-wbtn" aria-label={`close ${title}`} onClick={onClose} {...t}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                    <path d="M2 2l8 8M10 2l-8 8" />
+                  </svg>
+                </button>
+              )}</Tooltip>
+            </div>
           )}
         </div>
         <div className={`dk-body${flush ? " flush" : ""}`}>{children}</div>

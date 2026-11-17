@@ -154,7 +154,7 @@
 .dk-icon svg { color: var(--muted); }
 .dk-icon span { max-width: 100%; text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
 .dk-icon:active { transform: scale(0.97); }
-.dk-icon:focus-visible, .dk-close:focus-visible, .dk-back:focus-visible {
+.dk-icon:focus-visible, .dk-wbtn:focus-visible, .dk-back:focus-visible {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
 @media (hover: hover) and (pointer: fine) { .dk-icon:hover { background: var(--line); } }
@@ -174,14 +174,16 @@
 }
 .dk-title:active { cursor: grabbing; }
 .dk-win[data-max="true"] .dk-title { cursor: default; }
-.dk-title-text { color: var(--muted); transition: color 160ms ease; }
+.dk-title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); transition: color 160ms ease; }
 .dk-win[data-active="true"] .dk-title-text { color: var(--fg); }
-.dk-close {
-  display: grid; place-items: center; width: 36px; height: 36px; padding: 0; background: none;
+.dk-wbtns { display: flex; flex: none; }
+.dk-wbtn {
+  position: relative; display: grid; place-items: center; width: 40px; height: 36px; padding: 0; background: none;
   border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; transition: transform 160ms ease-out, color 160ms ease;
 }
-.dk-close:active { transform: scale(0.97); }
-@media (hover: hover) and (pointer: fine) { .dk-close:hover { color: var(--fg); } }
+.dk-wbtn::after { content: ""; position: absolute; inset: -4px 0; } /* 44px tall hit area */
+.dk-wbtn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .dk-wbtn:hover { color: var(--fg); } }
 /* dock: only while something is minimized; matte neutral */
 .dk-dock-row { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 999; display: flex; justify-content: center; pointer-events: none; }
 .dk-dock {
@@ -255,5 +257,5 @@
   .dk-wall img { transition-duration: 200ms; }
   .gr-off.gone { transition: none; }
   .gr-off.gone .gr-ring { animation: none; }
-  .gr-power:active, .gr-plain:active, .dk-plain:active, .dk-icon:active, .dk-close:active, .dk-back:active, .dk-dock-item:active { transform: none; }
+  .gr-power:active, .gr-plain:active, .dk-plain:active, .dk-icon:active, .dk-wbtn:active, .dk-back:active, .dk-dock-item:active { transform: none; }
 }

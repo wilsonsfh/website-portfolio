@@ -238,6 +238,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
               flush={a.flush}
               onFocus={() => focus(w.id)}
               onToggleMax={() => toggleMax(w.id)}
+              onMinimize={() => minimize(w.id)}
               dockPt={() => dockPt(w.id)}
               onClose={() => close(w.id)}
               onMove={(x, y) => move(w.id, x, y)}
