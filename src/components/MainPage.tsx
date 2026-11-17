@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import workExperience from "../data/work-experience.json";
 import projects from "../data/projects.json";
 import activities from "../data/activities.json";
@@ -6,7 +6,7 @@ import { skillLine, lede, aboutParagraphs, contacts, ext } from "../copy";
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const id = label.replace(/\s+/g, "-");
+  const id = `${useId()}-${label.replace(/\s+/g, "-")}`; // unique: MainPage can render twice (page + desktop window)
   return (
     <section className="row">
       <h2 className="row-heading">
@@ -38,6 +38,12 @@ function ThemeToggle() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
+  // stay in sync with the other MainPage instance
+  useEffect(() => {
+    const mo = new MutationObserver(() => setDark(document.documentElement.classList.contains("dark")));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
   return (
     <button
       type="button"
@@ -54,9 +60,11 @@ function ThemeToggle() {
   );
 }
 
-export default function MainPage() {
+export default function MainPage({ embedded = false }: { embedded?: boolean }) {
+  // embedded (inside a desktop window): no #main id or main landmark, no full-height page, tighter padding
+  const Root = embedded ? "div" : "main";
   return (
-    <main id="main" className="page">
+    <Root id={embedded ? undefined : "main"} className={`page${embedded ? " embedded" : ""}`}>
       <div className="column">
         <header className="intro">
           <h1 className="name">wilson.</h1>
@@ -125,6 +133,6 @@ export default function MainPage() {
           <ThemeToggle />
         </footer>
       </div>
-    </main>
+    </Root>
   );
 }

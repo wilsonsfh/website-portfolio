@@ -64,6 +64,10 @@ body {
 }
 
 .page { min-height: 100vh; min-height: 100dvh; }
+.page.embedded { min-height: 0; }
+.embedded .column { padding: 8px 6px 24px; }
+.embedded .intro { margin-bottom: 40px; }
+.embedded .foot { margin-top: 40px; }
 .column { max-width: 620px; margin: 0 auto; padding: 96px 24px 64px; text-align: left; }
 @media (min-width: 768px) { .column { padding-top: 192px; } }
 
