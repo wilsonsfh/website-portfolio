@@ -1,5 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type KeyboardEvent as ReactKeyboardEvent, type FocusEvent as ReactFocusEvent } from "react";
-import Tooltip from "./Tooltip";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type KeyboardEvent as ReactKeyboardEvent, type CSSProperties, type FocusEvent as ReactFocusEvent } from "react";
 import story from "../../data/story.json";
 import "./scrolls.css";
 
@@ -15,15 +14,15 @@ const HEAD = 44; // strip above the lanes: holds "all photos" and the close butt
 const ITEM_GAP = 16;
 const CLICK_PX = 6; // a press that moved less than this is a click, not a drag
 
-// roll out: drawer-style ease, staggered top first; roll up: together, faster, enter/exit ease
+// roll out: drawer-style ease (quick start, long settle, like the reference scroll), lanes start in a shuffled order
+// with uneven gaps; roll up: together, slower and softer. Once rolled up the whole scroll is hidden (CLOSE_MS in css).
 const OPEN_MS = 900;
 const OPEN_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-const STAGGER = 110;
-const CLOSE_MS = 320;
-const CLOSE_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
+const STAGGER_MIN = 60; // gap between one lane starting and the next, random in [MIN, MAX]
+const STAGGER_MAX = 190;
+const CLOSE_MS = 800;
+const CLOSE_EASE = "cubic-bezier(0.33, 0, 0.2, 1)";
 const FADE_MS = 200;
-const STUB = 64; // visible width of a rolled-up lane: label spool plus a sliver of paper on its roller
-const ROLLER = 14; // width of the travelling roller bar
 
 // drift: constant speed (linear), neighbours run opposite ways at slightly different speeds
 const DRIFT = 22; // px/s, plus 2 per lane
@@ -287,12 +286,17 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   }, []);
 
   // WAAPI, so the roll stays smooth while the page is busy. Toggling mid-roll continues from where it is.
-  // Rolled up is not 0: the paper stops at STUB wide so the stub stays on screen. `instant` snaps there (mount, resize).
+  // Rolled up is 0: nothing shows (the css then hides the scroll). `instant` snaps to the end state (mount).
   const roll = (instant: boolean) => {
     const el = root.current;
     if (!el) return;
     const id = ++run.current;
     driftOn.current = false;
+    // random start order: lane i waits for its place in a shuffle, plus a growing uneven gap
+    const rank = [...Array(story.lanes.length).keys()].sort(() => Math.random() - 0.5);
+    const wait: number[] = [];
+    let t = 0;
+    rank.forEach((lane) => { wait[lane] = t; t += STAGGER_MIN + Math.random() * (STAGGER_MAX - STAGGER_MIN); });
     const done: Animation[] = [];
     el.querySelectorAll<HTMLElement>(".sc-lane").forEach((lane, i) => {
       const clip = lane.querySelector<HTMLElement>(".sc-clip");
@@ -306,13 +310,11 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
         const from = prev && !instant ? Number(getComputedStyle(paper).opacity) : to;
         next = [paper.animate([{ opacity: from }, { opacity: to }], { duration: instant ? 0 : FADE_MS, easing: "ease-out", fill: "both" })];
       } else {
-        // reveal fraction at which the roller's right edge sits at STUB; on a phone it rolls away completely (no stub)
-        const lo = window.innerWidth < PHONE ? 0 : (STUB - ROLLER) / Math.max(lane.offsetWidth - ROLLER, 1);
-        const to = open ? 1 : lo;
+        const to = open ? 1 : 0;
         const from = prev && !instant ? revealed(clip) : to;
         const opts: KeyframeAnimationOptions = {
-          duration: instant ? 0 : Math.max(1, (open ? OPEN_MS : CLOSE_MS) * Math.min(1, Math.abs(to - from) / (1 - lo))),
-          delay: open && !instant && Math.abs(from - lo) < 0.001 ? i * STAGGER : 0,
+          duration: instant ? 0 : Math.max(1, (open ? OPEN_MS : CLOSE_MS) * Math.abs(to - from)),
+          delay: open && !instant && from < 0.001 ? wait[i] : 0,
           easing: open ? OPEN_EASE : CLOSE_EASE,
           fill: "both",
         };
@@ -336,15 +338,13 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const first = useRef(true);
   useLayoutEffect(() => {
     roll(first.current);
-    // keyboard: unrolling moves focus to the close button, rolling up back to the stub (both unmount/hide the one that had it)
-    if (!first.current) el_focus(root.current, open ? ".sc-close" : ".sc-stub");
+    // keyboard: unrolling moves focus to the close button, rolling up back to the timeline icon (the scroll hides with the button)
+    if (!first.current) {
+      if (open) el_focus(root.current, ".sc-close");
+      else document.getElementById("dk-icon-timeline")?.focus({ preventScroll: true });
+    }
     first.current = false;
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // the lanes' width changed: a rolled-up stub is re-measured, an unrolled one needs nothing
-  useLayoutEffect(() => {
-    if (!open && !first.current) roll(true);
-  }, [box.w]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const n = story.lanes.length;
   const fit = Math.floor((box.h - HEAD - PAD * 2 - GAP * (n - 1)) / n);
@@ -352,7 +352,7 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const ph = laneH - CHROME;
 
   return (
-    <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root}>
+    <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root} style={{ "--sc-close": `${reduced ? FADE_MS : CLOSE_MS}ms` } as CSSProperties}>
       <div className="sc-head">
         <button type="button" className="sc-all" onClick={onAll}>all photos</button>
         <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>
@@ -374,11 +374,6 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
           />
         ))}
       </div>
-      {!open && (
-        <Tooltip text="unroll my photos">{(t) => (
-          <button type="button" className="sc-stub" onClick={onToggle} aria-label="unroll my photos" aria-expanded={false} {...t} />
-        )}</Tooltip>
-      )}
     </div>
   );
 }
