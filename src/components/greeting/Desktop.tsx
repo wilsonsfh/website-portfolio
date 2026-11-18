@@ -68,6 +68,9 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
   const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
   const reqN = useRef(0);
+  const [bulb, setBulb] = useState(false); // a tap on the projects icon lights the bulb for a moment (hover does it in css)
+  const bulbTimer = useRef(0);
+  useEffect(() => () => clearTimeout(bulbTimer.current), []);
   const toggleRolls = () => setRollsOpen(!rollsOpen); // the lanes sit above any open windows
 
   // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; the window would sit under the lanes, so they roll up
@@ -180,12 +183,18 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
+            onPointerDown={a.id === "projects" ? (e) => {
+              if (e.pointerType === "mouse") return;
+              setBulb(true);
+              clearTimeout(bulbTimer.current);
+              bulbTimer.current = window.setTimeout(() => setBulb(false), 1400);
+            } : undefined}
             onClick={() => (a.id === "timeline" ? toggleRolls() : open(a.id))}
             aria-expanded={a.id === "timeline" ? rollsOpen : undefined}
             {...t}
           >
             <span className="dk-tile" aria-hidden="true">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" className={a.id === "projects" ? `dk-bulb${bulb ? " lit" : ""}` : undefined}>
                 <path d={a.glyph} />
               </svg>
             </span>

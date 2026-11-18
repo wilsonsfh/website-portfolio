@@ -204,6 +204,30 @@
   display: grid; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 108px);
   grid-auto-columns: 104px; align-content: start; gap: 6px;
 }
+/* desktop placement, one cell each (column / row); the phone grid below drops these and wraps in reading order
+   row1: about, (1) unread / row2: work, terminal / row3: projects / row4: involvements / row5: plaintext-version, contact, photos, timeline */
+@media (min-width: 640px) {
+  .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(4, 104px); grid-template-rows: repeat(5, 108px); grid-auto-columns: auto; }
+  #dk-icon-about { grid-area: 1 / 1; }
+  #dk-icon-messages { grid-area: 1 / 2; }
+  #dk-icon-work { grid-area: 2 / 1; }
+  #dk-icon-terminal { grid-area: 2 / 2; }
+  #dk-icon-projects { grid-area: 3 / 1; }
+  #dk-icon-activities { grid-area: 4 / 1; }
+  #dk-icon-plain { grid-area: 5 / 1; }
+  #dk-icon-contact { grid-area: 5 / 2; }
+  #dk-icon-photos { grid-area: 5 / 3; }
+  #dk-icon-timeline { grid-area: 5 / 4; }
+}
+/* the projects bulb: off at rest; hover or a tap flickers it on (irregular on/off, then lit) */
+.dk-bulb path:first-child { fill: var(--tile-ink); fill-opacity: 0; }
+@keyframes dk-flicker {
+  0% { opacity: 0.45; fill-opacity: 0; } 8% { opacity: 1; fill-opacity: 0.35; } 16% { opacity: 0.45; fill-opacity: 0; }
+  30% { opacity: 1; fill-opacity: 0.35; } 40% { opacity: 0.45; fill-opacity: 0; } 55% { opacity: 1; fill-opacity: 0.3; }
+  65% { opacity: 0.6; fill-opacity: 0.05; } 100% { opacity: 1; fill-opacity: 0.3; }
+}
+.dk-bulb.lit path:first-child { animation: dk-flicker 420ms linear both; }
+@media (hover: hover) and (pointer: fine) { .dk-icon:hover .dk-bulb path:first-child { animation: dk-flicker 420ms linear both; } }
 /* icon: a cream paper tile with an ink glyph and a hard print shadow, cream label on the green field */
 .dk-icon {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -328,5 +352,6 @@
   .gr-off.gone { transition: none; }
   .gr-off.gone .gr-ring { animation: none; }
   .gr-hop { animation: none; }
+  .dk-bulb.lit path:first-child, .dk-icon:hover .dk-bulb path:first-child { animation: none; }
   .gr-power:active, .dk-plain:active, .dk-icon:active, .dk-wbtn:active, .dk-back:active, .dk-dock-item:active { transform: none; }
 }

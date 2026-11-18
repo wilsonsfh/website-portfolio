@@ -10,7 +10,7 @@ const HELP = [
   "whoami               who is this",
   "ls                   list files",
   "cat about.txt        read about.txt",
-  "open <name>          open work, projects, activities, photos or contact",
+  "open <name>          open work, projects, involvements, photos or contact",
   "unroll               unroll or roll up the photo scrolls",
   "exit                 go to the plain site",
 ];
@@ -20,16 +20,17 @@ function run(cmd: string, ctx: Ctx): string[] {
   switch (name) {
     case "help": return HELP;
     case "whoami": return [lede];
-    case "ls": return ["about.txt  work/  projects/  activities/  photos/  contact/"];
+    case "ls": return ["about.txt  work/  projects/  involvements/  photos/  contact/"];
     case "cat":
       if (arg === "about.txt") return [lede, ...aboutParagraphs];
       return [arg ? `cat: ${arg}: no such file` : "usage: cat about.txt"];
     case "open":
-      if ((OPENABLE as readonly string[]).includes(arg)) {
-        ctx.open(arg as AppId);
+      const id = arg === "involvements" ? "activities" : arg; // the app keeps its old id; "activities" still works
+      if ((OPENABLE as readonly string[]).includes(id)) {
+        ctx.open(id as AppId);
         return [`opening ${arg}`];
       }
-      return ["usage: open <work|projects|activities|photos|contact>"];
+      return ["usage: open <work|projects|involvements|photos|contact>"];
     case "unroll":
       ctx.unroll();
       return ["unrolling the photo scrolls"];
