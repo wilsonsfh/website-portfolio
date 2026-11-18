@@ -55,7 +55,7 @@ const place = (id: AppId, n: number, z: number, focus: boolean): Win => {
   return { id, x: Math.max(150, (cw - w) / 2 + ((n % 5) - 2) * 36), y: BAR + 28 + (n % 5) * 30, z, focus };
 };
 
-export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain: () => void; onPowerOff: () => void; focusOnMount: boolean }) {
+export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () => void; focusOnMount: boolean }) {
   const clock = useClock();
   const root = useRef<HTMLDivElement>(null);
   const vp = useViewport();
@@ -125,7 +125,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
     if (focusOnMount && !root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ctx: Ctx = { open, exit: onPlain, unroll: toggleRolls, photoReq };
+  const ctx: Ctx = { open, exit: () => open("plain"), unroll: toggleRolls, photoReq };
   const top = Math.max(0, ...wins.filter((w) => phone || !w.min).map((w) => w.z));
   const docked = phone ? [] : wins.filter((w) => w.min);
 

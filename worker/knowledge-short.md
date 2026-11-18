@@ -1,7 +1,7 @@
 # About Wilson Soon (short version)
 
 ## Who he is
-Wilson Soon builds software and has worked in engineering, product and solutions roles. He is on GitHub as wilsonsfh. He was Vice President of External Relations at the NUS Students' Computing Club (Aug 2024 to Aug 2025). He represented 6000+ computing students, led a team of 72 and raised $54,450 through partnerships.
+Wilson Soon is based in Singapore and studies computer science at the National University of Singapore (NUS). He builds software and has worked in engineering, product and solutions roles. He is on GitHub as wilsonsfh. He was Vice President of External Relations at the NUS Students' Computing Club (Aug 2024 to Aug 2025). He represented 6000+ computing students, led a team of 72 and raised $54,450 through partnerships.
 
 ## Work experience
 - Solutions Engineering Intern, Cloudflare (May to Aug 2026, Singapore). He built a security assessment tool that checks client accounts against Cloudflare's WAF, SSL/TLS, Rate Limiting and Bot Management products, and a browser-based Linux desktop on Cloudflare Containers that powers hands-on labs. He demoed to senior leaders at a meeting of 80+ SEs and shadowed SEs on live customer calls.

@@ -35,7 +35,6 @@
 }
 .gr-root .ms { --ms-wilson-bg: #123D2B; --ms-wilson-fg: #F1EAD3; --ms-visitor-bg: #E0D6B6; --ms-visitor-fg: #123D2B; }
 :root.dark .gr-root .ms { --ms-wilson-bg: #EAE3C9; --ms-wilson-fg: #0F2A1E; --ms-visitor-bg: #1E4431; --ms-visitor-fg: #EAE3C9; }
-#main:focus { outline: none; }
 
 /* power-off + boot screen (always dark, like a switched-off tv: green-black glass, cream phosphor) */
 .gr-screen {

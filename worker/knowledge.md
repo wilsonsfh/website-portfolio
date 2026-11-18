@@ -2,6 +2,9 @@
 
 This is everything the chat may say about Wilson. Hand-written and hand-edited. See docs/ai-chat-decisions.md for what is allowed in.
 
+## Who he is
+Based in Singapore, studying computer science at the National University of Singapore (NUS), and passionate about building all things tech and aesthetics. He has worked in solutions engineering, product management and software engineering.
+
 ## Work experience
 
 ### Solutions Engineering Intern, Cloudflare (May 2026 to Aug 2026, Singapore)
