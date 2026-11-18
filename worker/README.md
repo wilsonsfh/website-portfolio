@@ -53,3 +53,71 @@ Gemma 4 is a thinking model: the chat call passes `chat_template_kwargs: { enabl
 `knowledge.md` (Workers AI) and `knowledge-short.md` (Groq, under ~1,500 tokens for its ~8K tokens/minute free tier)
 are hand-written and edited directly; nothing regenerates them. Keep them inside the allowlist in
 `../docs/ai-chat-decisions.md`, and keep the preparation-time app paragraph word for word.
+
+## Unanswered questions (D1 + admin)
+
+When the model can't answer from the knowledge it replies with the sentinel `UNKNOWN`. The Worker swaps that for a fixed
+friendly line and logs the visitor's latest message (only that, no conversation, no IP, no identifier) to D1 table
+`questions`, deduped on a normalized form with an `asked_count`. At most 500 questions can be open; past that, new ones
+are not logged. Wilson answers in the admin; saved answers (newest 40, capped by size, cached 5 minutes) are added to the
+prompt as "Wilson's own answers" for both Workers AI and Groq. Design notes: `../docs/design-rationale.md` section 12.
+
+Pieces: `../db/migrations/` (schema), `src/qa.ts` (public Worker D1 code), `../admin/` (Worker `portfolio-admin`: one HTML
+page + JSON API, `handleAdmin` in `admin/src/handler.ts`), `../scripts/wiki-excerpt.mjs` (private wiki excerpt uploader).
+The repo is public: the wiki excerpt lives only in D1 and in gitignored local files.
+
+### Go-live steps (in order, run by Wilson)
+
+```sh
+cd worker
+npx wrangler d1 create portfolio-qa            # prints a database_id
+# paste it into database_id in worker/wrangler.jsonc AND admin/wrangler.jsonc (replace the 0000... placeholder)
+npx wrangler d1 migrations apply portfolio-qa --remote   # run from worker/ (or admin/); creates the tables
+cd ../admin && npm install                     # admin has its own package.json
+cd .. && npm run deploy                        # public worker (site + chat) with the DB binding
+npm run deploy:admin                           # portfolio-admin
+```
+
+Then turn on Cloudflare Access for the admin Worker only (Zero Trust dashboard; Access is free for up to 50 users):
+1. Workers & Pages -> `portfolio-admin` -> Settings -> Domains & Routes -> on the `workers.dev` row choose "Enable Cloudflare
+   Access" (this creates the Access application for that hostname). Leave `portfolio` open.
+2. Edit the application's policy: Allow, Include "Emails" = Wilson's email only.
+3. Defence in depth: the Worker returns 403 to any request without the `Cf-Access-Jwt-Assertion` header
+   (`REQUIRE_ACCESS="true"` in `admin/wrangler.jsonc`). To also verify the JWT signature, set `ACCESS_TEAM_DOMAIN`
+   (e.g. `yourteam.cloudflareaccess.com`) and `ACCESS_AUD` (the application's AUD tag) in `admin/wrangler.jsonc` and redeploy.
+   Until both are set only the header's presence is checked.
+4. Open `https://portfolio-admin.wilsonsoon.workers.dev` in a private window: you should get the Access login, not the page.
+
+### Wiki excerpt (suggestions)
+
+```sh
+# 1. create admin/wiki-pages.local.txt (gitignored): one wiki page path per line, relative to the wiki root
+node scripts/wiki-excerpt.mjs --dry-run --root ~/Projects/Personal_LLM_Wiki/wiki   # what would upload
+node scripts/wiki-excerpt.mjs --root ~/Projects/Personal_LLM_Wiki/wiki             # writes admin/wiki-upload.local.sql
+cd admin && npx wrangler d1 execute portfolio-qa --remote --file wiki-upload.local.sql   # REPLACES all chunks
+```
+
+Pages are cut by heading into about 300 to 600 word chunks (frontmatter, links and "related" sections stripped). The
+"suggest" button retrieves the best chunks (FTS5, porter stemming) and asks Workers AI for a draft from them only.
+Suggestions are stored in `questions.suggestion`, are never read by the public Worker and never shown to visitors.
+Only publish text you would be fine seeing public: the draft is only a starting point, Wilson edits before saving.
+
+### Local dev
+
+```sh
+cd admin && npx wrangler d1 migrations apply portfolio-qa --local --persist-to ../.wrangler/state
+echo 'REQUIRE_ACCESS=false' > admin/.dev.vars        # gitignored; skips the Access check locally only
+(cd worker && npx wrangler dev --local --persist-to ../.wrangler/state) &    # port 8787
+(cd admin && npx wrangler dev --local --persist-to ../.wrangler/state --port 8788)
+```
+
+Both read the same local D1 through `--persist-to`. `AI` calls fail locally, so unknown-question logging only triggers
+with a stubbed model. The public worker needs `../dist` to exist (`mkdir dist`) because of its assets config.
+Checks: `npm test` and `npm run typecheck` in `worker/` and in `admin/`.
+
+### Moving the admin onto the public Worker (`/admin`)
+
+`handleAdmin(req, env, { base, authorize })` is mountable from either Worker. Switching: import it in `worker/src/index.ts`,
+route `/admin*` to `handleAdmin(req, env, { base: "/admin", authorize: tokenCheck })`, add `"/admin*"` to `run_worker_first`,
+write the `ADMIN_TOKEN` check (constant-time compare, failed-attempt rate limit, page keeps the token in sessionStorage and
+sends it as a header; not built yet), then delete `admin/` and its Access application.

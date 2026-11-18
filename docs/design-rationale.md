@@ -292,3 +292,28 @@ Not in the notes yet; taken from the task brief:
 - The README on `v2` still describes the Astro v1 site and the deleted Vercel URL, and needs a rewrite. A design-story doc
   was planned "at the very end"; this file may be it.
 - The unanswered-questions store: where it lives and how the admin view is protected are undecided in the sources.
+
+## 12. Unanswered questions
+
+The assistant answers only from its knowledge file, so some visitor questions (hobbies, say) have no answer. They now
+reach Wilson, and his answers feed back into the chat. Choices:
+
+- **Sentinel detection, not guessing.** The model is told to reply exactly `UNKNOWN` when a question about Wilson is not in
+  the knowledge. The Worker tests that deterministically (trimmed, case-insensitive, or starts with it), logs the question
+  and returns one fixed lowercase line. Phrase-matching "i don't know" in free text would miss variants and misfire on
+  real answers. Declined topics (health, family, money) and non-Wilson questions are declined, not logged.
+- **Minimal logging.** Only the latest user message, trimmed to 500 characters, deduped on a normalized form (lowercase,
+  punctuation and spacing collapsed) with a count and first/last dates. No IP or identifier. A cap of 500 open questions
+  bounds abuse. Dismissed questions stay in the table so repeats only bump their count.
+- **One D1 database, two Workers.** The public Worker writes questions and reads answers; the admin Worker reads, answers
+  and drafts. Answers are cached in memory for 5 minutes, so most chat requests never touch D1, and a saved answer goes
+  live within that window. Both providers get the answers (Groq a shorter list, because of its token limit).
+- **Separate admin Worker.** Cloudflare Access attaches to a whole Worker hostname. Keeping the admin in its own Worker
+  lets Access protect it while the public Worker stays open, and the Worker still refuses requests without the Access
+  header. The admin code is one mountable handler, so it could instead live under `/admin` on the public Worker with a token.
+- **The wiki excerpt lives in D1, never in the repo.** The repo is public. Wilson picks the pages, a local script chunks
+  them and uploads with `wrangler d1 execute`; the page list and generated SQL are gitignored. Retrieval is FTS5 in D1.
+- **Suggestions are never public.** A draft is stored in its own column, shown only in the admin and written from the wiki
+  excerpt only. Nothing reaches visitors until Wilson edits and saves it as an answer.
+- **Known limits.** A follow-up message ("and what about that?") is logged without its context. The admin page trusts
+  Cloudflare Access for identity and sets no passwords.
