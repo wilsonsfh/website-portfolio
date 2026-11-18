@@ -44,10 +44,22 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
   }, []);
 
   // a new album starts at the top
+  const pending = useRef<number | null>(null); // a requested photo waiting for the library album to load
   useEffect(() => {
-    setCur(0);
+    setCur(pending.current ?? 0);
+    pending.current = null;
     if (scroller.current) scroller.current.scrollTop = 0;
   }, [album]);
+
+  // the scrolls (or the "all photos" button) ask for a photo in the viewer, or for the grid
+  useEffect(() => {
+    const req = ctx.photoReq;
+    if (!req) return;
+    const i = req.id ? ITEMS.findIndex((x) => x.id === req.id) : -1;
+    if (i < 0) { setViewing(false); return; }
+    if (album === "library") setCur(i); else { pending.current = i; setAlbum("library"); }
+    setViewing(true);
+  }, [ctx.photoReq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const jump = (key: string) => {
     const g = groups.find((x) => x.key === key);
