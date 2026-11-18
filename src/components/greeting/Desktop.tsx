@@ -34,6 +34,12 @@ function useViewport() {
 
 type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean; min?: boolean }; // w/h: set once the visitor resizes
 const PHONE = 640;
+
+// onboarding: about.txt opens first, then "next" walks these in order (each window stacks on the last)
+const TOUR: AppId[] = ["about", "work", "projects", "activities", "contact"];
+const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
+type Tour = { cur: AppId; trail: AppId[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
+const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
 
 const size = (id: AppId, vw: number, vh: number) => {
@@ -63,7 +69,9 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const [sound, setSound] = useState(getSoundOn);
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
+  const [tour, setTour] = useState<Tour | null>(() => (tourDone() ? null : { cur: "about", trail: [] }));
+  // about.txt opens on landing; on a phone only while the tour runs (otherwise phones start on the icon grid)
+  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE || !tourDone() ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
@@ -260,6 +268,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         ))}
       </nav>
 
+      {tour && <div className="dk-tour-corner">{tourBar()}</div>}
       <div className="dk-dock-row">
         <AnimatePresence>
           {docked.length > 0 && (
