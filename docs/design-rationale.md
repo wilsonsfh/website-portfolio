@@ -375,10 +375,11 @@ reach Wilson, and his answers feed back into the chat. Choices:
   the timeline shows "← photos" top-left and no ×, because you came from somewhere and should go back there; unrolled from
   its desktop icon it keeps the ×. "all photos" is the photos icon ("show all photos") in both cases. A photo opened from
   the timeline and closed with "← timeline" goes back to the scrolls; if Photos was where you started, its window stays.
-- **Tour, one window at a time.** The cascade of stacked windows looked messy, so each step closes the last window as the
-  next opens (back does the same). about.txt opens as a normal window with the tour bar right under its bottom-right
-  corner, so the first "next" sits where the eye ends after reading; every later step opens maximised, with the bar in
-  the screen's corner. "skip → view plaintext" stays on every step, left of "← back". Tour buttons are solid (dark green,
+- **Tour, opt-in, one window at a time.** Every visit starts on the bare desktop. A first visit gets a small "welcome"
+  window asking "tour?" (blocks the desktop until answered; Escape = no). Yes: about.txt opens maximised and the tour
+  runs; no: contact opens. The cascade of stacked windows looked messy, so each step closes the last window as the next
+  opens (back does the same), every step maximised with the bar in the screen's corner. (An earlier version put the bar
+  under a normal-size about.txt; starting with an unasked-for window felt odd, so it became a question.) "skip → view plaintext" stays on every step, left of "← back". Tour buttons are solid (dark green,
   primary in the brighter accent) so they read over a maximised window's paper; the other bordered buttons (Photos
   toolbar and segments, viewer toggles, unread, assistant) moved from a 55% hairline to a solid border, and pressed
   segments fill in.

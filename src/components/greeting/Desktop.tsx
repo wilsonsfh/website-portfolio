@@ -71,9 +71,10 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const [sound, setSound] = useState(getSoundOn);
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  const [tour, setTour] = useState<Tour | null>(() => (tourDone() ? null : { cur: "about", trail: [] }));
-  // about.txt opens on landing; on a phone only while the tour runs (otherwise phones start on the icon grid)
-  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE || !tourDone() ? [place("about", 0, 11, focusOnMount)] : []));
+  // first visit: a small window asks "tour?" before anything opens; yes starts the tour, no opens contact
+  const [asking, setAsking] = useState(() => !tourDone());
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [wins, setWins] = useState<Win[]>([]); // every visit starts on the bare desktop
 
   const reduce = useReducedMotion();
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
@@ -157,11 +158,23 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const z = ++zRef.current;
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, min: false } : w)));
   };
-  // one window at a time: the current stage's window closes as the next one opens; after about.txt they open maximised
+  // one window at a time, maximised: the current stage's window closes as the next one opens
   const tourShow = (cur: AppId, id: AppId) => {
     const z = ++zRef.current;
-    setWins((ws) => [...ws.filter((w) => w.id !== cur && w.id !== id), { ...place(id, 0, z, true), max: id !== "about" }]);
+    setWins((ws) => [...ws.filter((w) => w.id !== cur && w.id !== id), { ...place(id, 0, z, true), max: true }]);
   };
+  const answer = (yes: boolean) => {
+    setAsking(false);
+    const z = ++zRef.current;
+    if (yes) { setTour({ cur: "about", trail: [] }); setWins([{ ...place("about", 0, z, true), max: true }]); }
+    else { endTour(); setWins([place("contact", 0, z, true)]); }
+  };
+  useEffect(() => {
+    if (!asking) return;
+    const on = (e: KeyboardEvent) => { if (e.key === "Escape") answer(false); };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+  }); // re-bound each render so answer sees the current state
   const tourTo = (id: AppId) => {
     if (!tour) return;
     tourShow(tour.cur, id);
@@ -305,15 +318,29 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         ))}
       </nav>
 
-      {tour && (() => {
-        // about.txt (not maximised, room below): the bar sits under its bottom-right corner; otherwise the screen's corner
-        const win = wins.find((w) => w.id === tour.cur);
-        if (phone || tour.cur !== "about" || !win || win.max || win.min) return <div className="dk-tour-corner" key="corner">{tourBar()}</div>;
-        const { w, h } = sizeOf(win, vp.cw, vp.h);
-        const x = clamp(win.x, 0, vp.cw - w), top = clamp(win.y, BAR, vp.h - h) + h + 14;
-        if (top + 44 > vp.h - 8) return <div className="dk-tour-corner" key="corner">{tourBar()}</div>;
-        return <div className="dk-tour-corner" key="under" style={{ top, right: vp.cw - x - w, bottom: "auto" }}>{tourBar()}</div>;
-      })()}
+      {tour && <div className="dk-tour-corner">{tourBar()}</div>}
+      <AnimatePresence>
+        {asking && (
+          // blocks the desktop until answered; Escape = no
+          <motion.div className="dk-ask-wrap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+            <motion.div
+              className="dk-win dk-seal" role="dialog" aria-modal="true" aria-labelledby="dk-ask-q"
+              initial={{ opacity: 0, transform: reduce ? "none" : "scale(0.95)" }}
+              animate={{ opacity: 1, transform: "scale(1)", transition: { duration: 0.25, delay: 0.15, ease: [0.23, 1, 0.32, 1] } }}
+              exit={{ opacity: 0, transform: reduce ? "none" : "scale(0.97)", transition: { duration: 0.15, ease: [0.23, 1, 0.32, 1] } }}
+            >
+              <div className="dk-title"><span className="dk-title-text">welcome</span></div>
+              <div className="dk-seal-body">
+                <p id="dk-ask-q">tour?</p>
+                <div className="dk-ask-btns">
+                  <button type="button" className="dk-tbtn" onClick={() => answer(false)}>no</button>
+                  <button type="button" className="dk-tbtn primary" autoFocus onClick={() => answer(true)}>yes</button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="dk-seal-wrap" role="status">
         <AnimatePresence>
           {sealed && (

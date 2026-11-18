@@ -439,6 +439,9 @@
 /* finish message after the tour: centred, never takes the pointer, fades in and out on its own */
 .dk-seal-wrap { position: absolute; inset: 0; z-index: 1000; display: grid; place-items: center; pointer-events: none; }
 .dk-seal { width: min(360px, calc(100% - 32px)); height: auto; }
+.dk-ask-wrap { position: absolute; inset: 0; z-index: 1000; display: grid; place-items: center; } /* takes every click until answered */
+.dk-ask-btns { display: flex; gap: 10px; }
+.dk-ask-btns .dk-tbtn { min-width: 88px; }
 .dk-seal .dk-title { cursor: default; }
 .dk-seal .dk-title-text { color: var(--fg); font-weight: 500; }
 .dk-seal-body { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 20px 18px; text-align: center; }
