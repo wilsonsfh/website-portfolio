@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 // v1's hero line: types a word, deletes it, types the next (a plain swap every 3s under reduced motion)
-const WORDS = ["software engineer", "product manager", "dancer", "fullstack developer", "nature lover", "tea lover", "singaporean", "photographer", "rock climber", "(learning) guitarist", "volleyball beginner"];
+export const WORDS = ["software engineer", "product manager", "dancer", "fullstack developer", "nature lover", "tea lover", "singaporean", "photographer", "rock climber", "(learning) guitarist", "volleyball beginner"];
 
 export default function Typewriter() {
   const reduce = useReducedMotion();

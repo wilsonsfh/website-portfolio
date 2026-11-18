@@ -2,14 +2,14 @@
 /* retro two-tone print: deep green ink + cream paper. Overrides the site tokens inside the greeting only
    (and on the body-level tooltips). Wallpaper: grayscale photo -> screen(--wall-lift) -> multiply(--wall-tint),
    so photo black lands on --wall-tint x --wall-lift (#0B2A1D) and photo white on --wall-tint. */
-.gr-root, .tt, .dk-tour-corner.over {
+.gr-root, .tt, .dk-tour-corner.over, .dk-note {
   --bg: #F1EAD3; --fg: #123D2B; --muted: #3E5E4D; --accent: #1A6E3E;
   --line: rgba(18, 61, 43, 0.22); --line-strong: rgba(18, 61, 43, 0.55);
   --title-bg: #E4DBBE; --edge: #123D2B; --drop: rgba(6, 23, 15, 0.5);
   --wall-lift: #3D6C6A; --wall-tint: #2E6346; --on-wall: #F1EAD3;
   --tile-bg: #F1EAD3; --tile-ink: #123D2B; --err: #A2412A; --warm: #9A4A1C;
 }
-:root.dark .gr-root, :root.dark .tt, :root.dark .dk-tour-corner.over {
+:root.dark .gr-root, :root.dark .tt, :root.dark .dk-tour-corner.over, :root.dark .dk-note {
   --bg: #0F2A1E; --fg: #EAE3C9; --muted: #A9BCA6; --accent: #B5DB7A;
   --line: rgba(234, 227, 201, 0.16); --line-strong: rgba(234, 227, 201, 0.4);
   --title-bg: #163626; --edge: rgba(234, 227, 201, 0.55); --drop: rgba(0, 0, 0, 0.5);
@@ -470,6 +470,15 @@
 /* the tour's demo cursor: glides to a target, squashes on the press */
 .dk-demo { transform-origin: 30% 0; transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1), scale 100ms ease-out; }
 .dk-demo.press { scale: 0.8; }
+/* the about stop's handwritten note, in rust "pen" beside the cursor, a curved arrow back to the word */
+.dk-note {
+  position: fixed; top: 0; left: 0; z-index: 3999; pointer-events: none; display: flex; align-items: flex-start; gap: 2px;
+  padding: 0 0 0 24px; margin-top: -10px; color: var(--warm); font: 500 26px/1 "Caveat", cursive; text-transform: none;
+  white-space: nowrap; animation: dk-note-in 260ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.dk-note span { rotate: -4deg; margin-top: 10px; }
+.dk-note.below { margin-top: 28px; }
+@keyframes dk-note-in { from { opacity: 0; } to { opacity: 1; } } /* opacity only: the inline transform places it */
 @media (hover: hover) and (pointer: fine) {
   .gr-root { cursor: var(--cur-arrow) 1 1, auto; }
   .gr-root :is(button:not(:disabled), a[href], summary, label, select, input[type="range"], [role="button"], .ph-tile) {

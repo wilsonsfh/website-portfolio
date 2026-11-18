@@ -416,3 +416,50 @@ reach Wilson, and his answers feed back into the chat. Choices:
   plaintext footer toggle and the terminal's `theme`, and watches the class so all three agree. Phones (< 640px) could
   not fit name + centred clock + five icons, so there the bar flows left to right, the name shortens to "wilson" and
   icons are 34px wide (checked at 360 and 375px: no overlap, no overflow).
+
+## 14. Round 12 (2026-11-18)
+
+- **Tour order: content first, then the desktop.** Three orders (a, b, c) were built behind a `?tour=` parameter and
+  compared; Wilson picked b, now the only tour, 11 stops: about, work, projects, involvements, contact, then desktop,
+  timeline, photos, terminal, (1) unread, assistant (`TOUR` in `src/components/greeting/Desktop.tsx`). The sources do not
+  record why b won (inferred: someone who leaves after a few stops has already seen the résumé, and the desktop's
+  features read as extras once you know who the page is about).
+- **A caption on every stop.** One or two lowercase sentences above the tour bar (`CAPTION`), saying what you are looking
+  at and what to try ("expand for what i did and where", "press draw to see this one"). Three stops have no window
+  of their own (desktop, timeline, assistant), so the caption is the only text there.
+- **Show, don't tell: a scripted cursor.** On each stop a pixel cursor acts out the feature (`TourDemo.tsx`): expand then
+  collapse a list item, poke the spirits, flip photos to "original" and back, type `whoami` and `ls` in the terminal.
+  It is the desktop's own cursor art, so it reads as a pointer, not a video. It never takes over: any real press or key
+  stops it at once, so the demo never fights a visitor who has started using the page. Reduced motion
+  skips it entirely (the captions still say what to try), rather than a gentler version, since a moving cursor is the
+  whole effect. It undoes what it did (collapses the item, restores the spirits setting) so the visitor's state is not
+  changed.
+- **The handwritten note.** On the about stop the typewriter cycles words, and a first-time viewer may read the first
+  one and leave. The cursor points just right of the typewriter's longest word and a rust note says "this keeps changing!"
+  with a curved arrow back to it, a preempt so people wait for the next word. It is the only use of a non-Inter font
+  (Caveat 500, `@fontsource/caveat`), a deliberate exception: handwriting reads as an annotation from a person (inferred). Placed right of the longest word so it never covers a word mid-cycle; on a narrow screen it
+  goes under the line.
+- **The image ask is typed, not sent.** The assistant stop switches to image mode and types "show wilson in pixel art"
+  but leaves "draw" to the visitor. Image generation spends the free daily image allocation (section 6), and sending it
+  on every tour would let tours use it up. The caption tells the visitor to press draw.
+- **Expand/collapse that never moves.** Lists use one bottom-right "expand"/"collapse" control (`src/components/Item.tsx`)
+  placed after the default lines, with the extra content opening below it. The old inline more/less (round 10) sat in the text; the control now stays where the pointer left it
+  after a press. Text then icon, right-aligned, so the icon stays put when the word
+  changes. No extra content, no control. Work shows tags by default; involvements show title and role/date, with bullets
+  behind expand. Same on plaintext-version.html.
+- **Spirits rest and hop, quietly.** The mushroom and slime sit in a row under the icon grid and under the plaintext
+  header. While the setting is "hop", the desktop ones alternate hop and rest every 40s, the same interval as the
+  wallpaper photo change, so the screen keeps one rhythm and is not always moving (inferred). A quiet "stop"/"hop" and "hide" control
+  sits beside them ("show spirits" once hidden), one setting for desktop and plaintext. The creatures are decoration (`aria-hidden`), so they can be switched off.
+- **Scrolls fade as they roll up.** The timeline's head and lanes fade out over 380ms while rolling up, so going from
+  timeline to a photo (or photos) no longer shows a moving roll over the window opening beneath it.
+- **Tour re-entry.** A bottom-right "resume tour" (only when a tour was left unfinished) and "tour again" show when no
+  tour is running, in the same corner as the tour bar. The tour is opt-in and a skip or finish is remembered per tab, so this is the way
+  back in.
+- **Finish from plaintext lands on "get in touch".** Finishing a tour that was skipped to plaintext opens that page's
+  "get in touch" row and scrolls it into view.
+- **"(1) unread" speaks as wilson.** The messages app opens with "hey, i'm wilson", so replies in the first person ("i",
+  "my") match; a third-person reply inside a chat that opens in Wilson's voice would not fit (inferred). The portfolio assistant stays
+  third person and says it is not Wilson, so the two voices are never confused. The wilson persona still admits being an
+  ai stand-in when asked and points to the contact app. When it lacks an answer it says "i haven't written that one
+  down yet. ask me through the contact app and i'll answer it." Small talk and follow-ups no longer fall to UNKNOWN.

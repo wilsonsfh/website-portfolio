@@ -296,3 +296,85 @@ than 30 days and a flood can't grow it forever (each row is one D1 write; the fr
 can page through `chat_log`. Both chat panels say "questions and answers are saved for 30 days so wilson can improve
 the answers." Why D1, not KV: KV's free plan allows 1,000 writes a day (one per message), D1 about 100,000, and D1 was
 already bound and browsable in /admin.
+
+## Round 12 (2026-11-18)
+
+**How does the demo cursor type into an input React controls?** Setting `input.value = "x"` changes the DOM but React's
+`onChange` never fires, and React also resets the value on the next render. `TourDemo.tsx` takes the native setter from
+`HTMLInputElement.prototype`, calls it on the input, then dispatches `new Event("input", { bubbles: true })`, which is
+what a keystroke produces, so React's state follows. It types one character per 80ms. Enter is a synthetic
+`KeyboardEvent("keydown", { key: "Enter", bubbles: true })` on the input, because the terminal handles Enter on keydown
+(no `<form>`). Buttons are pressed with `el.click()` after a short "press" class on the cursor.
+
+**How does the script tell its own events from the visitor's?** `isTrusted`. Events the browser makes from real input are
+trusted; ones made with `dispatchEvent` or `click()` are not. The demo listens for `pointerdown` and `keydown` on `window`
+in the capture phase and stops (hides the cursor, sets `alive = false`) only when `e.isTrusted`. Every step checks
+`alive`, so a real press ends the script mid-step. The effect cleanup also removes the listeners and hides the cursor
+when the step changes. Reduced motion returns before any of this runs.
+
+**How does it poke the spirits?** They hop on `pointerdown`, not click, so `press(el, { poke: true })` dispatches
+`new PointerEvent("pointerdown", { bubbles: true })` on the mushroom and slime and does not click. The same function then
+presses "stop" and, a second later, the "hop" button that replaces it, so the visitor's setting ends where it started.
+
+**Why are the cursor, the note and the tour corner portalled to `<body>`?** The assistant panel (`.as`, `position: fixed`,
+`z-index: 2000`, `assistant.css`) is portalled to `<body>`. The desktop `.dk` has `z-index: 1`, which makes it a stacking
+context, so nothing inside it can rise above the panel whatever z-index it has. `TourDemo` therefore portals the cursor
+(`z-index: 4000`) and the note (3999) to `document.body`. On the assistant stop the tour corner is portalled too
+(`createPortal(corner, document.body)` in `Desktop.tsx`, class `.over`, `z-index: 2100`, `position: fixed`) so "next"
+stays clickable above the panel; on other stops it stays inside `.dk`.
+
+**Why did the theme tokens have to be extended?** The retro colours (`--bg`, `--fg`, `--warm`...) are defined on
+`.gr-root` and `.tt` only, so the greeting does not recolour the plain page. Anything portalled to `<body>` is outside
+`.gr-root` and would fall back to the site's v1 tokens (beige, navy). `greeting.css` adds `.dk-tour-corner.over` and
+`.dk-note` to the selector lists, light and `:root.dark`. The cursor needed no tokens: `--cur-arrow` and `--cur-glove`
+are declared on `.gr-root, .dk-touch`.
+
+**How is the note placed beside the typewriter's longest word?** The typewriter (`src/components/Typewriter.tsx`) exports
+its `WORDS`. The script creates an off-screen canvas, sets `ctx.font` to the typewriter element's computed `font`, and
+takes the largest `measureText(word).width`. The note goes at `left + longest + 14px`, vertically centred on the line.
+Measuring is needed because the element's own width changes as letters appear. If `right + 230` exceeds the viewport
+(phones), the note goes under the line (`.below`).
+
+**Why is the note's animation opacity only?** The note is placed with an inline `transform: translate3d(...)`, and a
+`transform` keyframe would replace it. `dk-note-in` fades opacity only. The demo cursor uses a `transition` on
+`transform` (600ms) instead of keyframes, which re-trigger badly when interrupted.
+
+**How do the spirit settings sync across copies?** `src/components/Spirits.tsx`: `useSpirits()` reads `localStorage.spirits`
+("still" or "hidden"; unset means hop) and returns the mode plus a setter. The setter writes localStorage (removes the key
+for hop), updates its own state and dispatches `window` event `spirits-change`; every hook instance listens and re-reads.
+That keeps the desktop and plaintext rows in step in one tab. (The native `storage` event only fires in other tabs, so a
+custom event is needed.) Reads and writes are in try/catch for blocked storage.
+
+**How do the desktop spirits rest?** `Desktop.tsx` flips a `resting` boolean every `EVERY` ms (40000, exported from
+`Wallpaper.tsx`, the wallpaper's photo interval). The row gets `spirits-still` when the mode is "still" or `resting`. The
+visitor's setting is never changed by this; it only applies while the mode is "hop".
+
+**How does "open this row" work across windows (`touchReq`)?** A counter, not a boolean. `Desktop.tsx` keeps
+`touchReq` state and bumps it when finish is pressed on plaintext; it goes through the app context (`Ctx.touchReq`,
+`apps.tsx`) to `<MainPage touchReq>` and into the "get in touch" `Row` as `openReq`. `Row` (`MainPage.tsx`) runs an effect on
+`[openReq]`: if non-zero it opens the row and calls `scrollIntoView({ block: "start" })`, smooth unless reduced motion.
+A boolean would be true already the second time, so the effect would not re-run; a new number always does, and `0`
+(the initial value) means "no request".
+
+**How does the tour remember where it was?** `sessionStorage["tour-last"]` holds the last `TOUR` step reached
+(written on every step change, validated against `TOUR` when read, cleared on finish). `tour-done` marks it finished or
+skipped in this tab. With no tour running and no finish animation, `Desktop.tsx` shows "resume tour" (only if `tour-last`
+is set; calls `startTour(last)`) and "tour again" (`startTour(TOUR[0])`). `startTour` sets up one maximised window, or
+none for the no-window stops (`NOWIN`: desktop, timeline, assistant), and unrolls the timeline / opens the assistant when
+the step is one of those. A plaintext step ("skip") keeps the step it was skipped from as `last`.
+
+**How long does the finish window stay?** `SEAL_MS = 2200`: 300ms for contact to shrink, 400ms fade in, held 1.5s, then
+out. The idle "resume/tour again" corner is hidden while it plays (`!sealed`).
+
+**How does `as: "wilson"` reach the model?** `askChat(turns, signal, as)` in `src/lib/ai.ts` adds `as` to the
+`/api/chat` body only when set. `Messages.tsx` (the "(1) unread" app) passes `"wilson"`; the assistant panel and
+terminal do not. In the Worker, `chatPersona(body)` in `worker/src/logic.ts` returns "wilson" only for exactly that
+value, otherwise "assistant", so an unknown value cannot select anything. The persona picks a block of the system prompt
+(`systemPrompt(persona, knowledge)`) and the fixed unknown line (`unknownReply(persona)`). The facts and rules are the
+same for both; only the voice differs (first person versus third person with "you are not wilson").
+
+**Why are notices left out of the model's history?** Chat messages from the app carry `notice: true` for status lines
+(the "limit reached, now on groq" note and error messages like "out of answers for today"). They are shown in the
+log but `Messages.tsx` filters them out when building `turns` (`i.msg.text && !i.msg.notice`). Sent back, they would
+read to the model as things it had said as wilson, and it would answer follow-ups from them ("sorry, i'm out of
+answers") or copy their wording.

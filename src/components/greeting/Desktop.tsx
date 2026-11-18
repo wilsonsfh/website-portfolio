@@ -47,7 +47,7 @@ const NOWIN: Step[] = ["desktop", "timeline", "assistant"];
 const TOUR: Step[] = ["about", "work", "projects", "activities", "contact", "desktop", "timeline", "photos", "terminal", "messages", "assistant"];
 // every stop says what you're looking at, one or two short sentences
 const CAPTION: Partial<Record<Step, string>> = {
-  about: "who i am, in a few lines. the word after \"i'm also a\" keeps changing.",
+  about: "who i am, in a few lines.",
   work: "where i've worked, one line each. expand for what i did and where.",
   projects: "things i've built, with links to the code or the live site. expand for the details.",
   activities: "what i'm involved in outside work. expand for what i did there.",
@@ -57,7 +57,7 @@ const CAPTION: Partial<Record<Step, string>> = {
   photos: "my photo library: by month, albums, and a viewer with swipe and zoom.",
   terminal: "the same things as commands: try help, cat work.txt or ask <question>.",
   messages: 'a short chat with "me" that plays itself. tap the replies.',
-  assistant: "ask anything about me. it answers from notes i wrote, and can draw pictures from the image button.",
+  assistant: "ask anything about me. it answers from notes i wrote, and draws pictures too: press draw to see this one.",
 };
 const stepTitle = (s: Step) => (s === "desktop" ? "desktop" : appById(s).title);
 const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
@@ -326,7 +326,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
       <TouchCursor />
-      <TourDemo step={tour?.cur ?? null} title={tour ? stepTitle(tour.cur) : ""} />
+      <TourDemo step={tour?.cur ?? null} />
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
