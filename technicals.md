@@ -256,3 +256,24 @@ remotely (see worker/README.md "Local dev").
 the /admin suggest button call it with different system prompts and different context: the chat gets `knowledge.md`
 (public facts) plus saved answers; suggest gets chunks of the private wiki excerpt from D1. Since round 7 both prompts
 split questions the same way: about Wilson → only from their context, anything else → general knowledge.
+
+**Which questions end up in D1 (and why generic ones don't).** There are two decisions, made by two different things:
+1. *The model decides what kind of question it is.* There is no if/else in the code that recognises "generic" vs
+   "about wilson". The system prompt (`worker/src/index.ts`, `system()`) tells the model to sort every question:
+   - about wilson, and the answer is in KNOWLEDGE (knowledge.md + your saved answers) → answer it;
+   - about wilson, but not in KNOWLEDGE → reply with exactly the word `UNKNOWN`;
+   - anything else (general, technical, small talk) → answer from general knowledge;
+   - sensitive topics about wilson (health, family, money…) → politely decline (a normal reply, not `UNKNOWN`).
+2. *The code makes one check on the reply.* In `chat()` → `finish()`: `if (isUnknown(answer))` (the reply starts with
+   "unknown", any case, `worker/src/logic.ts`) then the visitor sees the fixed line "i don't know that one yet…" and
+   `logUnknown` (`worker/src/qa.ts`) runs in the background; otherwise the model's answer is returned and nothing is stored.
+   So "generic questions don't appear" because the model answers them, never replying `UNKNOWN`.
+Inside `logUnknown`: only the visitor's latest message is stored (trimmed to 500 chars, no conversation, no IP). It is
+normalised (lowercase, punctuation squashed) and, if that normalised text already exists, only `asked_count` and
+`last_asked` go up; otherwise a new open row is inserted, unless 500 questions are already open (an abuse cap). Failures
+are logged to the console and never break the chat. Picture requests normally never get here: the browser sends them
+to `/api/image` before the chat sees them.
+The loop back: answers you save in /admin are read by `answeredRows` (newest 40, cached 5 minutes) and added to the
+prompt as "Wilson's own answers", so the same question, or a rephrasing of it, is answered next time instead of logged.
+Because step 1 is a model judgement, it can misjudge: before round 7 the prompt said "decline questions not about
+wilson" and the model replied `UNKNOWN` to those too, which is how two-sum and geography questions reached /admin.
