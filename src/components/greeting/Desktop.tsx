@@ -71,7 +71,9 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const toggleRolls = () => setRollsOpen(!rollsOpen); // the lanes sit above any open windows
 
   // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; the window would sit under the lanes, so they roll up
+  const fromTl = useRef(false); // the Photos window was opened from the scrolls: its back buttons unroll them again
   const showPhoto = (id: string | null) => {
+    fromTl.current = true;
     setPhotoReq({ id, n: ++reqN.current });
     setRollsOpen(false);
     open("photos");
@@ -89,10 +91,24 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const focus = (id: AppId) => {
     const z = ++zRef.current;
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z } : w)));
+    // pressing an earlier tour window goes to that stage; "back" then returns to the one it came from
+    if (tour && id !== tour.cur && TOUR.includes(id)) setTour({ cur: id, trail: [...tour.trail, tour.cur] });
   };
-  const close = (id: AppId) => {
+  // back = true: a "back" button (phone title bar, photo viewer) rather than the close button
+  const close = (id: AppId, back = false) => {
     setWins((ws) => ws.filter((w) => w.id !== id));
-    if (id === "photos") setPhotoReq(null); // a reopened window starts on the grid
+    if (tour && id === tour.cur && id === "plain") endTour(); // skipped to plaintext: closing it ends the tour
+    else if (tour && id === tour.cur) {
+      // the tour steps back to the last window it came from that is still open, or ends
+      const trail = tour.trail.filter((t) => t !== id && wins.some((w) => w.id === t));
+      const prev = trail.pop();
+      if (prev) { setTour({ cur: prev, trail }); focusWin(prev); return; } else endTour();
+    }
+    if (id === "photos") {
+      setPhotoReq(null); // a reopened window starts on the grid
+      if (back && fromTl.current) { setRollsOpen(true); fromTl.current = false; return; }
+      fromTl.current = false;
+    }
     document.getElementById(`dk-icon-${id}`)?.focus({ preventScroll: true });
   };
   const move = (id: AppId, x: number, y: number) =>
@@ -295,6 +311,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
               onMinimize={() => minimize(w.id)}
               dockPt={() => dockPt(w.id)}
               onClose={() => close(w.id)}
+              onBack={() => close(w.id, true)}
               onMove={(x, y) => move(w.id, x, y)}
               onRect={(x, y, nw, nh) => rect(w.id, x, y, nw, nh)}
             >

@@ -19,11 +19,11 @@ type Props = {
   x: number; y: number; w: number; h: number; z: number;
   vw: number; vh: number;
   active: boolean; max: boolean; min: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
-  onFocus: () => void; onToggleMax: () => void; onMinimize: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
+  onFocus: () => void; onToggleMax: () => void; onMinimize: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onBack: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, onMinimize, dockPt, onClose, onMove, onRect, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, onMinimize, dockPt, onClose, onBack, onMove, onRect, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
@@ -136,7 +136,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min,
           onPointerCancel={() => { drag.current = null; }}
           onDoubleClick={(e) => { if (!phone && !(e.target as HTMLElement).closest("button")) onToggleMax(); }}
         >
-          {phone && <button type="button" className="dk-back" onClick={onClose}>← back</button>}
+          {phone && <button type="button" className="dk-back" onClick={onBack}>← back</button>}
           <span className="dk-title-text">{title}</span>
           {!phone && (
             <div className="dk-wbtns">

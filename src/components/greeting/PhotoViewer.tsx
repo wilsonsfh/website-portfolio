@@ -33,6 +33,7 @@ type Props = {
   index: number;
   onIndex: (i: number) => void;
   onClose: () => void;
+  backLabel: string; // "grid", or "timeline" when the photo was opened from the scrolls
   reduced: boolean;
   compact: boolean;
 };
@@ -205,7 +206,7 @@ function Strip({ items, idx, shown, compact, reduced, tween, onGo }: {
 
 // ---------- viewer ----------
 
-export default function PhotoViewer({ items, index, onIndex, onClose, reduced, compact }: Props) {
+export default function PhotoViewer({ items, index, onIndex, onClose, backLabel, reduced, compact }: Props) {
   const pv = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -527,7 +528,7 @@ export default function PhotoViewer({ items, index, onIndex, onClose, reduced, c
       <div className="pv-bg" ref={bg} />
       <header className="pv-head pv-chrome">
         <div className="pv-left">
-          <button type="button" className="pv-btn" onClick={onClose}>← grid</button>
+          <button type="button" className="pv-btn" onClick={onClose}>← {backLabel}</button>
           <button type="button" className="pv-btn pv-ico" aria-label="full screen" aria-pressed={fs || bare} onClick={toggleFs}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               {fs || bare ? <path d="M9 4v5H4 M15 4v5h5 M9 20v-5H4 M15 20v-5h5" /> : <path d="M4 9V4h5 M20 9V4h-5 M4 15v5h5 M20 15v5h-5" />}

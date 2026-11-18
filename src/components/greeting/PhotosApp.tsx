@@ -19,6 +19,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
   const [density, setDensity] = useState(1);
   const [cur, setCur] = useState(0);
   const [viewing, setViewing] = useState(false);
+  const [fromTl, setFromTl] = useState(false); // the viewer was opened from the scrolls, so "back" returns there
   const reduce = !!useReducedMotion();
   const compact = width < COMPACT;
 
@@ -59,6 +60,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
     if (i < 0) { setViewing(false); return; }
     if (album === "library") setCur(i); else { pending.current = i; setAlbum("library"); }
     setViewing(true);
+    setFromTl(true);
   }, [ctx.photoReq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const jump = (key: string) => {
@@ -192,7 +194,11 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
         </div>
       </div>
       {viewing && items[cur] && (
-        <PhotoViewer items={items} index={cur} onIndex={setCur} onClose={() => setViewing(false)} reduced={reduce} compact={compact} />
+        <PhotoViewer
+          items={items} index={cur} onIndex={setCur} reduced={reduce} compact={compact}
+          backLabel={fromTl ? "timeline" : "grid"}
+          onClose={() => (fromTl ? ctx.toTimeline() : setViewing(false))}
+        />
       )}
     </div>
   );
