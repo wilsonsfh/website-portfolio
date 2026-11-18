@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
-import { IMAGE_OFF, LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
+import { IMAGE_OFF, LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
 import "./assistant.css";
 
 type Out = { kind: "text"; text: string } | { kind: "image"; q: string; src: string } | { kind: "error"; message: string };
@@ -73,8 +73,9 @@ export default function Assistant() {
     setDraft("");
     setOut(null);
     setBusy(true);
+    const draw = m === "image" || (canImage && wantsImage(q)); // an obvious picture request is drawn; the toggle stays where it was
     try {
-      if (m === "image") {
+      if (draw) {
         const r = await makeImage(q, ac.signal);
         setOut(r.ok ? { kind: "image", q, src: r.src } : { kind: "error", message: r.message });
       } else {

@@ -12,7 +12,7 @@ export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "t
 export type Ctx = {
   open: (id: AppId) => void;
   close: (id: AppId) => void;
-  unroll: () => void; // unroll the photo scrolls (they cover the windows)
+  unroll: (from?: "photos") => void; // unroll the photo scrolls (they cover the windows); from Photos they show "back" instead of ×
   photoReq: { id: string | null; n: number } | null; // a scroll asked the Photos app to show a photo (id) or the grid (null)
   toTimeline: () => void; // "back" from a photo opened on the scrolls: close Photos and unroll them again
 };

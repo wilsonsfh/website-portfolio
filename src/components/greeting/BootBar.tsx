@@ -3,7 +3,7 @@ import { useReducedMotion } from "motion/react";
 
 // own pixel art, one char per pixel: o ink outline, y/h/d slime body/light/shade, s star, e dark
 // cap: c orange, w spot, k shade; stem: b cream, t shade
-const SLIME = [
+export const SLIME = [
   "......oo......",
   ".....oyyo.....",
   "....oyyyyo....",
@@ -16,7 +16,7 @@ const SLIME = [
   "..oddyyyyddo..",
   "...oooooooo...",
 ];
-const MUSH = [
+export const MUSH = [
   "....oooooo....",
   "..ooccccccoo..",
   ".occwwccccwco.",
@@ -35,7 +35,7 @@ const PAL: Record<string, string> = {
   c: "#E8731F", w: "#F7CE5B", k: "#B5500F", b: "#F1EAD3", t: "#CFC4A0",
 };
 
-function Sprite({ rows }: { rows: string[] }) {
+export function Sprite({ rows }: { rows: string[] }) {
   return (
     <svg viewBox={`0 0 14 ${rows.length}`} width="42" height={rows.length * 3} shapeRendering="crispEdges">
       {rows.flatMap((r, y) =>

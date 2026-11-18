@@ -72,16 +72,18 @@
 
 /* top strip: "all photos" and the close button sit in it, never over a lane */
 .sc-head { flex: none; height: 44px; display: flex; justify-content: flex-end; align-items: center; gap: 4px; padding: 0 8px; }
-.sc-all {
+.sc-all, .sc-back {
   position: relative; height: 36px; padding: 0 14px; pointer-events: auto; background: var(--sc-paper); color: var(--sc-ink); border: 2px solid var(--sc-ink); border-radius: 6px;
   font: inherit; font-size: 13px; text-transform: lowercase; cursor: pointer; transition: transform 160ms ease-out, background-color 160ms ease;
 }
-.sc-all:active { transform: scale(0.97); }
-.sc-all::before { content: ""; position: absolute; inset: -4px; } /* 44px hit area */
-.sc-all:focus-visible { outline: 3px solid var(--sc-paper); outline-offset: 2px; }
+.sc-all { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; }
+.sc-back { margin-right: auto; } /* top-left; only when the scrolls were unrolled from photos */
+.sc-all:active, .sc-back:active { transform: scale(0.97); }
+.sc-back::before { content: ""; position: absolute; inset: -4px; } /* 44px hit area */
+.sc-all:focus-visible, .sc-back:focus-visible { outline: 3px solid var(--sc-paper); outline-offset: 2px; }
 .sc-pic:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sc-pic[data-open] { cursor: pointer; }
-@media (hover: hover) and (pointer: fine) { .sc-all:hover { background: color-mix(in srgb, var(--sc-paper) 85%, var(--sc-ink)); } }
+@media (hover: hover) and (pointer: fine) { .sc-all:hover, .sc-back:hover { background: color-mix(in srgb, var(--sc-paper) 85%, var(--sc-ink)); } }
 .sc-close {
   width: 44px; height: 44px; display: grid; place-items: center; pointer-events: auto;
   background: var(--sc-paper); color: var(--sc-ink); border: 2px solid var(--sc-ink); border-radius: 6px; font: inherit; font-size: 22px; line-height: 1; cursor: pointer;
@@ -98,4 +100,4 @@
 .sc-rolled .sc-head { opacity: 0; }
 /* the lanes cover any open window (window z starts at 12 and climbs), below the dock and top bar */
 .sc:not(.sc-rolled) .sc-lanes { pointer-events: auto; }
-@media (prefers-reduced-motion: reduce) { .sc-close:active, .sc-all:active { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sc-close:active, .sc-all:active, .sc-back:active { transform: none; } }

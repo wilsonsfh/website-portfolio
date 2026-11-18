@@ -29,17 +29,19 @@
 .ph-title { margin: 0 auto 0 0; font-size: 14px; font-weight: 500; display: flex; align-items: baseline; gap: 8px; }
 .ph-title span { font-size: 12px; font-weight: 400; color: var(--muted); }
 .ph-field select {
-  height: 28px; padding: 0 8px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: 6px; cursor: pointer;
+  height: 28px; padding: 0 8px; background: var(--bg); border: 1px solid var(--fg); border-radius: 6px; cursor: pointer;
 }
 .ph-size input { width: 72px; margin: 0; accent-color: var(--fg); cursor: pointer; }
-.ph-seg { display: flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
+.ph-seg { display: flex; border: 1px solid var(--fg); border-radius: 6px; overflow: hidden; }
 .ph-seg button { height: 26px; padding: 0 10px; background: none; border: 0; color: var(--muted); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
-.ph-seg button[aria-pressed="true"] { background: var(--line); color: var(--fg); }
+.ph-seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .ph-btn {
-  height: 28px; padding: 0 10px; background: none; border: 1px solid var(--line-strong); border-radius: 6px; cursor: pointer;
+  height: 28px; padding: 0 10px; background: var(--fg); border: 1px solid var(--fg); border-radius: 6px; cursor: pointer;
   transition: transform 160ms ease-out, background-color 160ms ease;
 }
 .ph-btn:active { transform: scale(0.97); }
+.ph .ph-btn { color: var(--bg); } /* beats .ph button { color: inherit } */
+.ph-ibtn { width: 28px; padding: 0; display: grid; place-items: center; }
 .ph button:focus-visible, .ph select:focus-visible, .ph input:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
 .ph-scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding-top: 30px; outline: none; }
@@ -69,10 +71,11 @@
 .ph.compact .ph-album { flex: none; min-height: 32px; }
 .ph.compact .ph-album:first-child { margin-bottom: 0; margin-right: 6px; }
 .ph.compact .ph-size { display: none; }
-@media (max-width: 639.98px) { .ph-album, .ph-btn, .ph-seg button, .ph-field select { min-height: 36px; } }
+@media (max-width: 639.98px) { .ph-album, .ph-btn, .ph-seg button, .ph-field select { min-height: 36px; } .ph-ibtn { width: 36px; } }
 
 @media (hover: hover) and (pointer: fine) {
-  .ph-album:hover, .ph-btn:hover { background: var(--line); }
+  .ph-album:hover { background: var(--line); }
+  .ph-btn:hover { background: var(--accent); border-color: var(--accent); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ph-album:active, .ph-btn:active { transform: none; }
@@ -98,7 +101,7 @@
   color: var(--muted); cursor: pointer; transition: transform 160ms ease-out, background-color 160ms ease, color 160ms ease;
 }
 .pv-btn:active { transform: scale(0.97); }
-.pv-btn[aria-pressed="true"] { background: var(--line); color: var(--fg); }
+.pv-btn[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .pv-btn:disabled { opacity: 0.4; cursor: default; }
 .pv-ico { padding: 0; font-size: 16px; }
 .pv-zoom { display: flex; align-items: center; gap: 2px; }

@@ -5,6 +5,7 @@ import Scrolls from "./Scrolls";
 import Assistant from "./Assistant";
 import Wallpaper from "./Wallpaper";
 import TouchCursor from "./TouchCursor";
+import { Sprite, SLIME, MUSH } from "./BootBar";
 import Window, { BAR, MIN_W, MIN_H, clamp } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
 import { getSoundOn, setSoundOn } from "./sound";
@@ -41,6 +42,7 @@ const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
 type Tour = { cur: AppId; trail: AppId[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
 const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
+const SEAL_MS = 3400; // the finish window: waits for contact to shrink, 400ms in, held, then out
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
@@ -77,12 +79,13 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
   const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
   const reqN = useRef(0);
-  const toggleRolls = () => setRollsOpen(!rollsOpen); // the lanes sit above any open windows
+  const [rollsFrom, setRollsFrom] = useState<"icon" | "photos">("icon"); // photos: unrolled from the Photos app, so "back" returns there (no ×)
+  const toggleRolls = () => { if (!rollsOpen) setRollsFrom("icon"); setRollsOpen(!rollsOpen); }; // the lanes sit above any open windows
 
   // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; the window would sit under the lanes, so they roll up
   const fromTl = useRef(false); // the Photos window was opened from the scrolls: its back buttons unroll them again
   const showPhoto = (id: string | null) => {
-    fromTl.current = true;
+    if (rollsFrom === "icon") fromTl.current = true; // unrolled from Photos: that window was already open, it is not the scrolls' child
     setPhotoReq({ id, n: ++reqN.current });
     setRollsOpen(false);
     open("photos");
@@ -154,23 +157,45 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const z = ++zRef.current;
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, min: false } : w)));
   };
+  // one window at a time: the current stage's window closes as the next one opens; after about.txt they open maximised
+  const tourShow = (cur: AppId, id: AppId) => {
+    const z = ++zRef.current;
+    setWins((ws) => [...ws.filter((w) => w.id !== cur && w.id !== id), { ...place(id, 0, z, true), max: id !== "about" }]);
+  };
   const tourTo = (id: AppId) => {
     if (!tour) return;
-    open(id);
+    tourShow(tour.cur, id);
     setTour({ cur: id, trail: [...tour.trail, tour.cur] });
   };
   const tourNext = () => {
     if (!tour) return;
     const i = TOUR.indexOf(tour.cur);
-    if (i < 0 || i === TOUR.length - 1) endTour();
+    if (i < 0 || i === TOUR.length - 1) tourFinish();
     else tourTo(TOUR[i + 1]);
   };
+  // finish (after contact): everything but contact closes, contact shrinks from maximised back to a window, the scrolls
+  // roll up, then a small window with the slime and mushroom fades in and out
+  const [sealed, setSealed] = useState(false);
+  const tourFinish = () => {
+    const z = ++zRef.current;
+    setWins((ws) => ws.filter((w) => w.id === "contact").map((w) => ({ ...w, z, min: false, max: false })));
+    setRollsOpen(false);
+    setPhotoReq(null);
+    fromTl.current = false;
+    endTour();
+    setSealed(true);
+  };
+  useEffect(() => {
+    if (!sealed) return;
+    const t = window.setTimeout(() => setSealed(false), SEAL_MS);
+    return () => clearTimeout(t);
+  }, [sealed]);
   const tourBack = () => {
     if (!tour) return;
     const trail = [...tour.trail];
     const prev = trail.pop();
     if (!prev) return;
-    open(prev); // brings it to the front (or reopens it if it was closed)
+    tourShow(tour.cur, prev);
     setTour({ cur: prev, trail });
   };
   // skip: plaintext opens and the tour stays in the corner (back to the tour, or finish) until finished or plaintext is closed
@@ -183,9 +208,16 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     return (
       <div className="dk-tour" role="group" aria-label="tour">
         <span className="dk-tstep">{plain ? "plaintext" : `${i + 1} / ${TOUR.length}`}</span>
-        {i === 0 && <button type="button" className="dk-tbtn" onClick={tourSkip}>skip → view plaintext</button>}
-        {tour.trail.length > 0 && <button type="button" className="dk-tbtn" onClick={tourBack}>{plain ? "← back to the tour" : "← back"}</button>}
-        <button type="button" className="dk-tbtn primary" onClick={plain ? endTour : tourNext}>{next ? `next: ${appById(next).title} →` : "finish"}</button>
+        {/* phones: shorter labels so the bar stays one row */}
+        {!plain && <button type="button" className="dk-tbtn" onClick={tourSkip}>{phone ? "skip → plaintext" : "skip → view plaintext"}</button>}
+        {tour.trail.length > 0 && (
+          <button type="button" className="dk-tbtn" onClick={tourBack} aria-label={plain ? "back to the tour" : "back"}>
+            {plain ? (phone ? "← tour" : "← back to the tour") : phone ? "←" : "← back"}
+          </button>
+        )}
+        <button type="button" className="dk-tbtn primary" onClick={plain ? endTour : tourNext} aria-label={next ? `next: ${appById(next).title}` : undefined}>
+          {next ? (phone ? `${appById(next).title} →` : `next: ${appById(next).title} →`) : "finish"}
+        </button>
       </div>
     );
   };
@@ -193,7 +225,12 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   // an icon opens its window; pressed again, an open window closes and a minimised one restores
   const toggle = (id: AppId) => (wins.some((w) => w.id === id && (phone || !w.min)) ? close(id) : open(id));
 
-  const ctx: Ctx = { open, close, unroll: () => setRollsOpen(true), photoReq, toTimeline: () => close("photos", true) };
+  const ctx: Ctx = {
+    open, close, photoReq,
+    unroll: (from) => { setRollsFrom(from ?? "icon"); setRollsOpen(true); },
+    // back from a photo opened on the scrolls: unrolled from Photos, that window stays (it is under the scrolls); otherwise it closes
+    toTimeline: () => (rollsFrom === "photos" ? setRollsOpen(true) : close("photos", true)),
+  };
   const top = Math.max(0, ...wins.filter((w) => phone || !w.min).map((w) => w.z));
   const docked = phone ? [] : wins.filter((w) => w.min);
 
@@ -201,7 +238,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
       <TouchCursor />
-      <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} />
+      <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
           <span className="dk-name">wilson soon, 2026</span>
@@ -268,7 +305,36 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         ))}
       </nav>
 
-      {tour && <div className="dk-tour-corner">{tourBar()}</div>}
+      {tour && (() => {
+        // about.txt (not maximised, room below): the bar sits under its bottom-right corner; otherwise the screen's corner
+        const win = wins.find((w) => w.id === tour.cur);
+        if (phone || tour.cur !== "about" || !win || win.max || win.min) return <div className="dk-tour-corner" key="corner">{tourBar()}</div>;
+        const { w, h } = sizeOf(win, vp.cw, vp.h);
+        const x = clamp(win.x, 0, vp.cw - w), top = clamp(win.y, BAR, vp.h - h) + h + 14;
+        if (top + 44 > vp.h - 8) return <div className="dk-tour-corner" key="corner">{tourBar()}</div>;
+        return <div className="dk-tour-corner" key="under" style={{ top, right: vp.cw - x - w, bottom: "auto" }}>{tourBar()}</div>;
+      })()}
+      <div className="dk-seal-wrap" role="status">
+        <AnimatePresence>
+          {sealed && (
+            <motion.div
+              className="dk-win dk-seal"
+              initial={{ opacity: 0, transform: reduce ? "none" : "scale(0.95)" }}
+              animate={{ opacity: 1, transform: "scale(1)", transition: { duration: 0.4, delay: 0.3, ease: [0.23, 1, 0.32, 1] } }}
+              exit={{ opacity: 0, transform: reduce ? "none" : "scale(0.97)", transition: { duration: 0.24, ease: [0.23, 1, 0.32, 1] } }}
+            >
+              <div className="dk-title"><span className="dk-title-text">done</span></div>
+              <div className="dk-seal-body">
+                <span className="dk-seal-mobs" aria-hidden="true">
+                  <span className="gr-hop"><Sprite rows={MUSH} /></span>
+                  <span className="gr-hop"><Sprite rows={SLIME} /></span>
+                </span>
+                <p>immortalising my being in (retro) pixels</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <div className="dk-dock-row">
         <AnimatePresence>
           {docked.length > 0 && (

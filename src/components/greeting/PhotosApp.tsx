@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
-import type { Ctx } from "./apps";
+import { appById, type Ctx } from "./apps";
+import Tooltip from "./Tooltip";
 import { ALBUMS, ITEMS, fmtDate, fmtMonth, inAlbum, monthKey, type Item } from "./photosData";
 import PhotoViewer from "./PhotoViewer";
 import "./photos.css";
@@ -67,7 +68,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
     const g = groups.find((x) => x.key === key);
     const head = scroller.current?.querySelector<HTMLElement>(`[data-g="${key}"]`);
     if (!g || !head || !scroller.current) return;
-    scroller.current.scrollTop = head.offsetTop;
+    scroller.current.scrollTop = (head.parentElement as HTMLElement).offsetTop; // the section: a stuck (sticky) heading's offsetTop is where it is stuck
     setCur(g.start);
   };
 
@@ -162,7 +163,13 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
             <span className="sr-only">tile size</span>
             <input type="range" min={0} max={2} step={1} value={density} onChange={(e) => setDensity(Number(e.target.value))} />
           </label>
-          <button type="button" className="ph-btn" onClick={ctx.unroll}>unroll</button>
+          <Tooltip text="unroll timeline">{(t) => (
+          <button type="button" id="ph-unroll" className="ph-btn ph-ibtn" aria-label="unroll timeline" onClick={() => ctx.unroll("photos")} {...t}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
+              <path d={appById("timeline").glyph} />
+            </svg>
+          </button>
+          )}</Tooltip>
         </div>
         <div className="ph-scroll" ref={scroller} onKeyDown={onKeyDown}>
           {groups.map((g) => (
@@ -197,7 +204,10 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
         <PhotoViewer
           items={items} index={cur} onIndex={setCur} reduced={reduce} compact={compact}
           backLabel={fromTl ? "timeline" : "grid"}
-          onClose={() => (fromTl ? ctx.toTimeline() : setViewing(false))}
+          onClose={() => {
+            if (fromTl) { setFromTl(false); wasViewing.current = false; ctx.toTimeline(); } // the scrolls take focus, not the grid
+            setViewing(false);
+          }}
         />
       )}
     </div>

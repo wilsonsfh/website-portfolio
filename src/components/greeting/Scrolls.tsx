@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type KeyboardEvent as ReactKeyboardEvent, type CSSProperties, type FocusEvent as ReactFocusEvent } from "react";
 import story from "../../data/story.json";
+import Tooltip from "./Tooltip";
+import { appById } from "./apps";
 import "./scrolls.css";
 
 type Item = { id: string; lane: string; date: string | null; caption: string; type: string; src: string | null; poster: string | null; w: number; h: number };
@@ -254,11 +256,14 @@ const revealed = (clip: HTMLElement) => {
   return m ? 1 - Number(m[1]) / 100 : 1;
 };
 
-type Props = { open: boolean; reduced: boolean; onToggle: () => void; onPhoto: (id: string) => void; onAll: () => void };
+type Props = {
+  open: boolean; reduced: boolean; onToggle: () => void; onPhoto: (id: string) => void; onAll: () => void;
+  from: "icon" | "photos"; onBack: () => void; // from Photos: a "back" button replaces the close button
+};
 
 const el_focus = (root: HTMLElement | null, sel: string) => root?.querySelector<HTMLElement>(sel)?.focus({ preventScroll: true });
 
-export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Props) {
+export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll, from, onBack }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const anims = useRef<Animation[][]>([]); // per lane: [paper reveal, roller]
@@ -335,10 +340,10 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const first = useRef(true);
   useLayoutEffect(() => {
     roll(first.current);
-    // keyboard: unrolling moves focus to the close button, rolling up back to the timeline icon (the scroll hides with the button)
+    // keyboard: unrolling moves focus to the back or close button, rolling up back to what unrolled them (the scroll hides with the button)
     if (!first.current) {
-      if (open) el_focus(root.current, ".sc-close");
-      else document.getElementById("dk-icon-timeline")?.focus({ preventScroll: true });
+      if (open) el_focus(root.current, ".sc-back, .sc-close");
+      else document.getElementById(from === "photos" ? "ph-unroll" : "dk-icon-timeline")?.focus({ preventScroll: true });
     }
     first.current = false;
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -351,8 +356,15 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   return (
     <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root} style={{ "--sc-close": `${reduced ? FADE_MS : CLOSE_MS}ms` } as CSSProperties}>
       <div className="sc-head">
-        <button type="button" className="sc-all" onClick={onAll}>all photos</button>
-        <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>
+        {from === "photos" && <button type="button" className="sc-back" onClick={onBack}>← photos</button>}
+        <Tooltip text="show all photos">{(t) => (
+        <button type="button" className="sc-all" onClick={onAll} aria-label="show all photos" {...t}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
+            <path d={appById("photos").glyph} />
+          </svg>
+        </button>
+        )}</Tooltip>
+        {from === "icon" && <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>}
       </div>
       <div className="sc-lanes" inert={!open}>
         {story.lanes.map((l, i) => (

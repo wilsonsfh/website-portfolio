@@ -264,3 +264,15 @@ hobbies, so it really is a gap): answer or dismiss it in /admin.
 the tour / finish) until finish or plaintext closes; removed `-webkit-font-smoothing: antialiased` from app text (it made
 the grain look heavier). Window `extra` prop removed.
 **Also:** (1) unread has the same text/image icon toggles as the assistant.
+
+## Handover (2026-11-18, round 6) — newest
+**Done:** Photos "unroll" → film icon ("unroll timeline"); timeline unrolled from Photos shows "← photos" top-left and
+no ×, from its icon keeps ×; "all photos" is an icon ("show all photos"). "jump to" fixed (sticky heading offsetTop).
+Tour: one window at a time; about.txt normal with the bar under its bottom-right; later steps maximised; skip on every
+step left of back; solid contrasting buttons (tour + bordered app buttons). Finish: all but contact close, contact
+restores from maximised, a "done" window with the mushroom + slime fades in/out (~3.4s). Picture requests typed in text
+mode go to image mode (assistant + unread); prompt rule points at the picture button otherwise.
+**Verified** in Chrome: jump both directions at 375px; timeline from-Photos/back/viewer/all photos/× flows; tour at
+1400px (bar aligned to about's right edge, maximised steps, finish) and 375px (two-row bar); wantsImage on 22 samples
+(1 accepted false positive: "image of wilson's career"); tsc, worker tests, build.
+**Not verified:** real iPhone "jump to"; the new prompt rule on the live model.

@@ -227,3 +227,27 @@ the keyboard. The `<form>` is gone too (Enter is handled on keydown), and the in
 **Can the old Vercel URL redirect here?** Only through Vercel: the `*.vercel.app` name belongs to a Vercel project.
 Recreating a project named `wilsonsoon-website-portfolio` with a `vercel.json` that redirects every path to
 `https://portfolio.wilsonsoon.workers.dev` would do it (308, permanent), if the name is still free.
+
+**Why "jump to" in Photos missed months.** Each month heading is `position: sticky`, and `jump` scrolled to the heading's
+`offsetTop`. A stuck heading reports where it is stuck (the bottom of its month once you have scrolled past it), so a
+backward jump landed at the end of that month. It now scrolls to the heading's section, which is never sticky. It showed
+most on phones, where you scroll further before jumping.
+
+**How the Vercel redirect works.** `deploy/vercel-redirect/` is a tiny Vercel project with the old name
+(`wilsonsoon-website-portfolio`). Its `vercel.json` has one redirect rule, `/(.*)` → `https://portfolio.wilsonsoon.workers.dev/$1`
+with `permanent: true`, so Vercel's edge answers every request with a 308 and the same path (the query string is kept)
+before any file is served. `index.html` is only a fallback page with a meta refresh. Redeploy from that folder with
+`npx vercel deploy --prod --yes`.
+
+**How picture requests are routed.** `wantsImage` in `src/lib/ai.ts` is a regex: the message starts with draw / sketch /
+paint / illustrate (optionally after "can you" or "please"), or contains "<image word> of" (image, picture, photo,
+portrait, pixel art…), or starts with generate / create / make / show me / give me and names an image word. A match in
+text mode switches the toggle to image mode and calls `/api/image`. When images are off for the day it stays in chat,
+and the worker prompt has a rule to answer image requests with a pointer to the picture button. A regex rather than a
+model call: it is free, instant, and a miss still lands on the prompt rule.
+
+**Does /admin work locally?** `npm run dev` only proxies `/api/*` to the deployed Worker, so `localhost:4321/admin` is
+not the admin page. The live `/admin` is already deployed and is the place to answer questions; its suggest button runs
+on the deployed Worker (real model, real D1). Locally, `cd worker && npx wrangler dev --local` serves `/admin` on :8787
+with a local, empty D1 and `ADMIN_TOKEN` from `.dev.vars`, but suggest fails there because Workers AI only runs
+remotely (see worker/README.md "Local dev").

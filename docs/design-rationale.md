@@ -371,3 +371,21 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Pictures of Wilson.** Reference photos with FLUX.2, always illustrated, never photoreal; see technicals.md.
 - **Admin suggest** answers questions that aren't about Wilson from general knowledge; facts about him still come only from
   the wiki excerpt.
+- **Timeline as its own app.** Photos' "unroll" is now the timeline's film icon ("unroll timeline"). Unrolled from Photos,
+  the timeline shows "← photos" top-left and no ×, because you came from somewhere and should go back there; unrolled from
+  its desktop icon it keeps the ×. "all photos" is the photos icon ("show all photos") in both cases. A photo opened from
+  the timeline and closed with "← timeline" goes back to the scrolls; if Photos was where you started, its window stays.
+- **Tour, one window at a time.** The cascade of stacked windows looked messy, so each step closes the last window as the
+  next opens (back does the same). about.txt opens as a normal window with the tour bar right under its bottom-right
+  corner, so the first "next" sits where the eye ends after reading; every later step opens maximised, with the bar in
+  the screen's corner. "skip → view plaintext" stays on every step, left of "← back". Tour buttons are solid (dark green,
+  primary in the brighter accent) so they read over a maximised window's paper; the other bordered buttons (Photos
+  toolbar and segments, viewer toggles, unread, assistant) moved from a 55% hairline to a solid border, and pressed
+  segments fill in.
+- **Tour finish.** A floating text toast felt out of place, so finish now plays like the desktop: every window but contact
+  closes, contact shrinks from maximised back to a window (the existing 240ms restore), then a small "done" window with
+  the boot screen's mushroom and slime hopping says "immortalising my being in (retro) pixels" and fades out after about
+  3s (in 400ms after a 300ms wait, out 240ms; no pointer). Finish from plaintext (after skip) only ends the tour.
+- **Picture requests in chat.** "draw a cat" or "image of wilson" typed in text mode used to get a text reply (or the
+  "i don't know that one yet" fallback). The assistant and unread now switch to image mode and draw it; the system
+  prompt also tells the model to point at the picture button for phrasings the pattern misses.

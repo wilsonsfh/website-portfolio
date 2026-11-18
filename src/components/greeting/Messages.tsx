@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import { motion, useReducedMotion } from "motion/react";
 import script from "../../data/chat-script.json";
 import photos from "../../data/photos.json";
-import { LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
+import { LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
 import Tooltip from "./Tooltip";
 import "./messages.css";
 
@@ -147,7 +147,8 @@ export default function Messages() {
     setDraft("");
     auto.current = document.hidden;
     stuck.current = true;
-    ask(text, null, image);
+    const draw = image || (canImage && wantsImage(text)); // an obvious picture request is drawn; the toggle stays where it was
+    ask(text, null, draw);
   };
 
   const remaining = S.topics.filter((t) => !asked.includes(t.id));

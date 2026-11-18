@@ -47,6 +47,18 @@ export async function askChat(turns: Turn[], signal?: AbortSignal): Promise<Resu
   return { ok: true, answer: String(r.data.answer ?? "") };
 }
 
+// a message that plainly asks for a picture ("draw a cat", "image of wilson", "can you make a pixel art wallpaper"):
+// the assistant and unread send it to image mode instead of the chat
+const IMAGE_NOUN = "(?:image|picture|pic|photo|drawing|painting|illustration|portrait|sketch|pixel art|wallpaper|avatar)";
+const MADE_NOUN = "(?:image|picture|pic|drawing|painting|illustration|portrait|sketch|pixel art|wallpaper|avatar)"; // not "photo": "show me his photos" means the real ones
+const IMAGE_ASK = new RegExp(
+  `^\\s*(?:(?:can|could|would|will) you\\s+|please\\s+|pls\\s+)?(?:draw|sketch|paint|illustrate|doodle)\\b` +
+  `|\\b${IMAGE_NOUN}s?\\s+of\\b` +
+  `|^\\s*(?:(?:can|could|would|will) you\\s+|please\\s+|pls\\s+)?(?:generate|create|make|render|show me|give me)\\b.*\\b${MADE_NOUN}s?\\b`,
+  "i",
+);
+export const wantsImage = (q: string) => IMAGE_ASK.test(q);
+
 export async function makeImage(prompt: string, signal?: AbortSignal): Promise<Result<{ src: string }>> {
   const r = await post("/api/image", { prompt: prompt.slice(0, 300) }, signal);
   if (!r.ok) return r;
