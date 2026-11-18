@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import script from "../../data/chat-script.json";
 import photos from "../../data/photos.json";
 import { LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
+import Tooltip from "./Tooltip";
 import "./messages.css";
 
 type Link = { label: string; href: string };
@@ -135,7 +136,11 @@ export default function Messages() {
     sync();
   };
 
-  const submit = (e: FormEvent, image = false) => {
+  const [mode, setMode] = useState<"text" | "image">("text"); // what "send" does: answer, or draw
+  const canImage = imageAvailable();
+  const image = canImage && mode === "image";
+
+  const submit = (e: FormEvent) => {
     e.preventDefault();
     const text = draft.trim();
     if (!text) return;
@@ -164,9 +169,25 @@ export default function Messages() {
         </div>
         <form className="ms-form" onSubmit={submit}>
           <label className="ms-sr" htmlFor="ms-input">ask wilson something</label>
-          <input id="ms-input" value={draft} maxLength={120} autoComplete="off" placeholder="ask something…" onChange={(e) => onDraft(e.target.value)} />
-          {imageAvailable() && <button type="button" disabled={!draft.trim() || busy} onClick={(e) => submit(e, true)}>image</button>}
-          <button type="submit" className="ms-send" disabled={!draft.trim() || busy}>send</button>
+          <input id="ms-input" value={draft} maxLength={120} autoComplete="off" placeholder={image ? "describe an image, e.g. wilson as pixel art…" : "ask something…"} onChange={(e) => onDraft(e.target.value)} />
+          {/* answer type: icon toggles on the right, named by their tooltip (same as the assistant) */}
+          <div role="group" aria-label="answer type" className="ms-seg">
+            <Tooltip text="text answer">{(t) => (
+              <button type="button" className="ms-ico" aria-label="text" aria-pressed={!image} onClick={() => setMode("text")} {...t}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden="true">
+                  <path d="M5 6.5V5h14v1.5 M12 5v14 M9 19h6" />
+                </svg>
+              </button>
+            )}</Tooltip>
+            <Tooltip text={canImage ? "draw an image" : "images are off today"}>{(t) => (
+              <button type="button" className="ms-ico" aria-label="image" aria-pressed={image} disabled={!canImage} onClick={() => setMode("image")} {...t}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
+                  <path d="M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01" />
+                </svg>
+              </button>
+            )}</Tooltip>
+          </div>
+          <button type="submit" className="ms-send" disabled={!draft.trim() || busy}>{image ? "draw" : "send"}</button>
         </form>
       </div>
     </div>
