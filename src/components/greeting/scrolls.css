@@ -1,7 +1,7 @@
 /* photo scrolls: four matte paper lanes over the wallpaper, below windows and icons */
 .sc {
   --sc-paper: #ece9e3; --sc-ink: #2a2a28; --sc-dim: #6b6b68; --sc-rule: rgba(0, 0, 0, 0.22); --sc-edge: rgba(0, 0, 0, 0.14);
-  position: absolute; top: 40px; right: 0; bottom: 0; left: 0; z-index: 1; pointer-events: none;
+  position: absolute; top: 40px; right: 0; bottom: 0; left: 0; z-index: 900; pointer-events: none;
   display: flex; flex-direction: column;
 }
 :root.dark .sc {
@@ -79,15 +79,12 @@
 .sc-close:active { transform: scale(0.97); }
 .sc-close:focus-visible { outline: 3px solid var(--sc-paper); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .sc-close:hover { background: color-mix(in srgb, var(--sc-paper) 85%, var(--sc-ink)); } }
-/* rolled up: nothing shows or takes the pointer once the roll-up (--sc-close, set from CLOSE_MS) has run; the photos icon brings it back */
+/* rolled up: nothing shows or takes the pointer once the roll-up (--sc-close, set from CLOSE_MS) has run; the timeline icon brings it back */
 .sc-rolled .sc-paper, .sc-rolled .sc-spool { pointer-events: none; }
 .sc { transition: visibility 0s; }
 .sc-rolled { visibility: hidden; transition-delay: var(--sc-close, 800ms); }
 .sc-head { transition: opacity 200ms ease-out; }
 .sc-rolled .sc-head { opacity: 0; }
-/* phone: the lanes cover the icons and the sheets (window z starts at 12 and climbs), below the dock and top bar */
-@media (max-width: 639.98px) {
-  .sc { z-index: 900; }
-  .sc:not(.sc-rolled) .sc-lanes { pointer-events: auto; }
-}
+/* the lanes cover any open window (window z starts at 12 and climbs), below the dock and top bar */
+.sc:not(.sc-rolled) .sc-lanes { pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .sc-close:active, .sc-all:active { transform: none; } }

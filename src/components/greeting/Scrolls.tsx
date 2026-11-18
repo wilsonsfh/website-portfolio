@@ -338,10 +338,10 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const first = useRef(true);
   useLayoutEffect(() => {
     roll(first.current);
-    // keyboard: unrolling moves focus to the close button, rolling up back to the photos icon (the scroll hides with the button)
+    // keyboard: unrolling moves focus to the close button, rolling up back to the timeline icon (the scroll hides with the button)
     if (!first.current) {
       if (open) el_focus(root.current, ".sc-close");
-      else document.getElementById("dk-icon-photos")?.focus({ preventScroll: true });
+      else document.getElementById("dk-icon-timeline")?.focus({ preventScroll: true });
     }
     first.current = false;
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps

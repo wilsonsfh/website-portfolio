@@ -65,19 +65,15 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
-  const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the photos icon unrolls them
+  const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
   const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
   const reqN = useRef(0);
-  // unrolling sends the open windows to the dock first (phone has sheets and no dock: lanes just cover them)
-  const toggleRolls = () => {
-    if (!rollsOpen && !phone) wins.filter((w) => !w.min).forEach((w) => minimize(w.id, false));
-    setRollsOpen(!rollsOpen);
-  };
+  const toggleRolls = () => setRollsOpen(!rollsOpen); // the lanes sit above any open windows
 
-  // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; phone sheets would sit under the lanes, so they roll up
+  // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; the window would sit under the lanes, so they roll up
   const showPhoto = (id: string | null) => {
     setPhotoReq({ id, n: ++reqN.current });
-    if (phone) setRollsOpen(false);
+    setRollsOpen(false);
     open("photos");
   };
 
@@ -179,13 +175,13 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
       <nav className="dk-icons" aria-label="apps">
         {APPS.map((a) => (
-          <Tooltip key={a.id} text={a.id === "photos" && rollsOpen ? "roll them up" : a.tip}>{(t) => (
+          <Tooltip key={a.id} text={a.id === "timeline" && rollsOpen ? "roll them up" : a.tip}>{(t) => (
           <button
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
-            onClick={() => (a.id === "photos" ? toggleRolls() : open(a.id))}
-            aria-expanded={a.id === "photos" ? rollsOpen : undefined}
+            onClick={() => (a.id === "timeline" ? toggleRolls() : open(a.id))}
+            aria-expanded={a.id === "timeline" ? rollsOpen : undefined}
             {...t}
           >
             <span className="dk-tile" aria-hidden="true">
