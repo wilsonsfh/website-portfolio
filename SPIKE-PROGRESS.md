@@ -176,3 +176,4 @@ app (grid) opens from a button in the scroll's top strip or by clicking a photo 
 Maple art: ORIGINAL lookalikes only (own pixel star-eyed slime, own orange-capped mushroom, own white pixel-glove cursor);
 never download/copy Nexon sprites or the rw-designer cursors. "Bigger": windows open larger by default (readable text).
 Subagents (round 3): v2-knowledge (worker text), v2-scrolls2, v2-retro (theme+top bar+windows+cursor+boot bar), v2-assistant.
+Merged 2026-11-18: knowledge rewrite (913c46a), scrolls round 3 (a119fd2). Open: phone stub z-index covers the Photos sheet's left edge (pending Wilson's phone-stub choice: 1 shift icons / 2 right edge / 3 none). Waiting: v2-retro, v2-assistant.
