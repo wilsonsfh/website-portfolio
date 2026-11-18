@@ -24,9 +24,10 @@
 
 .as-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 6px 14px; border-top: 1px solid var(--line); }
 .as-seg { display: flex; gap: 6px; }
+.as-panel .as-ico { padding: 0; display: grid; place-items: center; }
 .as-seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 .as-hint { color: var(--muted); font-size: 12px; }
-@media (hover: none) { .as-hint { display: none; } }
+@media (hover: none) { .as-hint { visibility: hidden; } } /* keeps the icons on the right */
 
 .as-body { max-height: min(50dvh, 420px); overflow-y: auto; overscroll-behavior: contain; padding: 12px 14px 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
 .as-body p { margin: 0; overflow-wrap: anywhere; }

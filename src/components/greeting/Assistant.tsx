@@ -121,17 +121,30 @@ export default function Assistant() {
                   <span className="as-prompt" aria-hidden="true">&gt;</span>
                   <input
                     autoFocus value={draft} maxLength={300} autoComplete="off" enterKeyHint="send"
-                    aria-label={m === "image" ? "describe an image" : "ask about wilson"} placeholder={m === "image" ? "describe an image…" : "ask about wilson…"}
+                    aria-label={m === "image" ? "describe an image" : "ask about wilson"} placeholder={m === "image" ? "describe an image, e.g. wilson as pixel art…" : "ask about wilson…"}
                     onChange={(e) => setDraft(e.target.value)}
                   />
                   <button type="submit" className="as-go" disabled={!draft.trim() || busy}>{m === "image" ? "draw" : "ask"}</button>
                 </form>
                 <div className="as-tools">
-                  <div role="group" aria-label="answer type" className="as-seg">
-                    <button type="button" aria-pressed={m === "text"} onClick={() => setMode("text")}>text</button>
-                    <button type="button" aria-pressed={m === "image"} disabled={!canImage} onClick={() => setMode("image")}>image</button>
-                  </div>
                   <span className="as-hint">esc closes</span>
+                  {/* answer type: icon buttons on the right, named by their tooltip */}
+                  <div role="group" aria-label="answer type" className="as-seg">
+                    <Tooltip text="text answer">{(t) => (
+                      <button type="button" className="as-ico" aria-label="text" aria-pressed={m === "text"} onClick={() => setMode("text")} {...t}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" aria-hidden="true">
+                          <path d="M5 6.5V5h14v1.5 M12 5v14 M9 19h6" />
+                        </svg>
+                      </button>
+                    )}</Tooltip>
+                    <Tooltip text={canImage ? "draw an image" : "images are off today"}>{(t) => (
+                      <button type="button" className="as-ico" aria-label="image" aria-pressed={m === "image"} disabled={!canImage} onClick={() => setMode("image")} {...t}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
+                          <path d="M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01" />
+                        </svg>
+                      </button>
+                    )}</Tooltip>
+                  </div>
                 </div>
                 {(notes.length > 0 || busy || out) && (
                   <div className="as-body" aria-live="polite">
