@@ -100,15 +100,15 @@ export type App = {
 };
 
 export const APPS: App[] = [
-  { id: "about", tip: "read about me", title: "about.txt", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6", w: 400, h: 360, render: () => <About /> },
-  { id: "work", tip: "where i have worked", title: "work", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 460, h: 440, render: () => <Work /> },
-  { id: "projects", tip: "things i have built", title: "projects", glyph: "M3 6h6l2 2h10v11H3z", w: 460, h: 440, render: () => <Projects /> },
-  { id: "activities", tip: "what i do outside work", title: "activities", glyph: "M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 9.3l6-.7z", w: 440, h: 420, render: () => <Activities /> },
-  { id: "photos", tip: "browse my photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 860, h: 600, flush: true, render: (ctx) => <PhotosApp ctx={ctx} /> },
-  { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 360, h: 240, render: () => <Contact /> },
-  { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 520, h: 340, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
-  { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 380, h: 460, flush: true, render: () => <Messages /> },
-  { id: "plain", tip: "the boring version, all of it", title: "plaintextversion.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 640, h: 560, hFrac: 0.8, render: () => <MainPage embedded /> },
+  { id: "about", tip: "read about me", title: "about.txt", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6", w: 580, h: 560, render: () => <About /> },
+  { id: "work", tip: "where i have worked", title: "work", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 680, h: 640, render: () => <Work /> },
+  { id: "projects", tip: "things i have built", title: "projects", glyph: "M3 6h6l2 2h10v11H3z", w: 680, h: 640, render: () => <Projects /> },
+  { id: "activities", tip: "what i do outside work", title: "activities", glyph: "M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6L3.4 9.3l6-.7z", w: 660, h: 620, render: () => <Activities /> },
+  { id: "photos", tip: "browse my photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 980, h: 700, flush: true, render: (ctx) => <PhotosApp ctx={ctx} /> },
+  { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 480, h: 320, render: () => <Contact /> },
+  { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
+  { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 460, h: 620, flush: true, render: () => <Messages /> },
+  { id: "plain", tip: "the boring version, all of it", title: "plaintextversion.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: () => <MainPage embedded /> },
 ];
 
 export const appById = (id: AppId) => APPS.find((a) => a.id === id)!;
