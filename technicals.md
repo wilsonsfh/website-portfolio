@@ -277,3 +277,6 @@ The loop back: answers you save in /admin are read by `answeredRows` (newest 40,
 prompt as "Wilson's own answers", so the same question, or a rephrasing of it, is answered next time instead of logged.
 Because step 1 is a model judgement, it can misjudge: before round 7 the prompt said "decline questions not about
 wilson" and the model replied `UNKNOWN` to those too, which is how two-sum and geography questions reached /admin.
+No keyword is involved: "about wilson" is the model's reading of the question in context, not a check for the word
+"wilson". On this site "you", "he", "his" and bare questions like "hobbies?" or "outside work?" are read as about him
+(both of those were logged without the word). Vague ones ("what's your favourite language?") can go either way.
