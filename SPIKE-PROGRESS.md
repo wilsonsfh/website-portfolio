@@ -150,3 +150,24 @@ AI worker merged (9eb3257): worker/ (Workers AI gemma-4-26b-a4b-it, flux-1-schne
 fallback on error 3036, per-IP rate limits, CORS env). Not deployed; model calls untested. Wilson is reviewing
 worker/knowledge.md (~6.5K tokens; Groq free 8K TPM means about 1 fallback request/min). Next after his review +
 `wrangler login` + Groq key: deploy, then assistant UI (own minimal AI icon) and (1) unread AI answers.
+
+## Handover (2026-11-18) — Wilson's round 3 requests (newest; supersede older lists where they overlap)
+Done before this: dates applied (3eec831), all photos dated. Worker merged, not deployed.
+1. worker/knowledge.md: keep content, rewrite tone: plain human voice, succinct, not AI-sounding; non-technical wording
+   for non-technical things, technical only where needed. Also make a SHORT knowledge version for the Groq fallback
+   (Groq free 8K tokens/min).
+2. Scrolls: close X at TOP right; the empty strip (foot strip) moves to the top too. Lanes loop forever (circular, never
+   an empty gap at the end). Clicking a photo on a scroll opens it exactly like clicking it in the Photos app (viewer).
+   Scrolls appear only when the photos icon is clicked (see answers below for stub/auto-open).
+3. Top bar: plain-site icon goes just RIGHT of the centred clock (not far left).
+4. Retro look, GREEN is the key: grainy two-tone print feel like ~/Downloads/retro-dekstopinspo1.jpeg (and
+   retro-dekstopinspo1-withtext.PNG) but green instead of blue; wallpaper/background retro; less translucency (too much
+   now); app icons more prominent; windows/text bigger and readable when opened; retro (game-like) cursor.
+5. Loading/boot bar: retro, lightly MapleStory-flavoured (not over-themed): jumping star-eyed slime, jumping orange
+   mushroom on top of the bar, with interaction animation. Refs: ~/Downloads/maplestory-slime-stareyes-correctdirection.jpg
+   (direction), ~/Downloads/maplestorymobs.png (orange mushroom; ignore the rest). Cursor ref:
+   https://www.rw-designer.com/cursor-set/original-maplestory-white
+6. AI assistant: retro, original minimal AI icon (not Siri's) in the top bar; opens with a glow animation and a retro
+   Spotlight-style bar; retro loading animation; image generation in both the bar and (1) unread; (1) unread answers via
+   AI after its scripted opening. Research retro examples with Exa.
+7. Deploy Q (answered in chat): wrangler deploys only the Worker to Cloudflare (*.workers.dev); the site stays on Vercel.
