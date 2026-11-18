@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import Desktop from "./Desktop";
+import BootBar from "./BootBar";
 import { playOn, playOff } from "./sound";
 import "./greeting.css";
 
@@ -135,6 +136,7 @@ export default function Greeting() {
           {phase === "boot" && (
             <>
               <div className="gr-glow" aria-hidden="true" />
+              <BootBar />
               <ul className="gr-boot" aria-hidden="true">
                 {BOOT.map((l, i) => (
                   <li key={l} style={{ animationDelay: `${420 + i * 140}ms` }}>{l}</li>
