@@ -197,3 +197,4 @@ Done 2026-11-18: `portfolio` deployed and live (site + chat verified). Old Worke
 project `wilsonsoon-website-portfolio` removed (URL 404). Groq test: `FORCE_FALLBACK=1` preview version (alias
 groq-test-portfolio.wilsonsoon.workers.dev) -> Groq 401, i.e. the stored GROQ_API_KEY value is rejected; Wilson re-puts
 the NEW key, then re-run the preview upload + curl (preview versions snapshot secrets at upload).
+Groq fallback verified 2026-11-18 via groq-test preview (provider groq, 200). Newest version is that preview again: run `npm run deploy` before the next `secret put`.
