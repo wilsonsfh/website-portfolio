@@ -143,6 +143,10 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
       <header className="dk-bar">
         <span className="dk-left">
           <span className="dk-name">wilson soon, 2026</span>
+        </span>
+        {/* the clock stays centred; the plain-site icon hangs off its right edge */}
+        <span className="dk-mid">
+          <span className="dk-clock">{clock}</span>
           <Tooltip text="plain site">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={() => open("plain")} aria-label="plain site" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -152,7 +156,6 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
           </button>
           )}</Tooltip>
         </span>
-        <span className="dk-clock">{clock}</span>
         <span className="dk-right">
           <Tooltip text="switch off">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off" {...t}>
