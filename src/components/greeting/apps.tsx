@@ -32,12 +32,10 @@ function Work() {
     <div className="dk-prose">
       {workExperience.map((job) => (
         <article className="item" key={job.company + job.date}>
-          <p className="item-head">
-            <a href={job.website} {...ext(job.website)}>{job.company}</a>
-            <span className="sep">/</span>{job.role}
-            <span className="meta date">{job.date}</span>
-          </p>
-          {job.description.map((d, i) => <p className="meta" key={i}>{d}</p>)}
+          <h3 className="item-title"><a href={job.website} {...ext(job.website)}>{job.company}</a></h3>
+          <p className="item-sub"><span className="role">{job.role}</span><span className="date">{job.date}</span></p>
+          <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
+          {job.tags.length > 0 && <p className="tags">{job.tags.join(" · ")}</p>}
         </article>
       ))}
     </div>
@@ -49,15 +47,15 @@ function Projects() {
     <div className="dk-prose">
       {projects.map((p) => (
         <article className="item" key={p.title}>
-          <p className="item-head">
+          <h3 className="item-title">
             {p.title}
             <span className="links">
-              {p.github && <a href={p.github} {...ext(p.github)}>github</a>}
-              {p.live && <a href={p.live} {...ext(p.live)}>live</a>}
+              {p.github && <a href={p.github} {...ext(p.github)}>github ↗</a>}
+              {p.live && <a href={p.live} {...ext(p.live)}>live ↗</a>}
             </span>
-          </p>
+          </h3>
           <p className="desc">{p.description}</p>
-          <p className="meta">{p.tags.join(", ")}</p>
+          <p className="tags">{p.tags.join(" · ")}</p>
         </article>
       ))}
     </div>
