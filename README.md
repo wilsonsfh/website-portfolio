@@ -33,12 +33,18 @@ Live: **https://portfolio.wilsonsoon.workers.dev**
 
 ## Inspiration
 
-- A grainy two-tone print desktop (the reference was blue; this one is green).
-- Emil Kowalski's animation rules for the motion principles.
-- Anime promo reels with a paper hand-scroll on a roller, for the photo timeline (the border pattern is my own).
-- An iMessage-style thread that plays itself, for the "(1) unread" app.
+- [Sequel's blue-and-cream footer, listed under Pranav on Inspora](https://www.inspora.design/posts/footer-section), for the grainy two-tone print palette (adapted to green; original designer unverified).
+- [Emil Kowalski](https://emilkowal.ski/ui/you-dont-need-animations), for animation principles, stagger and tooltips.
+- [Demon Slayer: Kimetsu no Yaiba Promotion Reel](https://www.youtube.com/watch?v=QwvWdnd2Ktg), published by Aniplex USA / animation by ufotable, for the paper-scroll timeline (the border pattern is my own).
+- [Zara Zhang's interactive text story](https://zara.small.world/jensenchat/), for the self-playing "(1) unread" thread.
+- [Terminal Industries](https://terminal-industries.com/), for scene-transition inspiration.
 - Terminal portfolios (satnaing/terminal-portfolio, davidesantangelo.com and others) for the terminal.
-- A MapleStory-flavoured boot and cursor, kept original.
+- [MapleStory / Nexon](https://www.maplestory.com/), for the creature inspiration; this site's sprites are drawn from scratch.
+- A pixel Star Wars loading-bar clip, for characters riding a progress bar; its creator remains unverified.
+
+The 11 original reference files are versioned in [referenceideas-for-portfolio/](referenceideas-for-portfolio/README.md),
+with source evidence and unresolved attribution noted there. They are research references, outside the deployed
+`public/` assets. Concise credits also appear below contact and in the plaintext version.
 
 ## Noteworthy bits
 
@@ -57,7 +63,9 @@ or tap one and it does a big squash-and-stretch hop. They come back in the tour'
 MapleStory-flavoured but drawn from scratch. The SVG above is generated from that same pixel data.
 
 ### First-visit tour
-A small "welcome / tour?" window asks first. Yes: about.txt opens and the tour steps through work, projects,
+A small "welcome / tour?" window asks once per tab: **no**, **yes**, or the rightmost orange **view simple** button.
+View simple opens the maximised plaintext version immediately and dismisses onboarding for the tab.
+Yes: about.txt opens and the tour steps through work, projects,
 involvements and contact, one maximised window at a time, with next / back / "skip → plaintext" in the corner. It ends
 with a small "done" window.
 
@@ -167,4 +175,5 @@ scripts/                 photo and wiki-excerpt helpers
 public/                  fonts, photos, reference images, v1 (old Astro site)
 deploy/vercel-redirect/  redirect from the old Vercel URL
 docs/                    design rationale, research, AI decisions, media
+referenceideas-for-portfolio/  original inspiration files and source credits (not deployed)
 ```

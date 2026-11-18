@@ -530,6 +530,9 @@
 .dk-ask-wrap { position: absolute; inset: 0; z-index: 1000; display: grid; place-items: center; } /* takes every click until answered */
 .dk-ask-btns { display: flex; gap: 10px; }
 .dk-ask-btns .dk-tbtn { min-width: 88px; }
+.dk-ask-btns .dk-tbtn.simple { min-width: 0; background: #E8731F; border-color: #9A4A1C; color: #182014; }
+@media (hover: hover) and (pointer: fine) { .dk-ask-btns .dk-tbtn.simple:hover { background: #F38C3F; } }
+@media (max-width: 380px) { .dk-ask-btns { gap: 8px; } .dk-ask-btns .dk-tbtn { min-width: 0; padding-inline: 10px; } }
 .dk-seal .dk-title { cursor: default; }
 .dk-seal .dk-title-text { color: var(--fg); font-weight: 500; }
 .dk-seal-body { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 20px 18px; text-align: center; }

@@ -139,10 +139,16 @@ function Credits() {
     <section className="more credits" aria-label="credits and disclaimer">
       <h3>credits &amp; disclaimer</h3>
       <ul>
-        <li>the pixel slime, mushroom and cursor are my own drawings, made pixel by pixel for this site. they're inspired by the look of classic 2d games like maplestory, but no game art, sprites or other assets are used.</li>
-        <li>maplestory is a trademark of nexon. this site is a personal portfolio and isn't affiliated with, endorsed or sponsored by nexon or any other game studio.</li>
-        <li>fonts: inter and caveat, both under the sil open font license.</li>
-        <li>if you own something you see here and want it changed or taken down, email <a href={email.href}>{email.text}</a> and i'll do it.</li>
+        <li>print palette &amp; grain: <a href="https://www.inspora.design/posts/footer-section" {...ext("https://www.inspora.design/posts/footer-section")}>sequel footer, via pranav on inspora</a>.</li>
+        <li>animation, stagger &amp; tooltips: <a href="https://emilkowal.ski/ui/you-dont-need-animations" {...ext("https://emilkowal.ski/ui/you-dont-need-animations")}>emil kowalski</a>.</li>
+        <li>paper-scroll timeline: <a href="https://www.youtube.com/watch?v=QwvWdnd2Ktg" {...ext("https://www.youtube.com/watch?v=QwvWdnd2Ktg")}>demon slayer reel, aniplex usa / ufotable</a>.</li>
+        <li>scripted messages: <a href="https://zara.small.world/jensenchat/" {...ext("https://zara.small.world/jensenchat/")}>zara zhang’s interactive text story</a>.</li>
+        <li>scene transitions: <a href="https://terminal-industries.com/" {...ext("https://terminal-industries.com/")}>terminal industries</a>.</li>
+        <li>boot-bar idea: pixel star wars loading clip; creator unverified.</li>
+        <li>creature inspiration: <a href="https://www.maplestory.com/" {...ext("https://www.maplestory.com/")}>maplestory / nexon</a>; site sprites redrawn by me.</li>
+        <li>fonts: <a href="https://rsms.me/inter/" {...ext("https://rsms.me/inter/")}>inter</a> &amp; <a href="https://github.com/googlefonts/caveat" {...ext("https://github.com/googlefonts/caveat")}>caveat</a> (sil open font license).</li>
+        <li>independent portfolio; no affiliation or endorsement by these creators.</li>
+        <li>credit correction or removal: <a href={email.href}>email me</a>.</li>
       </ul>
     </section>
   );

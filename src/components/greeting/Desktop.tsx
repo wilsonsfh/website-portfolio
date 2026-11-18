@@ -105,7 +105,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   };
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  // first visit: a small window asks "tour?" before anything opens; yes starts the tour, no opens contact
+  // first visit: yes starts the tour, no opens contact, view simple opens plaintext
   const [asking, setAsking] = useState(() => !tourDone());
   const [tour, setTour] = useState<Tour | null>(null);
   const [wins, setWins] = useState<Win[]>([]); // every visit starts on the bare desktop
@@ -230,6 +230,11 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const z = ++zRef.current;
     if (yes) startTour(TOUR[0]);
     else { endTour(); setWins([place("contact", 0, z, true)]); }
+  };
+  const viewSimple = () => {
+    setAsking(false);
+    endTour();
+    setWins([{ ...place("plain", 0, ++zRef.current, true), max: true }]);
   };
   useEffect(() => {
     if (!asking) return;
@@ -463,6 +468,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
                 <div className="dk-ask-btns">
                   <button type="button" className="dk-tbtn" onClick={() => answer(false)}>no</button>
                   <button type="button" className="dk-tbtn primary" autoFocus onClick={() => answer(true)}>yes</button>
+                  <button type="button" className="dk-tbtn simple" onClick={viewSimple}>view simple</button>
                 </div>
               </div>
             </motion.div>
