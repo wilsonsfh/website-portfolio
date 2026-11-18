@@ -291,7 +291,7 @@ only from knowledge.md, UNKNOWN + logged when missing); code as plain text; chat
 tokyo, two sum code, internships, favourite food → UNKNOWN, a joke. /admin: dismissed (not deleted) ids 2, 3, 4, 5, 10,
 11, 12, 13 (generic, junk, and test questions); open: 6, 7, 8, 9. Finish window held 1s (SEAL_MS 1700).
 
-## Round 8 (2026-11-18) — v2 merged into main; worktrees gone. Uncommitted, NOT deployed, migration NOT applied
+## Round 8 (2026-11-18) — v2 merged into main; worktrees gone. Committed, pushed, migration 0002 applied, deployed (fddf4656)
 - `main` == old `v2` (7c76146) on GitHub; all worktrees and v2-* branches removed (folders in the Trash); spikes kept
   as `archive/spike-*` tags. Work in `/Users/WilsonSoon/Projects/wilson-portfolio` now. Dev server: use port 5173
   or 4321 (the live Worker only allows those localhost origins, plus 4173 for preview).
@@ -302,3 +302,4 @@ tokyo, two sum code, internships, favourite food → UNKNOWN, a joke. /admin: di
 - Verified on localhost:5173 (desktop + 375px): icon position, open/close/focus, two-turn history with context,
   reload persistence, clear. Chat log NOT verified: needs `npx wrangler d1 migrations apply portfolio-qa --remote`
   (from worker/) and a deploy.
+- Live check: one chat logged to chat_log (visitor deploy-check-0000, a test row; expires in 30 days); /admin/api/chats → 401 without or with a wrong token.
