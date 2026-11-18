@@ -22,12 +22,15 @@ export type Ctx = {
   toTimeline: () => void; // "back" from a photo opened on the scrolls: close Photos and unroll them again
   ask: () => void; // open the portfolio assistant panel
   touchReq: number; // bumped by the tour's finish on plaintext: its "get in touch" row opens and scrolls into view
+  tourAt: string | null; // the tour's current stop, if one is running
 };
 
-function About() {
+// tour: on phones the handwritten note sits in the flow under the word (no room beside it); desktop floats it (TourDemo)
+function About({ tour }: { tour: boolean }) {
   return (
     <div className="dk-prose">
       <p className="lede">hi! i'm wilson. i'm also a <Typewriter /></p>
+      {tour && <p className="dk-note-inline" aria-hidden="true">↑ this keeps changing!</p>}
       <p>{ledeFlag}</p>
       {aboutParagraphs.map((t) => <p key={t}>{t}</p>)}
       <p className="skills"><b>skills</b>{skillLine}</p>
@@ -105,10 +108,11 @@ const MORE: { id: AppId | "timeline"; name: string; what: string }[] = [
   { id: "v1", name: "v1", what: "my previous website" },
 ];
 
-// shown in contact and at the end of the plaintext page (which leaves out the link to itself)
+// shown in contact and at the end of the plaintext page (which leaves out the link to itself), then the credits
 function More({ ctx, inPlain = false }: { ctx: Ctx; inPlain?: boolean }) {
   const go = (id: AppId | "timeline") => (id === "timeline" ? ctx.unroll() : id === "assistant" ? ctx.ask() : ctx.open(id));
   return (
+    <>
     <section className="more" aria-label="more on this desktop">
       <h3>there's more on this desktop</h3>
       {!inPlain && (
@@ -121,6 +125,24 @@ function More({ ctx, inPlain = false }: { ctx: Ctx; inPlain?: boolean }) {
         {MORE.map((m) => (
           <li key={m.id}><button type="button" className="dk-link" onClick={() => go(m.id)}>{m.name}</button> {m.what}</li>
         ))}
+      </ul>
+    </section>
+    <Credits />
+    </>
+  );
+}
+
+// who made what: the pixel art is original, the studios it nods to are not involved, and there's a way to ask for removal
+function Credits() {
+  const email = contacts.find((c) => c.label === "email")!;
+  return (
+    <section className="more credits" aria-label="credits and disclaimer">
+      <h3>credits &amp; disclaimer</h3>
+      <ul>
+        <li>the pixel slime, mushroom and cursor are my own drawings, made pixel by pixel for this site. they're inspired by the look of classic 2d games like maplestory, but no game art, sprites or other assets are used.</li>
+        <li>maplestory is a trademark of nexon. this site is a personal portfolio and isn't affiliated with, endorsed or sponsored by nexon or any other game studio.</li>
+        <li>fonts: inter and caveat, both under the sil open font license.</li>
+        <li>if you own something you see here and want it changed or taken down, email <a href={email.href}>{email.text}</a> and i'll do it.</li>
       </ul>
     </section>
   );
@@ -157,7 +179,7 @@ export type App = {
 };
 
 export const APPS: App[] = [ // reading order: the phone grid wraps in this order; desktop places each icon in greeting.css
-  { id: "about", tip: "read about me", title: "about.txt", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6", w: 580, h: 560, render: () => <About /> },
+  { id: "about", tip: "read about me", title: "about.txt", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6", w: 580, h: 560, render: (ctx) => <About tour={ctx.tourAt === "about"} /> },
   { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 460, h: 620, flush: true, render: () => <Messages /> },
   { id: "work", tip: "where i have worked", title: "work", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 680, h: 640, render: () => <Work /> },
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },

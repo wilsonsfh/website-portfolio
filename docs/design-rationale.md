@@ -428,7 +428,7 @@ reach Wilson, and his answers feed back into the chat. Choices:
   at and what to try ("expand for what i did and where", "press draw to see this one"). Three stops have no window
   of their own (desktop, timeline, assistant), so the caption is the only text there.
 - **Show, don't tell: a scripted cursor.** On each stop a pixel cursor acts out the feature (`TourDemo.tsx`): expand then
-  collapse a list item, poke the spirits, flip photos to "original" and back, type `whoami` and `ls` in the terminal.
+  collapse a list item, poke the spirits, flip photos to "original" and back, type `help` and `whoami` in the terminal.
   It is the desktop's own cursor art, so it reads as a pointer, not a video. It never takes over: any real press or key
   stops it at once, so the demo never fights a visitor who has started using the page. Reduced motion
   skips it entirely (the captions still say what to try), rather than a gentler version, since a moving cursor is the
@@ -437,8 +437,8 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **The handwritten note.** On the about stop the typewriter cycles words, and a first-time viewer may read the first
   one and leave. The cursor points just right of the typewriter's longest word and a rust note says "this keeps changing!"
   with a curved arrow back to it, a preempt so people wait for the next word. It is the only use of a non-Inter font
-  (Caveat 500, `@fontsource/caveat`), a deliberate exception: handwriting reads as an annotation from a person (inferred). Placed right of the longest word so it never covers a word mid-cycle; on a narrow screen it
-  goes under the line.
+  (Caveat 500, `@fontsource/caveat`), a deliberate exception: handwriting reads as an annotation from a person (inferred). Placed right of the longest word so it never covers a word mid-cycle; on phones there is no room beside
+  it, so the note sits in the flow under the word and pushes the text down rather than covering it.
 - **The image ask is typed, not sent.** The assistant stop switches to image mode and types "show wilson in pixel art"
   but leaves "draw" to the visitor. Image generation spends the free daily image allocation (section 6), and sending it
   on every tour would let tours use it up. The caption tells the visitor to press draw.
@@ -453,8 +453,8 @@ reach Wilson, and his answers feed back into the chat. Choices:
   sits beside them ("show spirits" once hidden), one setting for desktop and plaintext. The creatures are decoration (`aria-hidden`), so they can be switched off.
 - **Scrolls fade as they roll up.** The timeline's head and lanes fade out over 380ms while rolling up, so going from
   timeline to a photo (or photos) no longer shows a moving roll over the window opening beneath it.
-- **Tour re-entry.** A bottom-right "resume tour" (only when a tour was left unfinished) and "tour again" show when no
-  tour is running, in the same corner as the tour bar. The tour is opt-in and a skip or finish is remembered per tab, so this is the way
+- **Tour re-entry.** A bottom-right "tour again" shows when no tour is running, in the same corner as the tour bar. No
+  "resume": leaving mid-tour may well be deliberate, so the way back in starts from the top. The tour is opt-in and a skip or finish is remembered per tab, so this is the way
   back in.
 - **Finish from plaintext lands on "get in touch".** Finishing a tour that was skipped to plaintext opens that page's
   "get in touch" row and scrolls it into view.

@@ -55,15 +55,13 @@ const CAPTION: Partial<Record<Step, string>> = {
   desktop: "a desktop, not a page. icons open windows you can drag and resize. poke the slime or the mushroom and they hop.",
   timeline: "four paper lanes of my years: career, people, me and scenery. drag to throw them; click a photo to open it.",
   photos: "my photo library: by month, albums, and a viewer with swipe and zoom.",
-  terminal: "the same things as commands: try help, cat work.txt or ask <question>.",
+  terminal: "the same things as commands: try help or cat work.txt. there's an assistant cli mode too, for chatting with the ai right here.",
   messages: 'a short chat with "me" that plays itself. tap the replies.',
   assistant: "ask anything about me. it answers from notes i wrote, and draws pictures too: press draw to see this one.",
 };
 const stepTitle = (s: Step) => (s === "desktop" ? "desktop" : appById(s).title);
 const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
 type Tour = { cur: Step; trail: Step[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
-const LAST_KEY = "tour-last"; // sessionStorage: the last TOUR step reached, while the tour is unfinished
-const lastStep = (): Step | null => { try { const v = sessionStorage.getItem(LAST_KEY) as Step | null; return v && TOUR.includes(v) ? v : null; } catch { return null; } };
 const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
 const SEAL_MS = 2200; // the finish window: 300ms wait for contact to shrink, 400ms in, held 1.5s, then out
@@ -110,11 +108,6 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   // first visit: a small window asks "tour?" before anything opens; yes starts the tour, no opens contact
   const [asking, setAsking] = useState(() => !tourDone());
   const [tour, setTour] = useState<Tour | null>(null);
-  const [last, setLastState] = useState(lastStep); // where an unfinished tour was left, for "resume tour"
-  const setLast = (id: Step | null) => {
-    setLastState(id);
-    try { if (id) sessionStorage.setItem(LAST_KEY, id); else sessionStorage.removeItem(LAST_KEY); } catch {}
-  };
   const [wins, setWins] = useState<Win[]>([]); // every visit starts on the bare desktop
   const [spirits, setSpirits] = useSpirits();
   // left hopping, the desktop spirits take turns: hop for one wallpaper photo, rest for the next
@@ -217,9 +210,15 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     if (NOWIN.includes(id)) setWins(keep);
     else setWins((ws) => [...keep(ws), { ...place(id as AppId, 0, z, true), max: true }]);
   };
-  // the tour starts (or restarts, or resumes) at a step: one maximised window, like answering yes
+  // the tour plays itself: the demo cursor presses "next" after each stop until a real click or key pauses it (TourDemo);
+  // the bar's play button resumes it (playKey restarts the current stop's demo, then it carries on)
+  const [auto, setAuto] = useState(true);
+  const [playKey, setPlayKey] = useState(0);
+  const play = () => { setAuto(true); setPlayKey((k) => k + 1); };
+  // the tour starts (or restarts) at a step: one maximised window, like answering yes
   const startTour = (at: Step) => {
     const z = ++zRef.current;
+    setAuto(true);
     setTour({ cur: at, trail: [] });
     setWins(NOWIN.includes(at) ? [] : [{ ...place(at as AppId, 0, z, true), max: true }]);
     setRollsFrom("icon");
@@ -232,8 +231,6 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     if (yes) startTour(TOUR[0]);
     else { endTour(); setWins([place("contact", 0, z, true)]); }
   };
-  // remember the furthest-left step: the last TOUR step shown (plaintext keeps the step it was skipped from)
-  useEffect(() => { if (tour && TOUR.includes(tour.cur)) setLast(tour.cur); }, [tour?.cur]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!asking) return;
     const on = (e: KeyboardEvent) => { if (e.key === "Escape") answer(false); };
@@ -262,7 +259,6 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     setPhotoReq(null);
     fromTl.current = false;
     endTour();
-    setLast(null);
     setSealed(true);
   };
   useEffect(() => {
@@ -275,7 +271,6 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     setWins((ws) => ws.map((w) => (w.id === "plain" ? { ...w, max: false } : w)));
     setTouchReq((n) => n + 1);
     endTour();
-    setLast(null);
     setSealed(true);
   };
   const tourBack = () => {
@@ -295,6 +290,15 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const next = plain ? undefined : TOUR[i + 1];
     return (
       <div className="dk-tour" role="group" aria-label="tour">
+        {/* leave the tour from any stop (the desktop, timeline and assistant stops have no window to close) */}
+        <button type="button" className="dk-tbtn dk-ticon" onClick={endTour} aria-label="end tour">×</button>
+        {!plain && (
+          <button type="button" className="dk-tbtn dk-ticon" onClick={auto ? () => setAuto(false) : play} aria-label={auto ? "pause the tour" : "play the tour"}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <path d={auto ? "M3 2h3v10H3z M8 2h3v10H8z" : "M3.5 1.5l9 5.5-9 5.5z"} />
+            </svg>
+          </button>
+        )}
         <span className="dk-tstep">{plain ? "plaintext" : `${i + 1} / ${TOUR.length}`}</span>
         {/* phones: shorter labels so the bar stays one row */}
         {!plain && <button type="button" className="dk-tbtn skip" onClick={tourSkip}>{phone ? "skip → plaintext" : "skip → view plaintext"}</button>}
@@ -304,17 +308,26 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
           </button>
         )}
         <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${stepTitle(next)}` : undefined}>
-          {next ? (phone ? `${stepTitle(next)} →` : `next: ${stepTitle(next)} →`) : "finish"}
+          {next ? (phone ? `${next === "assistant" ? "assistant" : stepTitle(next)} →` : `next: ${stepTitle(next)} →`) : "finish"}
         </button>
       </div>
     );
   };
 
+  // phones: the name in the top bar goes back to the bare desktop (every window closed, scrolls rolled up, assistant shut, tour ended)
+  const goHome = () => {
+    setWins([]);
+    setRollsOpen(false);
+    setAskOpen(false);
+    setPhotoReq(null);
+    fromTl.current = false;
+    if (tour) endTour();
+  };
   // an icon opens its window; pressed again, an open window closes and a minimised one restores
   const toggle = (id: AppId) => (wins.some((w) => w.id === id && (phone || !w.min)) ? close(id) : open(id));
 
   const ctx: Ctx = {
-    open, close, photoReq, ask: () => setAskOpen(true), touchReq,
+    open, close, photoReq, ask: () => setAskOpen(true), touchReq, tourAt: tour?.cur ?? null,
     unroll: (from) => { setRollsFrom(from ?? "icon"); setRollsOpen(true); },
     // back from a photo opened on the scrolls: unrolled from Photos, that window stays (it is under the scrolls); otherwise it closes
     toTimeline: () => (rollsFrom === "photos" ? setRollsOpen(true) : close("photos", true)),
@@ -326,11 +339,14 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
       <TouchCursor />
-      <TourDemo step={tour?.cur ?? null} />
+      <TourDemo step={tour?.cur ?? null} auto={auto} playKey={playKey} onTake={() => setAuto(false)} />
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
-          <span className="dk-name">wilson<span className="dk-name-rest"> soon, 2026</span></span>
+          {/* phones: the name is the way home (full-screen sheets hide the desktop); desktop: just the name */}
+          {phone
+            ? <button type="button" className="dk-name dk-home" onClick={goHome} aria-label="wilson: back to the desktop">wilson</button>
+            : <span className="dk-name">wilson<span className="dk-name-rest"> soon, 2026</span></span>}
         </span>
         {/* the clock stays centred; the plain-site icon hangs off its right edge */}
         <span className="dk-mid">
@@ -423,11 +439,10 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         // the assistant panel is portalled to <body>: on its stop the tour follows it there, above it, so "next" stays reachable
         return tour.cur === "assistant" ? createPortal(corner, document.body) : corner;
       })()}
-      {/* no tour running: a way back in (resume where they left, or from the start) */}
+      {/* no tour running: a way back in, from the start (leaving may well have been on purpose, so no resume) */}
       {!tour && !asking && !sealed && (
         <div className="dk-tour-corner idle">
           <div className="dk-tour" role="group" aria-label="tour">
-            {last && <button type="button" className="dk-tbtn primary" onClick={() => startTour(last)}>resume tour</button>}
             <button type="button" className="dk-tbtn" onClick={() => startTour(TOUR[0])}>tour again</button>
           </div>
         </div>

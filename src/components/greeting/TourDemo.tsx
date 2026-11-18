@@ -6,17 +6,24 @@ import { WORDS } from "../Typewriter";
 // the tour shows rather than tells: a pixel cursor acts out each stop (press expand then collapse, type in the terminal,
 // poke the spirits...). Any real press or key stops it; reduced motion skips it. Portalled to <body> with the note, so
 // both sit above the assistant panel (also portalled there).
-const MOVE_MS = 600;
+const MOVE_MS = 700; // matches the css glide
 const OPEN_WAIT = 700; // the maximised window settles first
-const COMMANDS = ["whoami", "ls"];
-const IMAGE_ASK = "show wilson in pixel art"; // typed, not sent: every tour would otherwise spend the daily image quota
+// autoplay pacing: at least AFTER_DEMO after a stop's demo, at least NO_DEMO on a stop without one, and every stop padded
+// up to STOP_MS (about the average stop), so the tour keeps an even rhythm
+const AFTER_DEMO = 2000;
+const NO_DEMO = 3500;
+const STOP_MS = 5000; // + the ~1s glide and press on "next" ≈ 6s, the measured average stop (desktop 8.9s, terminal 7.7s run longer)
+const MODIFIERS = ["Shift", "Control", "Alt", "Meta"]; // holding one (cmd-tab, a shortcut) isn't taking over
+const COMMANDS = ["help", "whoami"];
+const PHONE = 640; // matches Desktop's phone breakpoint
+const IMAGE_ASK ="show wilson in pixel art"; // typed, not sent: every tour would otherwise spend the daily image quota
 
 type Cursor = {
   to: (el: Element) => Promise<void>;
   toPt: (x: number, y: number) => Promise<void>;
   press: (el: HTMLElement, opts?: { hold?: number; poke?: boolean }) => Promise<void>;
   type: (input: HTMLInputElement, text: string) => Promise<boolean>;
-  note: (x: number, y: number, below: boolean) => void;
+  note: (x: number, y: number) => void;
   wait: (ms: number) => Promise<void>;
   alive: () => boolean;
 };
@@ -34,12 +41,12 @@ const about: Script = async (c) => {
   ctx.font = getComputedStyle(tw).font;
   const longest = Math.max(...WORDS.map((w) => ctx.measureText(w).width));
   const b = tw.getBoundingClientRect();
-  const right = b.left + longest + 14;
-  const below = right + 230 > window.innerWidth; // no room on the right (phones): the note goes under the line
-  const x = below ? b.left + 12 : right;
-  const y = below ? b.bottom + 4 : b.top + b.height / 2;
+  // phones: no room beside the word, so About shows the note in the flow under it; the cursor just points at the word
+  if (window.innerWidth < PHONE) { await c.toPt(b.left + 12, b.bottom - 4); return; }
+  const x = Math.min(b.left + longest + 14, window.innerWidth - 240);
+  const y = b.top + b.height / 2;
   await c.toPt(x, y);
-  c.note(x, y, below);
+  c.note(x, y);
 };
 
 // a list window: press its first expand, then collapse a second later
@@ -55,6 +62,14 @@ const list = (title: string): Script => async (c) => {
 // desktop: poke the mushroom and the slime, then press stop and hop (the visitor's setting ends where it started)
 const desktop: Script = async (c) => {
   const row = document.querySelector(".dk-mobs");
+  // phones: the caption and tour bar cover the bottom of the icon grid, so scroll the spirits up above them first
+  const icons = document.querySelector<HTMLElement>(".dk-icons");
+  const top = document.querySelector(".dk-tour-corner")?.getBoundingClientRect().top;
+  const rb = row?.getBoundingClientRect();
+  if (icons && top !== undefined && rb && rb.bottom > top - 8) {
+    icons.scrollBy({ top: rb.bottom - top + 16, behavior: "smooth" });
+    await c.wait(450);
+  }
   for (const sel of [".gr-mush", ".gr-slime"]) {
     const m = row?.querySelector<HTMLElement>(sel);
     if (!m) continue;
@@ -120,21 +135,36 @@ const SCRIPTS: Record<string, Script> = {
   about, work: list("work"), projects: list("projects"), activities: list("involvements"), desktop, photos, terminal, assistant,
 };
 
-export default function TourDemo({ step }: { step: string | null }) {
+// auto: autoplay, so after the demo (or a pause, for a stop without one) the cursor presses "next" too. read through a ref,
+// so switching it off (onTake, on the visitor's first real press or key) doesn't restart the stop's demo
+// playKey: bumped by the bar's play button, so the current stop's demo runs again and autoplay carries on from there
+export default function TourDemo({ step, auto, playKey, onTake }: { step: string | null; auto: boolean; playKey: number; onTake: () => void }) {
   const el = useRef<HTMLDivElement>(null);
   const noteEl = useRef<HTMLDivElement>(null);
+  const autoRef = useRef(auto);
+  autoRef.current = auto;
+  const takeRef = useRef(onTake);
+  takeRef.current = onTake;
   useEffect(() => {
-    const run = step ? SCRIPTS[step] : undefined;
     const cur = el.current;
     const nt = noteEl.current;
-    if (!run || !cur || !nt || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!step || !cur || !nt) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const run = reduce ? undefined : SCRIPTS[step]; // reduced motion: no cursor demos (autoplay still advances)
+    if (!run && !autoRef.current) return;
     let alive = true;
-    const stop = (e: Event) => { if (e.isTrusted) { alive = false; cur.hidden = true; } };
+    const t0 = performance.now();
+    const stop = (e: Event) => {
+      if (!e.isTrusted || (e instanceof KeyboardEvent && MODIFIERS.includes(e.key))) return;
+      alive = false;
+      cur.hidden = true;
+      takeRef.current();
+    };
     window.addEventListener("pointerdown", stop, true);
     window.addEventListener("keydown", stop, true);
     const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
     const at = { x: window.innerWidth - 60, y: window.innerHeight - 90 }; // starts by the tour bar
-    const place = () => { cur.style.transform = `translate3d(${at.x}px,${at.y}px,0)`; };
+    const place = () => { cur.style.translate = `${at.x}px ${at.y}px`; }; // translate, so the press's scale stays in place
     const glide = async (x: number, y: number, glove: boolean) => {
       if (!alive) return;
       at.x = x;
@@ -171,23 +201,38 @@ export default function TourDemo({ step }: { step: string | null }) {
         }
         return alive;
       },
-      note: (x, y, below) => {
-        nt.classList.toggle("below", below);
+      note: (x, y) => {
         nt.style.transform = `translate3d(${x}px,${y}px,0)`;
         nt.hidden = false;
       },
     };
-    (async () => {
-      await wait(OPEN_WAIT);
-      if (!alive) return;
+    const show = () => {
       cur.style.transition = "none";
       place();
       cur.hidden = false;
       void cur.offsetWidth; // start from here, then glide
       cur.style.transition = "";
-      await run(c);
-      await wait(500);
-      cur.hidden = true;
+    };
+    (async () => {
+      if (run) {
+        await wait(OPEN_WAIT);
+        if (!alive) return;
+        show();
+        await run(c);
+      }
+      if (!autoRef.current) {
+        await wait(1000); // linger, so it's seen where it finished
+        cur.hidden = true;
+        return;
+      }
+      await wait(Math.max(run ? AFTER_DEMO : NO_DEMO, STOP_MS - (performance.now() - t0)));
+      // the tour bar's primary button: "next: ..." or "finish" (portalled to <body> on the assistant stop)
+      const next = document.querySelector<HTMLElement>(".dk-tour-corner:not(.idle) .dk-tbtn.primary");
+      if (!alive || !autoRef.current || !next) return;
+      if (reduce) { next.click(); return; }
+      if (!run) show();
+      await c.to(next);
+      await c.press(next);
     })();
     return () => {
       alive = false;
@@ -197,7 +242,7 @@ export default function TourDemo({ step }: { step: string | null }) {
       window.removeEventListener("pointerdown", stop, true);
       window.removeEventListener("keydown", stop, true);
     };
-  }, [step]);
+  }, [step, playKey]);
   return createPortal(
     <>
       {/* handwritten, pinned beside the typewriter on the about stop: tells people the word is still coming */}

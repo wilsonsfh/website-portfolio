@@ -3,10 +3,21 @@ import workExperience from "../../data/work-experience.json";
 import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
 import { lede, aboutParagraphs, skillLine, contacts } from "../../copy";
-import { askChat } from "../../lib/ai";
+import { IMAGE_OFF, askChat, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
 import type { AppId, Ctx } from "./apps";
 
-type Line = { kind: "in" | "out" | "head" | "err"; text: string }; // head: a bold, accent-coloured line
+// head: a bold, accent-coloured line; p: the prompt shown on an "in" line. assistant mode (after Claude Code / Codex):
+// box: the welcome panel (one line per \n); reply: an answer, marked ⏺; img: a picture (text is its alt)
+type Line = { kind: "in" | "out" | "head" | "err" | "img" | "box" | "reply"; text: string; src?: string; p?: string };
+const SHELL = "wilson@os ~ $";
+const CHAT = ">";
+const WELCOME = "✻ portfolio assistant\n\nask anything about wilson, or for a picture (\"draw wilson as pixel art\").\n/help for commands · /exit to leave";
+const CHAT_HELP: [string, string][] = [
+  ["/image <prompt>", "draw a picture (otherwise it's picked from what you ask)"],
+  ["/clear", "clear the screen and start a new conversation"],
+  ["/help", "this list"],
+  ["/exit", "back to the shell (or exit, ctrl+c)"],
+];
 type Out = Line[] | Promise<Line[]>;
 
 const out = (...t: string[]): Line[] => t.map((text) => ({ kind: "out", text }));
@@ -35,6 +46,7 @@ const HELP: [string, string][] = [
   ["open <app>", "open an app: work, projects, photos, timeline, v1, …"],
   ["close <app>", "close an app"],
   ["ask <question>", "ask the assistant about wilson"],
+  ["assistant", "chat with the assistant here, text or pictures (exit to leave)"],
   ["whoami", "who is this"],
   ["neofetch", "system info"],
   ["theme [dark|light]", "switch the colours"],
@@ -43,7 +55,7 @@ const HELP: [string, string][] = [
   ["clear", "clear the screen"],
   ["exit", "close the terminal"],
 ];
-const COMMANDS = ["help", "ls", "cat", "open", "close", "ask", "whoami", "neofetch", "theme", "github", "linkedin", "x", "email", "history", "clear", "date", "echo", "exit"];
+const COMMANDS = ["help", "ls", "cat", "open", "close", "ask", "assistant", "whoami", "neofetch", "theme", "github", "linkedin", "x", "email", "history", "clear", "date", "echo", "exit"];
 
 const started = Date.now();
 const uptime = () => {
@@ -72,6 +84,7 @@ function run(cmd: string, ctx: Ctx, history: string[]): Out {
     }
     case "open": {
       if (lower === "timeline") { ctx.unroll(); return out("unrolling the timeline"); }
+      if (lower === "assistant" || lower === "portfolio assistant") { ctx.ask(); return out("opening the portfolio assistant"); }
       const id = APP_NAMES[lower];
       if (!id) return err(arg ? `open: ${arg}: no such app. try: work, projects, photos, timeline, v1` : "usage: open <app>");
       ctx.open(id);
@@ -142,16 +155,18 @@ function complete(value: string): string {
     return c === parts[0] || !COMMANDS.includes(c) ? c : `${c} `;
   }
   const [cmd, ...rest] = parts;
-  const opts = cmd === "cat" ? Object.keys(FILES) : cmd === "open" || cmd === "close" ? [...Object.keys(APP_NAMES).filter((k) => !k.includes(".")), "timeline"] : [];
+  const opts = cmd === "cat" ? Object.keys(FILES) : cmd === "open" ? [...Object.keys(APP_NAMES).filter((k) => !k.includes(".")), "timeline", "assistant"] : cmd === "close" ? [...Object.keys(APP_NAMES).filter((k) => !k.includes(".")), "timeline"] : [];
   return `${cmd} ${pick(opts, rest.join(" "))}`;
 }
 
 const keyboardUp = () => !!window.visualViewport && window.visualViewport.height < window.innerHeight - 120;
 
 export default function Terminal({ ctx }: { ctx: Ctx }) {
-  const [lines, setLines] = useState<Line[]>([{ kind: "out", text: "wilson-os 0.1. type help, or try: cat work.txt, open photos, ask what did wilson build at cloudflare?" }]);
+  const [lines, setLines] = useState<Line[]>([{ kind: "out", text: "wilson-os 0.1. type help, or try: cat work.txt, open photos, assistant" }]);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
+  // assistant mode: every line goes to the assistant with the conversation so far; null = the normal shell
+  const [chat, setChat] = useState<Turn[] | null>(null);
   const history = useRef<string[]>([]);
   const hpos = useRef(0); // position while walking the history with up/down
   const input = useRef<HTMLInputElement>(null);
@@ -160,9 +175,54 @@ export default function Terminal({ ctx }: { ctx: Ctx }) {
 
   useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [lines, busy]);
 
+  const leaveChat = () => { setChat(null); setLines((ls) => [...ls, ...out("left the assistant. back in the shell.")]); };
+
+  // a picture when asked with /image or when the line plainly asks for one (same check as the assistant panel) and
+  // images are on today; otherwise a text answer with the conversation so far
+  const talk = (q: string, turns: Turn[], force = false) => {
+    const draw = force || wantsImage(q);
+    setBusy(true);
+    const done = draw && imageAvailable()
+      ? makeImage(q).then((r) => setLines((ls) => [...ls, r.ok ? { kind: "img", text: q, src: r.src } : err(r.message)[0]]))
+      : askChat([...turns, { role: "user", content: q }]).then((r) => {
+        if (!r.ok) { setLines((ls) => [...ls, ...err(r.message)]); return; }
+        setChat((c) => (c ? [...c, { role: "user", content: q }, { role: "assistant", content: r.answer }] : c));
+        setLines((ls) => [...ls, ...(draw ? out(`(${IMAGE_OFF}, so here's text)`) : []), { kind: "reply", text: r.answer }]);
+      });
+    done.finally(() => setBusy(false));
+  };
+
   const submit = () => {
     const cmd = value.trim();
     setValue("");
+    if (chat) {
+      if (!cmd) return;
+      if (history.current[history.current.length - 1] !== cmd) history.current.push(cmd);
+      hpos.current = history.current.length;
+      const echo: Line = { kind: "in", text: cmd, p: CHAT };
+      const [slash, ...rest] = cmd.split(/\s+/);
+      const arg = rest.join(" ");
+      if (["/exit", "/quit", "exit", "quit"].includes(slash.toLowerCase()) && !arg) { setLines((ls) => [...ls, echo]); leaveChat(); return; }
+      if (slash === "/clear") { setChat([]); setLines([{ kind: "box", text: WELCOME }]); return; }
+      if (slash === "/help") { setLines((ls) => [...ls, echo, ...CHAT_HELP.map(([c, d]) => ({ kind: "out" as const, text: `${c.padEnd(18)}${d}` }))]); return; }
+      if (slash === "/image") {
+        if (!arg) { setLines((ls) => [...ls, echo, ...err("usage: /image <prompt>, e.g. /image wilson as pixel art")]); return; }
+        setLines((ls) => [...ls, echo]);
+        talk(arg, chat, true);
+        return;
+      }
+      if (cmd.startsWith("/")) { setLines((ls) => [...ls, echo, ...err(`${slash}: unknown command. try /help`)]); return; }
+      setLines((ls) => [...ls, echo]);
+      talk(cmd, chat);
+      return;
+    }
+    if (cmd.toLowerCase() === "assistant") {
+      if (history.current[history.current.length - 1] !== cmd) history.current.push(cmd);
+      hpos.current = history.current.length;
+      setChat([]);
+      setLines((ls) => [...ls, { kind: "in", text: cmd }, { kind: "box", text: WELCOME }]);
+      return;
+    }
     if (!cmd) { setLines((ls) => [...ls, { kind: "in", text: "" }]); return; }
     if (history.current[history.current.length - 1] !== cmd) history.current.push(cmd);
     hpos.current = history.current.length;
@@ -178,10 +238,11 @@ export default function Terminal({ ctx }: { ctx: Ctx }) {
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const h = history.current;
     if (e.key === "Enter") { e.preventDefault(); if (!busy) submit(); }
-    else if (e.key === "Tab") { e.preventDefault(); setValue((v) => complete(v)); }
+    else if (e.key === "Tab") { e.preventDefault(); if (!chat) setValue((v) => complete(v)); } // shell commands only
     else if (e.key === "ArrowUp" && h.length) { e.preventDefault(); hpos.current = Math.max(0, hpos.current - 1); setValue(h[hpos.current]); }
     else if (e.key === "ArrowDown" && h.length) { e.preventDefault(); hpos.current = Math.min(h.length, hpos.current + 1); setValue(h[hpos.current] ?? ""); }
     else if (e.key === "l" && e.ctrlKey) { e.preventDefault(); setLines([]); }
+    else if (e.key === "c" && e.ctrlKey && chat && !busy) { e.preventDefault(); leaveChat(); }
   };
 
   // phones: one tap anywhere brings the keyboard up. A field that is focused without its keyboard (focus that did
@@ -200,17 +261,21 @@ export default function Terminal({ ctx }: { ctx: Ctx }) {
   return (
     <div className="dk-term" onClick={focusInput}>
       {lines.map((l, i) => (
-        <p key={i} className={l.kind === "out" ? undefined : l.kind}>{l.kind === "in" ? <><span className="dk-prompt">wilson@os ~ $</span> {l.text}</> : l.text}</p>
+        l.kind === "img"
+          ? <img key={i} className="dk-term-img" src={l.src} alt={l.text} />
+          : <p key={i} className={l.kind === "out" ? undefined : l.kind}>
+              {l.kind === "in" ? <><span className="dk-prompt">{l.p ?? SHELL}</span> {l.text}</> : l.kind === "reply" ? <><span className="dk-dot" aria-hidden="true">⏺</span>{l.text}</> : l.text}
+            </p>
       ))}
-      {busy && <p className="dk-wait">thinking…</p>}
+      {busy && <p className="dk-wait">{chat ? "✻ thinking…" : "thinking…"}</p>}
       <label className="dk-line">
-        <span className="dk-prompt" aria-hidden="true">wilson@os ~ $&nbsp;</span>
+        <span className="dk-prompt" aria-hidden="true">{chat ? CHAT : SHELL}&nbsp;</span>
         <input
           ref={input}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={onKey}
-          aria-label="terminal command"
+          aria-label={chat ? "message to the assistant" : "terminal command"}
           autoFocus={!touch} // a phone opens its keyboard only from a tap, so no focus on open
           autoComplete="off"
           autoCapitalize="off"
@@ -219,6 +284,7 @@ export default function Terminal({ ctx }: { ctx: Ctx }) {
           enterKeyHint="go"
         />
       </label>
+      {chat && <p className="dk-chat-hint">/help · /image &lt;prompt&gt; · /exit</p>}
       <div ref={end} />
     </div>
   );

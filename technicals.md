@@ -329,11 +329,25 @@ stays clickable above the panel; on other stops it stays inside `.dk`.
 `.dk-note` to the selector lists, light and `:root.dark`. The cursor needed no tokens: `--cur-arrow` and `--cur-glove`
 are declared on `.gr-root, .dk-touch`.
 
+**Why is the demo cursor placed with `translate` and not `transform`?** Its press is a CSS `scale`. The individual
+transform properties apply in a fixed order (`translate`, `rotate`, `scale`, then `transform`), so with the position in
+`transform: translate3d(...)` the press scaled the position too and flung the cursor about 20% toward the top-left
+corner on every click (112px on the projects stop; far more for targets at the right or bottom), which read as the
+cursor vanishing. With the position in `translate`, `scale` only squashes the cursor in place
+(`src/components/greeting/TourDemo.tsx`, `.dk-demo` in `greeting.css`). The glide is ease-in-out over 700ms, since an
+ease-out does most of a long move in the first ~100ms and looks like a teleport.
+
 **How is the note placed beside the typewriter's longest word?** The typewriter (`src/components/Typewriter.tsx`) exports
 its `WORDS`. The script creates an off-screen canvas, sets `ctx.font` to the typewriter element's computed `font`, and
 takes the largest `measureText(word).width`. The note goes at `left + longest + 14px`, vertically centred on the line.
-Measuring is needed because the element's own width changes as letters appear. If `right + 230` exceeds the viewport
-(phones), the note goes under the line (`.below`).
+Measuring is needed because the element's own width changes as letters appear; x is clamped to `innerWidth - 240`.
+Phones (< 640px) have no room beside the word, so the floating note is hidden there and About renders the same note in
+the flow under the word (`.dk-note-inline`, shown when `ctx.tourAt === "about"`), pushing the text down instead of
+covering it; the cursor just points at the word.
+
+**How does the desktop stop keep the spirits clear of the caption on phones?** While a tour runs, the phone icon grid
+gets `padding-bottom: 200px; overflow-y: auto`. The desktop script compares the spirits row's bottom with the tour
+corner's top and, if covered, `scrollBy`s the grid so the row sits 16px above the caption before poking.
 
 **Why is the note's animation opacity only?** The note is placed with an inline `transform: translate3d(...)`, and a
 `transform` keyframe would replace it. `dk-note-in` fades opacity only. The demo cursor uses a `transition` on
@@ -356,15 +370,14 @@ visitor's setting is never changed by this; it only applies while the mode is "h
 A boolean would be true already the second time, so the effect would not re-run; a new number always does, and `0`
 (the initial value) means "no request".
 
-**How does the tour remember where it was?** `sessionStorage["tour-last"]` holds the last `TOUR` step reached
-(written on every step change, validated against `TOUR` when read, cleared on finish). `tour-done` marks it finished or
-skipped in this tab. With no tour running and no finish animation, `Desktop.tsx` shows "resume tour" (only if `tour-last`
-is set; calls `startTour(last)`) and "tour again" (`startTour(TOUR[0])`). `startTour` sets up one maximised window, or
-none for the no-window stops (`NOWIN`: desktop, timeline, assistant), and unrolls the timeline / opens the assistant when
-the step is one of those. A plaintext step ("skip") keeps the step it was skipped from as `last`.
+**How does the tour come back after it ends?** `tour-done` (sessionStorage) marks it finished or skipped in this tab.
+With no tour running and no finish animation, `Desktop.tsx` shows only "tour again" (`startTour(TOUR[0])`): leaving
+mid-tour may well be on purpose, so there is no "resume" (an earlier `tour-last` resume was removed). `startTour` sets up
+one maximised window, or none for the no-window stops (`NOWIN`: desktop, timeline, assistant), and unrolls the timeline
+/ opens the assistant when the step is one of those.
 
 **How long does the finish window stay?** `SEAL_MS = 2200`: 300ms for contact to shrink, 400ms fade in, held 1.5s, then
-out. The idle "resume/tour again" corner is hidden while it plays (`!sealed`).
+out. The idle "tour again" corner is hidden while it plays (`!sealed`).
 
 **How does `as: "wilson"` reach the model?** `askChat(turns, signal, as)` in `src/lib/ai.ts` adds `as` to the
 `/api/chat` body only when set. `Messages.tsx` (the "(1) unread" app) passes `"wilson"`; the assistant panel and

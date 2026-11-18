@@ -71,7 +71,7 @@ zoom to 4x and a filmstrip.
 <img src="docs/media/timeline.gif" width="720" alt="the photo timeline scrolling, then the photo viewer and gallery">
 
 ### Terminal
-`help`, `ls`, `cat <file>`, `open` / `close <app>`, `ask <question>`, `whoami`, `neofetch`, `theme`, history, tab
+`help`, `ls`, `cat <file>`, `open` / `close <app>`, `ask <question>`, `assistant` (a Claude Code / Codex-style chat inside the terminal: `>` prompt, ⏺ answers, `/image`, `/clear`, `/exit`; pictures are auto-detected), `whoami`, `neofetch`, `theme`, history, tab
 completion, plus a few jokes. It is a second route to the same content.
 
 <img src="docs/media/terminal.gif" width="720" alt="terminal commands">

@@ -340,7 +340,24 @@ Live site returns 200.
   under about.txt) and under the plaintext header. Quiet "stop"/"hop" and "hide" ("show spirits" once hidden) beside
   them, one shared setting in localStorage `spirits` (`Spirits.tsx`). On the desktop, while the setting is "hop",
   they alternate hop / rest every 40s, the wallpaper's photo interval (`EVERY`, exported from `Wallpaper.tsx`).
-- Tour re-entry: bottom-right "resume tour" (sessionStorage `tour-last`) and "tour again" when no tour is running.
+- Tour re-entry: bottom-right "tour again" only, when no tour is running (resume removed: leaving may be deliberate).
+- Tour plays itself ("yes" and "tour again"): after a stop's demo the cursor waits >= 2s, still stops >= 3.5s, every
+  stop padded to STOP_MS 5000 (+ ~1s glide/press on next ≈ 6s, the measured average; desktop 8.9s, terminal 7.7s,
+  assistant 7.5s run longer), then the cursor presses next, through finish. Any real click/key (not Shift/Ctrl/Alt/Cmd)
+  pauses it; the bar's play/pause button (right of ×) resumes, re-running the current stop's demo (playKey).
+- Terminal: `assistant` starts a chat inside the terminal, after Claude Code / Codex (welcome box, `>` prompt, ⏺
+  answers, "✻ thinking…", hint line; /help /clear /image <prompt> /exit, also exit or ctrl+c). Text or picture is
+  auto-detected with `wantsImage` (the panel's check); /image forces one; images off -> text with a note. `open
+  assistant` still opens the panel. Intro hint no longer suggests the cloudflare ask; tour types `help`, `whoami`.
+- Phones: the top-left "wilson" is a home button (closes windows, rolls up the timeline, shuts the assistant, ends
+  the tour). Desktop: plain name.
+- End tour: a "×" on the tour bar on every stop (the desktop, timeline and assistant stops have no window to close).
+  Phones: tighter bar + "assistant →" so it stays one row down to 360px.
+- Credits & disclaimer after the "more on this desktop" list (contact and plaintext's get in touch): original pixel
+  art inspired by maplestory's look, no game assets; maplestory is nexon's trademark, no affiliation; fonts under OFL;
+  email for takedown. Not legal advice; if the sprites read as nexon's orange mushroom / slime, redraw them.
+- Phones: the about note sits in the flow under the word (`.dk-note-inline`); on the desktop stop the icon grid scrolls
+  the spirits clear of the caption. Demo cursor positioned with `translate` (a `scale` press used to fling it).
 - Photos from the timeline: viewer has "← timeline" and "library"; library has "← back to photo" and "← timeline".
 - Tour → plaintext → finish: plaintext's "get in touch" opens and scrolls into view (`touchReq` via Ctx → MainPage).
 - plaintext tooltip: "the clean version".
@@ -351,7 +368,7 @@ Live site returns 200.
 - Tour demo (`TourDemo.tsx`, portalled to <body> above the assistant panel): about: cursor points right of the
   typewriter's longest word + handwritten (Caveat, @fontsource/caveat, only use) rust note "this keeps changing!";
   work/projects/involvements: first expand, collapse 1s later; desktop: pokes mushroom + slime, presses stop then hop
-  (setting unchanged); photos: original, 1.2s, square; terminal: types + runs `whoami`, `ls`; assistant: image mode +
+  (setting unchanged); photos: original, 1.2s, square; terminal: types + runs `help`, `whoami`; assistant: image mode +
   types "show wilson in pixel art" but does NOT send (would spend the daily image quota per visitor). Any real
   pointerdown/keydown stops it; reduced motion skips it. Not tested: stopping it by hand mid-demo.
 - Scrolls fade out (380ms) as they roll up, so timeline -> photos no longer shows the roll over the new window.
