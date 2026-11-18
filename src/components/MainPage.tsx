@@ -82,10 +82,10 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
               <article className="item" key={job.company + job.date}>
                 <p className="item-head">
                   <a href={job.website} {...ext(job.website)}>{job.company}</a>
-                  <span className="sep">/</span>{job.role}
+                  <span className="sep">/</span><span className="role">{job.role}</span>
                   <span className="meta date">{job.date}</span>
                 </p>
-                {job.description.map((d, i) => <p className="meta" key={i}>{d}</p>)}
+                <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
               </article>
             ))}
           </Row>
@@ -101,7 +101,7 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
                   </span>
                 </p>
                 <p className="desc">{p.description}</p>
-                <p className="meta">{p.tags.join(", ")}</p>
+                <p className="meta tags">{p.tags.join(", ")}</p>
               </article>
             ))}
           </Row>
@@ -111,10 +111,10 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
               <article className="item" key={a.title}>
                 <p className="item-head">
                   {a.title}
-                  {a.role && <><span className="sep">/</span>{a.role}</>}
+                  {a.role && <><span className="sep">/</span><span className="role">{a.role}</span></>}
                   {a.date && <span className="meta date">{a.date}</span>}
                 </p>
-                {a.descriptions.map((d, i) => <p className="meta" key={i}>{d}</p>)}
+                <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
               </article>
             ))}
           </Row>
@@ -122,7 +122,7 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
           <Row label="get in touch">
             <ul className="contacts">
               {contacts.map((c) => (
-                <li key={c.label}><span className="meta">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
+                <li key={c.label}><span className="meta label">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
               ))}
             </ul>
             {more /* in the desktop's plaintext window: links to the other apps */}

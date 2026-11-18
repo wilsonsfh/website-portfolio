@@ -6,12 +6,12 @@
     "logoDarkBg": true,
     "role": "Solutions Engineering Intern",
     "date": "May 2026 - Aug 2026",
-    "location": "Singapore, Singapore",
+    "location": "APJC",
+    "summary": "Built a security assessment webapp and hands-on security labs for Customer Engineers.",
     "description": [
-      "Delivered technical demos to senior Solutions Engineering leadership at a cross-regional meeting of 80+ SEs, shadowed SEs on live customer engagements, and supported outbound client acquisition at a regional client summit",
-      "Built a security assessment tool that automates analysis of client accounts against Cloudflare's WAF, SSL/TLS, Rate Limiting, and Bot Management products, giving SEs discovery and upsell talking points and a simpler way to convey remediations to clients",
-      "Scoped and shipped scoring improvements across those products from SE user research, now used across client accounts and still active post-handover",
-      "Built a browser-based Linux desktop on Cloudflare Containers powering a hands-on lab series, letting clients and SEs configure and test security policies without a VM or local install"
+      "Built brownfield security assessment webapp in place of manual client data gathering, with guided fixes, historical comparisons, scored account security posture with live traffic summaries and auto-generated slide decks, thereby shortening Customer Engineers' preparation time for technical discovery",
+      "Built a browser-based Linux desktop on isolated Cloudflare Containers for users to run hands-on labs for configuring and testing security policies against their own accounts, routing each container's traffic through the WARP client over a VPN-like tunnel",
+      "Diagnosed containers re-enrolling as new WARP devices on every restart, and implemented automatic deregistration to prevent unused entries from overloading the device inventory ahead of a workshop"
     ],
     "tags": ["Zero Trust", "Workers", "Durable Objects", "KV"]
   },
@@ -21,26 +21,27 @@
     "website": "https://glints.com/sg",
     "role": "Product Management Intern",
     "date": "Dec 2025 – Apr 2026",
-    "location": "Singapore, Singapore & Jakarta, Indonesia",
+    "location": "Singapore & Jakarta, Indonesia",
+    "summary": "Grew jobseeker daily active users through A/B tests, user research and partnerships.",
     "description": [
-      "Led user research interviews with jobseekers and SME employers to map hiring behaviour and needs, with findings used by PM and Engineering teams to prioritise features for localisation and expansion into Singapore and Malaysia",
-      "Represented Glints at school events and industry sharing sessions to gather direct product feedback and engage potential clients",
-      "Grew jobseeker DAU by more than 2x through data-driven experiments and partnerships, and wrote SQL queries in Metabase to prioritise scope and cut manual database lookup time"
+      "Grew Daily Active Users among jobseekers seeking opportunities at SMEs and SME employers, through A/B-tested job navigation and strategic partnerships with organisations and communities to increase brand awareness",
+      "Ran competitor analysis across Singapore's talent ecosystem, and led 10 user research interviews with jobseekers on job search behaviour and portal navigation, translating findings and triaging bug reports into technical requirements such as that of improved bottom navigation bar placement and map-based nearby job search",
+      "Built reusable database views in SQL scoped to Singapore and Malaysia jobseeker and employer funnels, and automated daily KPI reporting for the regional growth team, cutting database lookup time"
     ],
     "tags": ["SQL", "Metabase", "User Research", "Product Analytics"]
   },
   {
-    "company": "NUS Enterprise Minimum Viable Product Studio",
+    "company": "NUS Enterprise",
     "logo": "/images/logos/nus-enterprise.png",
     "website": "https://enterprise.nus.edu.sg/tti/initiatives-programmes/nus-minimum-viable-product-mvp-studio/",
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
-    "location": "Singapore, Singapore",
+    "location": "Singapore",
+    "summary": "Worked on a webapp that helps researchers with bioacoustic analysis of birds.",
     "description": [
-      "Worked on a full-stack web application for researchers to analyse bird patterns with React and Django with PostgreSQL",
-      "Improved bird species identification across geographic regions by integrating BirdNET Machine Learning classifier using eBird API and GPS coordinate data, increasing classification accuracy compared to manual labeling",
-      "Enhanced cloud data pipeline with Python scripting to batch ingest and synchronize large volumes of bird audio recordings between local storage and Google Cloud Storage, reducing manual data entry time"
+      "Built on brownfield webapp to support researchers with bioacoustic analysis of birds",
+      "Improved bird species identification across sub-geographic regions in Singapore by integrating bird Machine Learning classifier, open database and GPS coordinate data to increase classification accuracy"
     ],
     "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
   },
@@ -50,9 +51,11 @@
     "website": "https://www.sla.gov.sg/",
     "role": "Software Engineering Intern",
     "date": "Nov 2020 – Feb 2021",
-    "location": "Singapore, Singapore",
+    "location": "Singapore",
+    "summary": "Made building data move between software with an open-source model and plug-in code.",
     "description": [
-      "Enhanced extraction of building data for geospatial applications such as Autodesk Revit by implementing C# plugin and open-source Buildings and Habitats object Model (BHoM)"
+      "Integrated open-source Building Habitats model as software medium for data interoperability",
+      "Implemented plug-in code to standardise data transfer across software applications"
     ],
     "tags": ["C#", "Autodesk Revit", "BHoM"]
   }

@@ -326,12 +326,29 @@
 .dk-prose .item-sub { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
 .dk-prose .role { font-size: 15px; font-weight: 600; color: var(--warm); }
 .dk-prose .date { font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
-.dk-prose .points { margin: 2px 0 0; padding-left: 18px; list-style: disc; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.55; }
-.dk-prose .points li::marker { color: var(--accent); }
+.dk-prose .points, .dk-body .page .points { margin: 2px 0 0; padding-left: 18px; list-style: disc; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.55; }
+.dk-prose .points li::marker, .dk-body .page .points li::marker { color: var(--accent); }
 .dk-prose .desc { font-size: 15px; }
 .dk-prose .tags { font-size: 13px; font-weight: 600; color: var(--accent); }
 .dk-prose .links { display: inline-flex; gap: 12px; font-size: 14px; font-weight: 600; }
 .dk-prose .links a { color: var(--accent); }
+.dk-prose .dk-more { font-size: 13px; }
+.dk-prose .item-more:not([hidden]) { display: flex; flex-direction: column; gap: 6px; }
+/* about.txt: v1's typewriter word, with a block caret that blinks (still under reduced motion) */
+.dk-tw { color: var(--accent); }
+.dk-tw::after { content: ""; display: inline-block; width: 0.5em; height: 0.95em; margin-left: 2px; vertical-align: -0.12em; background: currentColor; animation: dk-caret 1s steps(1) infinite; }
+@keyframes dk-caret { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dk-tw::after { animation: none; } }
+/* plaintext-version.html: the same print colours and type as the app windows */
+.dk-body .page { color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.dk-body .page .name { font-weight: 700; }
+.dk-body .page .lede { font-weight: 600; }
+.dk-body .page .row-label { font-weight: 700; }
+.dk-body .page .chev { color: var(--accent); }
+.dk-body .page .item-head { font-size: 17px; font-weight: 700; }
+.dk-body .page .role { font-weight: 600; color: var(--warm); }
+.dk-body .page .tags { font-weight: 600; color: var(--accent); }
+.dk-body .page .item-head .links a { color: var(--accent); font-weight: 600; }
 .dk-body a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; border-radius: 2px; }
 .dk-body a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .dk-body a:hover { color: var(--accent); text-decoration-color: currentColor; } }

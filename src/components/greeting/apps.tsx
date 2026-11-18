@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
+import { useReducedMotion } from "motion/react";
 import workExperience from "../../data/work-experience.json";
 import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
@@ -21,13 +22,61 @@ export type Ctx = {
   ask: () => void; // open the portfolio assistant panel
 };
 
+// v1's hero line: types a word, deletes it, types the next (a plain swap every 3s under reduced motion)
+const WORDS = ["software engineer", "product manager", "dancer", "fullstack developer", "nature lover", "tea lover", "singaporean", "photographer", "rock climber", "(learning) guitarist", "volleyball beginner"];
+
+function Typewriter() {
+  const reduce = useReducedMotion();
+  const [text, setText] = useState(WORDS[0]);
+  useEffect(() => {
+    let w = 0, n = WORDS[0].length, del = true, t = 0;
+    const tick = () => {
+      if (reduce) { w = (w + 1) % WORDS.length; setText(WORDS[w]); t = window.setTimeout(tick, 3000); return; }
+      if (del) {
+        n--;
+        if (n === 0) { del = false; w = (w + 1) % WORDS.length; }
+      } else if (n < WORDS[w].length) n++;
+      else { del = true; t = window.setTimeout(tick, 1600); return; }
+      setText(WORDS[w].slice(0, n));
+      t = window.setTimeout(tick, del ? 40 : n === 0 ? 300 : 80);
+    };
+    t = window.setTimeout(tick, reduce ? 3000 : 1600);
+    return () => window.clearTimeout(t);
+  }, [reduce]);
+  return (
+    <>
+      <span className="dk-tw" aria-hidden="true">{text}</span>
+      <span className="sr-only">{WORDS.join(", ")}</span>
+    </>
+  );
+}
+
 function About() {
   return (
     <div className="dk-prose">
-      <p className="lede">{lede}</p>
+      <p className="lede">hi! i'm wilson. i'm also a <Typewriter /></p>
+      <p>{lede.replace("based in singapore", "based in 🇸🇬")}</p>
       {aboutParagraphs.map((t) => <p key={t}>{t}</p>)}
       <p className="skills"><b>skills</b>{skillLine}</p>
     </div>
+  );
+}
+
+// one item: the title row ends in a more/less toggle; `more` shows only when expanded
+function Item({ title, more, children }: { title: ReactNode; more: ReactNode; children?: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <article className="item">
+      <h3 className="item-title">
+        {title}
+        <button type="button" className="dk-link dk-more" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
+          {open ? "less" : "more"}
+        </button>
+      </h3>
+      {children}
+      <div className="item-more" id={id} hidden={!open}>{more}</div>
+    </article>
   );
 }
 
@@ -35,12 +84,18 @@ function Work() {
   return (
     <div className="dk-prose">
       {workExperience.map((job) => (
-        <article className="item" key={job.company + job.date}>
-          <h3 className="item-title"><a href={job.website} {...ext(job.website)}>{job.company}</a></h3>
+        <Item
+          key={job.company + job.date}
+          title={<a href={job.website} {...ext(job.website)}>{job.company}</a>}
+          more={<>
+            <p className="date">{job.location}</p>
+            <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
+            {job.tags.length > 0 && <p className="tags">{job.tags.join(" · ")}</p>}
+          </>}
+        >
           <p className="item-sub"><span className="role">{job.role}</span><span className="date">{job.date}</span></p>
-          <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
-          {job.tags.length > 0 && <p className="tags">{job.tags.join(" · ")}</p>}
-        </article>
+          <p className="desc">{job.summary}</p>
+        </Item>
       ))}
     </div>
   );
@@ -50,17 +105,20 @@ function Projects() {
   return (
     <div className="dk-prose">
       {projects.map((p) => (
-        <article className="item" key={p.title}>
-          <h3 className="item-title">
+        <Item
+          key={p.title}
+          title={<>
             {p.title}
             <span className="links">
               {p.github && <a href={p.github} {...ext(p.github)}>github ↗</a>}
               {p.live && <a href={p.live} {...ext(p.live)}>live ↗</a>}
             </span>
-          </h3>
+          </>}
+          more={<ul className="points">{p.highlights.map((h, i) => <li key={i}>{h}</li>)}</ul>}
+        >
           <p className="desc">{p.description}</p>
           <p className="tags">{p.tags.join(" · ")}</p>
-        </article>
+        </Item>
       ))}
     </div>
   );
@@ -70,11 +128,14 @@ function Activities() {
   return (
     <div className="dk-prose">
       {activities.map((a) => (
-        <article className="item" key={a.title}>
-          <h3 className="item-title">{a.title}</h3>
-          {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
-          <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
-        </article>
+        <Item
+          key={a.title}
+          title={a.title}
+          more={<>
+            {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
+            <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
+          </>}
+        />
       ))}
     </div>
   );
@@ -82,7 +143,7 @@ function Activities() {
 
 // the rest of the desktop, for whoever arrives here at the end of the tour
 const MORE: { id: AppId | "timeline"; name: string; what: string }[] = [
-  { id: "messages", name: "(1) unread", what: "a short chat with me, tap the replies" },
+  { id: "messages", name: "(1) unread", what: 'a short chat with "me", tap the replies' },
   { id: "assistant", name: "portfolio assistant", what: "ask about me, or anything else" },
   { id: "terminal", name: "terminal", what: "the same things as commands: try help, cat work.txt or ask" },
   { id: "photos", name: "photos", what: "my photo library, by month" },
