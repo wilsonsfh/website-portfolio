@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
 import Scrolls from "./Scrolls";
+import Assistant from "./Assistant";
 import Wallpaper from "./Wallpaper";
 import Window, { BAR, MIN_W, MIN_H, clamp } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
@@ -154,6 +155,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
         </span>
         <span className="dk-clock">{clock}</span>
         <span className="dk-right">
+          <Assistant />
           <Tooltip text="switch off">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
