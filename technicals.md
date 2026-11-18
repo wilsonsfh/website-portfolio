@@ -193,3 +193,37 @@ or fewer) the whole excerpt goes to the model, which judges relevance.
    4439fbf) and then folded into `/admin` on `portfolio` with an `ADMIN_TOKEN` password, because I wanted one link.
 
 Now: one Worker (`portfolio`) serves the site, `/api/*` and `/admin*`; one D1 database; one `npm run deploy`.
+
+## Round 5 (2026-11-18 evening)
+
+**What model do the "neurons" run on?** Neurons are Workers AI's billing unit (10,000 free a day), not a model. The chat
+uses `@cf/google/gemma-4-26b-a4b-it` (Gemma 4, 26B mixture-of-experts, about 4B active per token, thinking off), with
+Groq `openai/gpt-oss-20b` as the fallback once the daily free neurons run out. Images use `@cf/black-forest-labs/flux-1-schnell`,
+and since round 5 `@cf/black-forest-labs/flux-2-klein-9b` for pictures of Wilson. The admin "suggest" uses the chat model.
+
+**Why couldn't the image model draw Wilson?** FLUX.1 schnell only gets text. It has never seen his face, so "wilson" is
+just a name to it. FLUX.2 (klein 9B) accepts up to 4 reference images (each under 512x512) as multipart form fields
+`input_image_0..3`. When a prompt mentions wilson/you/yourself/him, the Worker reads two cropped photos
+(`public/ai-ref/wilson-1.jpg`, `-2.jpg`) through the `ASSETS` binding and sends them along. The prompt is rewritten to
+an illustration (pixel art, cartoon, watercolour, ...; cartoon by default) with photo words removed, so nobody can make
+a photoreal fake of him. A short blocklist (weapons, nudity, drugs, ...) refuses some scenes before the model's own filter.
+"me" does not count: on the visitor's side it means the visitor. Tested with `wrangler dev --remote`: about 4s per image.
+
+**Why didn't photos scroll on a phone?** In a column flexbox, a child's `min-height` defaults to `auto`, i.e. its content
+height. On narrow windows the Photos app stacks vertically, so `.ph-main` grew to the full grid (7349px) and its scroller
+never had less room than content. `min-height: 0` lets it shrink to the window, and then `overflow-y: auto` scrolls.
+Desktop wasn't affected because there the app is a row, where the height comes from the window.
+
+**How does v1 live inside v2?** The old Astro site (main branch) is built with `astro build --base /v1` and its
+`index.html` + `_astro/` copied into `public/v1/`. Its images, fonts and photos are the same files v2 already serves at
+`/images`, `/fonts`, `/photos`, so the absolute paths in v1 still work. The v1 window is an iframe of `/v1/index.html`.
+Rebuild it only if v1 changes (it shouldn't).
+
+**The terminal on phones.** iOS only opens the keyboard when focus comes from a tap. `autoFocus` on open focused the input
+without a keyboard, which shows just the bar above the keyboard; tapping again did nothing because the field was already
+focused. Now there is no autofocus on touch screens, and a tap blurs and refocuses the field inside the tap, which opens
+the keyboard. The `<form>` is gone too (Enter is handled on keydown), and the input line is 44px tall to be easy to hit.
+
+**Can the old Vercel URL redirect here?** Only through Vercel: the `*.vercel.app` name belongs to a Vercel project.
+Recreating a project named `wilsonsoon-website-portfolio` with a `vercel.json` that redirects every path to
+`https://portfolio.wilsonsoon.workers.dev` would do it (308, permanent), if the name is still free.

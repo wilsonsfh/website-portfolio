@@ -340,3 +340,34 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Suggestions are never public.** A draft is stored in its own column, shown only in the admin and written from the wiki
   excerpt only. Nothing reaches visitors until Wilson edits and saves it as an answer.
 - **Known limits.** A follow-up message ("and what about that?") is logged without its context. The admin has one shared password (the token) and no accounts.
+
+## 13. Round 5 (2026-11-18 evening)
+- **Onboarding tour.** about.txt opens on landing (phones too, while the tour runs), with a bar just outside the window's
+  bottom-right: step count, "skip → view plaintext" on the first step, "← back" once there is somewhere to go back to, and
+  "next: <app> →". Windows stack (Wilson's call): next cascades the next window over the last. Pressing an earlier
+  window makes it the current step; back returns to the one you came from (a history, not the step order). Closing the
+  current window steps back the same way; done, skip, or closing the first window ends the tour (remembered per tab).
+  Revised the same evening (Wilson): the bar is fixed in the screen's bottom-right corner, always clickable, instead of
+  hanging off the window. "skip → view plaintext" keeps it there ("plaintext", ← back to the tour, finish) until finish
+  or the plaintext window is closed. On phones it is a full-width footer.
+- **Grain.** Unchanged (same overlay and opacity). The SF text had been set with thin antialiased rendering, which made
+  letters lighter so the grain broke them up; that rendering was removed.
+- **Contact ends the tour with the rest of the desktop.** Underlined links to the apps the tour didn't show, each with
+  one line on what it is. plaintext-version.html gets a bordered box because it is the clearest full version.
+- **App text.** System font (San Francisco on Apple devices, like iOS / Telegram), real hierarchy: bold 19px names, rust
+  roles (`--warm`), muted dates, green links and tags, bullet lists with green markers. Compared one-accent, two-colour
+  and chip-tags; chose two colours inside the print palette (chips read as pills).
+- **Timeline.** Keeps drifting under the mouse (only a press or keyboard focus stops it). A solid backdrop (`--sc-back`,
+  darker than the lanes in both themes) fills the gaps so icons (phone) and half-covered windows (desktop) don't show
+  through; it fades out as soon as the lanes roll up, so a photo's window appears straight away. Lane labels are
+  narrower (30px, 22px on phones). A photo opened from the timeline says "← timeline" and goes back there.
+- **Small ones.** The plain-site icon in the top bar toggles like the desktop icons; the timeline icon sits above photos;
+  viewer arrows always show; /admin has "← back to the desktop"; the v1 icon (clock-with-arrow glyph) opens the old site.
+- **Touch cursor.** Holding a finger down for 250ms shows the pixel arrow 40px above it (so the finger doesn't hide it),
+  following the drag and switching to the glove over clickable things. Quick taps never show it.
+- **Terminal.** More to do: cat any section as a file, open/close any app, ask the assistant, neofetch, theme, history,
+  tab completion, ↑/↓ history, a few jokes (sudo, rm, vim). `exit` now closes the terminal itself. Ideas from terminal
+  portfolios (davidesantangelo.com, satnaing/terminal-portfolio, wasaths-terminal, simone.ooo).
+- **Pictures of Wilson.** Reference photos with FLUX.2, always illustrated, never photoreal; see technicals.md.
+- **Admin suggest** answers questions that aren't about Wilson from general knowledge; facts about him still come only from
+  the wiki excerpt.

@@ -243,3 +243,22 @@ under `../` (spike-a, spike-c, v2-*): all merged; ask Wilson before removing the
 **Gotchas:** `rm -rf` is blocked by a hook (use `trash`); never `git add -A` in worktrees (symlinked node_modules);
 `wrangler d1 create` "add it for you?" → answer no; 8 chat requests/min per IP rate limit trips quick test bursts;
 ask before deploying, deleting, or creating accounts/keys.
+
+## Handover (2026-11-18, round 5) — newest; read with the one above
+**State:** all of round 5 is in the `v2` worktree, UNCOMMITTED and NOT DEPLOYED (Wilson to approve both).
+**Done:** onboarding tour (stacked windows, next/back/skip → plaintext, phone footer bar), contact "more on this desktop"
+links, app text restyle (system SF font, --warm rust, bold hierarchy), v1 icon (public/v1 = old Astro site built with
+`--base /v1`), terminal rewrite (cat/open/close/ask/neofetch/theme/history, tab + ↑↓, exit closes it, iOS keyboard fix),
+touch cursor (TouchCursor.tsx), timeline: no hover pause, backdrop `--sc-back`, narrow spools, timeline icon above photos,
+"← timeline" back from a scroll photo, photos scroll on phones (`.ph-main` min-height 0), viewer arrows always on, top-bar
+plain icon toggles, /admin back link, admin suggest uses general knowledge for non-Wilson questions, images of Wilson via
+FLUX.2 klein 9B + `public/ai-ref/*.jpg` (ASSETS binding, stylised only, blocklist).
+**Verified:** tsc, `vite build`, worker tests; Chrome at 1512x724 and a 375px iframe (tour, back, photos scroll,
+timeline, touch cursor via synthetic touches, terminal); `wrangler dev --remote`: Wilson pixel-art image in ~4s, unsafe
+prompt → 400. **Not verified:** real iPhone terminal keyboard + touch cursor; admin suggest on a general question (needs
+the token); live deploy. A test question "what does wilson do for fun?" was logged to live D1 (knowledge.md has no
+hobbies, so it really is a gap): answer or dismiss it in /admin.
+**Follow-up (same evening):** tour bar moved to the screen's bottom-right corner; skip → plaintext keeps it (back to
+the tour / finish) until finish or plaintext closes; removed `-webkit-font-smoothing: antialiased` from app text (it made
+the grain look heavier). Window `extra` prop removed.
+**Open:** Vercel redirect for wilsonsoon-website-portfolio.vercel.app (needs a new Vercel project; ask first).
