@@ -1,4 +1,4 @@
-import { NOTHING, ftsQuery, sameOrigin, suggestMessages, type Chunk } from "./logic.ts";
+import { DB_TABLES, NOTHING, dbPage, ftsQuery, sameOrigin, suggestMessages, type Chunk } from "./logic.ts";
 import { page } from "./page.ts";
 
 export interface Env {
@@ -46,6 +46,21 @@ export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise
       env.DB.prepare("SELECT status, COUNT(*) AS n FROM questions GROUP BY status"),
     ]);
     return json({ questions: list.results, counts: Object.fromEntries((counts.results as { status: string; n: number }[]).map((r) => [r.status, r.n])) });
+  }
+
+  if (req.method === "GET" && path === "/api/db") {
+    const res = await env.DB.batch(DB_TABLES.map((t) => env.DB.prepare(`SELECT COUNT(*) AS n FROM ${t}`))); // t is from the fixed allowlist
+    return json({ tables: DB_TABLES.map((t, i) => ({ name: t, count: (res[i].results[0] as { n: number }).n })) });
+  }
+  const dm = path.match(/^\/api\/db\/([a-z_]+)$/);
+  if (req.method === "GET" && dm) {
+    const p = dbPage(dm[1], url.searchParams.get("page"));
+    if (!p) return json({ error: "bad_table_or_page" }, 400);
+    const [rows, total] = await env.DB.batch([
+      env.DB.prepare(`SELECT * FROM ${p.table} ORDER BY id DESC LIMIT ? OFFSET ?`).bind(p.limit, p.offset), // p.table is from the fixed allowlist
+      env.DB.prepare(`SELECT COUNT(*) AS n FROM ${p.table}`),
+    ]);
+    return json({ table: p.table, page: p.page, page_size: p.limit, total: (total.results[0] as { n: number }).n, rows: rows.results });
   }
 
   const m = path.match(/^\/api\/questions\/(\d+)(?:\/(suggest|answer|dismiss|reopen))?$/);
