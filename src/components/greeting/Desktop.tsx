@@ -136,6 +136,10 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
       <header className="dk-bar">
         <span className="dk-left">
           <span className="dk-name">wilson soon, 2026</span>
+        </span>
+        {/* the clock stays centred; the plain-site icon hangs off its right edge */}
+        <span className="dk-mid">
+          <span className="dk-clock">{clock}</span>
           <Tooltip text="plain site">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={() => open("plain")} aria-label="plain site" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -145,7 +149,6 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
           </button>
           )}</Tooltip>
         </span>
-        <span className="dk-clock">{clock}</span>
         <span className="dk-right">
           <Assistant />
           <Tooltip text="switch off">{(t) => (
@@ -185,9 +188,11 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
             aria-expanded={a.id === "photos" ? rollsOpen : undefined}
             {...t}
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d={a.glyph} />
-            </svg>
+            <span className="dk-tile" aria-hidden="true">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter">
+                <path d={a.glyph} />
+              </svg>
+            </span>
             <span>{a.title}</span>
           </button>
           )}</Tooltip>

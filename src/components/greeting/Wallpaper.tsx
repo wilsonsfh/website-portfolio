@@ -13,7 +13,7 @@ const pick = (not: number) => {
 
 type Layer = { idx: number; shown: boolean };
 
-// photo wallpaper: two stacked layers crossfade; a matte theme-aware veil keeps icon labels readable
+// photo wallpaper: two stacked layers crossfade; two blend layers print them as an opaque green duotone (greeting.css)
 export default function Wallpaper() {
   const reduce = useReducedMotion();
   const [stack, setStack] = useState<Layer[]>(() => [{ idx: Math.floor(Math.random() * COUNT), shown: true }]);
@@ -60,7 +60,8 @@ export default function Wallpaper() {
       {stack.map((l) => (
         <img key={l.idx} src={src(l.idx)} alt="" className={l.shown ? "shown" : undefined} draggable={false} />
       ))}
-      <div className="dk-veil" />
+      <div className="dk-lift" />
+      <div className="dk-tint" />
     </div>
   );
 }
