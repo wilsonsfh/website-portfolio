@@ -33,8 +33,10 @@ const PAGE = String.raw`<!doctype html>
     background-size: 180px 180px; }
   main { position: relative; z-index: 1; max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
   .win { background: var(--bg); border: 2px solid var(--edge); border-radius: 4px; box-shadow: 6px 6px 0 var(--drop); overflow: hidden; }
-  .title { display: flex; align-items: center; min-height: 36px; padding: 0 14px; border-bottom: 2px solid var(--edge); background: var(--title-bg); font-size: 14px; font-weight: 500; }
+  .title { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 14px 0 4px; border-bottom: 2px solid var(--edge); background: var(--title-bg); font-size: 14px; font-weight: 500; }
   .body { padding: 16px 18px 20px; }
+  .back { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 4px; color: var(--fg); text-decoration: none; font-weight: 400; }
+  @media (hover: hover) and (pointer: fine) { .back:hover { background: var(--line); } }
   h1 { font-size: 1.2rem; font-weight: 500; margin: 0 0 .25rem; }
   .sub { color: var(--muted); margin: 0 0 1.25rem; font-size: .95rem; }
   nav { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
@@ -74,7 +76,7 @@ const PAGE = String.raw`<!doctype html>
 <body>
 <main>
 <div class="win">
-  <div class="title">admin — unanswered questions</div>
+  <div class="title"><a class="back" href="/">← back to the desktop</a><span>admin — unanswered questions</span></div>
   <div class="body">
   <h1>questions the assistant couldn't answer</h1>
   <p class="sub">answers you save go live in the chat within about 5 minutes. suggestions are drafts for you only.</p>
