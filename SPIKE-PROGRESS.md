@@ -184,3 +184,12 @@ Deploy order: Wilson runs wrangler from worker/ (name comes from wrangler.jsonc,
 Vercel env -> rebuild + redeploy the site (ask first).
 Merged 2026-11-18: retro boot bar (381e516, BootBar.tsx; original pixel slime + mushroom, hover/tap = big hop). Not yet eyeballed at 375px or live speed.
 Merged 2026-11-18: phone has no stub (rolled scroll hides after CLOSE_MS; photos icon reopens). Desktop stub unchanged.
+
+## Hosting (2026-11-18): one Cloudflare Worker for site + AI
+Worker `portfolio` (worker/wrangler.jsonc) serves dist/ as static assets and /api/* from worker/src; target URL
+https://portfolio.wilsonsoon.workers.dev (account subdomain `wilsonsoon`). VITE_AI_URL removed; site calls /api on its own
+origin; vite dev/preview proxy /api to the deployed worker. Deploy: `npm run deploy` (build + wrangler deploy).
+Gemma 4 needs `chat_template_kwargs.enable_thinking=false` (else content null -> empty_answer); verified via
+`wrangler dev --remote`. Next: Wilson deploys `portfolio` + `secret put GROQ_API_KEY` for it; then delete the old
+`wilson-portfolio-chat` Worker and take down the Vercel project (Wilson chose take-down; confirm right before). Groq
+fallback still untested live. Wilson confirmed knowledge.md + knowledge-short.md read well.

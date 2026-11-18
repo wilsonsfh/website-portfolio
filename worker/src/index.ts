@@ -72,7 +72,7 @@ async function chat(body: unknown, env: Env, json: J): Promise<Response> {
   if (Date.now() < aiBlockedUntil) reason = "daily_limit";
   else {
     try {
-      const res = await env.AI.run(env.TEXT_MODEL as any, { messages: [{ role: "system", content: SYSTEM }, ...messages], max_tokens: 400 } as any);
+      const res = await env.AI.run(env.TEXT_MODEL as any, { messages: [{ role: "system", content: SYSTEM }, ...messages], max_tokens: 400, chat_template_kwargs: { enable_thinking: false } } as any);
       const answer = extractText(res);
       if (answer) return json({ answer, provider: "workers-ai", fallback: false });
       return json({ error: "empty_answer" }, 502);

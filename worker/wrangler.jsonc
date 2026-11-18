@@ -1,10 +1,12 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "wilson-portfolio-chat",
+  "name": "portfolio",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-17",
   // no account_id here: wrangler takes it from `wrangler login`
   "ai": { "binding": "AI" },
+  // the built site (run `npm run build` in the repo root first); only /api/* reaches the worker code
+  "assets": { "directory": "../dist", "run_worker_first": ["/api/*"] },
   // knowledge.md is bundled as a text module
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
   // Rate Limiting binding (needs wrangler >= 4.36). period must be 10 or 60.
@@ -14,7 +16,7 @@
   ],
   "vars": {
     // comma-separated list of exact origins allowed by CORS
-    "ALLOWED_ORIGINS": "https://wilsonsoon-website-portfolio.vercel.app,http://localhost:5173,http://localhost:4173",
+    "ALLOWED_ORIGINS": "https://portfolio.wilsonsoon.workers.dev,http://localhost:4321,http://localhost:5173,http://localhost:4173",
     "TEXT_MODEL": "@cf/google/gemma-4-26b-a4b-it",
     "IMAGE_MODEL": "@cf/black-forest-labs/flux-1-schnell",
     "GROQ_MODEL": "openai/gpt-oss-20b"

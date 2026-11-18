@@ -1,7 +1,5 @@
-// client for the portfolio worker (worker/README.md). VITE_AI_URL = the worker's public url, no trailing slash needed.
-const BASE = (import.meta.env.VITE_AI_URL as string | undefined)?.trim().replace(/\/+$/, "");
-
-export const NOT_CONNECTED = "the assistant isn't connected yet.";
+// client for the portfolio worker (worker/README.md). Same origin: the worker serves the site and /api/*;
+// in dev, vite proxies /api to the deployed worker (vite.config.ts).
 export const LIMIT_NOTE = "today's limit is reached, now on groq (text only)";
 export const IMAGE_OFF = "image generation is unavailable today";
 
@@ -9,9 +7,8 @@ export type Turn = { role: "user" | "assistant"; content: string };
 export type Result<T> = ({ ok: true } & T) | { ok: false; message: string };
 
 // what the worker has told us this session; both only ever turn on
-export const connected = !!BASE;
 export const flags = { fallback: false, imageOff: false };
-export const imageAvailable = () => !!BASE && !flags.fallback && !flags.imageOff;
+export const imageAvailable = () => !flags.fallback && !flags.imageOff;
 
 // the worker caps: 6 messages, 500 chars each, 1500 in total, last one from the user
 const fit = (turns: Turn[]): Turn[] => {
@@ -28,10 +25,9 @@ const fit = (turns: Turn[]): Turn[] => {
 };
 
 async function post(path: string, body: unknown, signal?: AbortSignal): Promise<Result<{ data: any }>> {
-  if (!BASE) return { ok: false, message: NOT_CONNECTED };
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+    res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
   } catch (e) {
     if ((e as Error)?.name === "AbortError") throw e;
     return { ok: false, message: "couldn't reach the assistant. try again in a bit." };

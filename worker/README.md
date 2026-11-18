@@ -13,11 +13,10 @@ Decisions: `../docs/ai-chat-decisions.md`.
   When the daily limit is used up: 503 `{"error":"image_unavailable","reason":"daily_limit","message"}`.
 - Errors: 400 bad input, 403 origin not allowed, 429 `rate_limited`, 502 upstream, 503 no fallback.
 
-From the site (Vite): `src/lib/ai.ts` is the one client (used by the top-bar assistant and "(1) unread").
-It reads `import.meta.env.VITE_AI_URL`, the public worker URL (not a secret), e.g. in `.env.local` for dev or the Vercel
-project env for production: `VITE_AI_URL=https://wilson-portfolio-chat.<your-subdomain>.workers.dev` (no trailing slash needed).
-When it is unset the UI says "the assistant isn't connected yet." instead of failing. Add the site origin to
-`ALLOWED_ORIGINS` in `wrangler.jsonc`.
+One worker serves both the built site (`../dist`, static assets) and `/api/*` (this code), at
+`https://portfolio.wilsonsoon.workers.dev`. The site calls `/api/...` on its own origin through `src/lib/ai.ts`, so there
+is no API URL setting and production calls are same-origin (the origin check still runs). In dev, `vite.config.ts` proxies `/api` to the deployed worker, so
+`localhost:4321` must stay in `ALLOWED_ORIGINS`.
 
 ## Commands you run yourself
 
@@ -26,13 +25,14 @@ cd worker
 npm install
 npx wrangler login             # opens browser; use the PERSONAL account on Workers Free
 npx wrangler secret put GROQ_API_KEY   # paste the key from console.groq.com when prompted
-# edit ALLOWED_ORIGINS in wrangler.jsonc to include the real site origin(s)
-npx wrangler deploy
+cd .. && npm run deploy        # builds the site, then deploys site + worker together
 ```
 
 Local without login: `npx wrangler dev --local` (routing, CORS, rate limits work; AI calls fail with
 "Binding AI needs to be run remotely"). `npx wrangler dev` (remote) uses real Neurons and needs login.
 Checks: `npm run typecheck`, `npm test`.
+Gemma 4 is a thinking model: the chat call passes `chat_template_kwargs: { enable_thinking: false }`, otherwise it spends
+`max_tokens` on reasoning and `content` comes back null (`empty_answer`).
 
 ## Rate limits
 

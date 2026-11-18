@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
-import { IMAGE_OFF, LIMIT_NOTE, NOT_CONNECTED, askChat, connected, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
+import { IMAGE_OFF, LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
 import "./assistant.css";
 
 type Out = { kind: "text"; text: string } | { kind: "image"; q: string; src: string } | { kind: "error"; message: string };
@@ -87,7 +87,7 @@ export default function Assistant() {
     finally { if (abort.current === ac) setBusy(false); }
   };
 
-  const notes = [!connected && NOT_CONNECTED, flags.fallback && LIMIT_NOTE, flags.imageOff && `${IMAGE_OFF}.`].filter(Boolean) as string[];
+  const notes = [flags.fallback && LIMIT_NOTE, flags.imageOff && `${IMAGE_OFF}.`].filter(Boolean) as string[];
   const enter = reduced ? { opacity: 0 } : { opacity: 0, y: -10, clipPath: "inset(0% 18% 0% 18% round 6px)" };
   const shown = reduced ? { opacity: 1 } : { opacity: 1, y: 0, clipPath: "inset(0% 0% 0% 0% round 6px)" };
 
