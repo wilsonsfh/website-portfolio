@@ -193,3 +193,7 @@ Gemma 4 needs `chat_template_kwargs.enable_thinking=false` (else content null ->
 `wrangler dev --remote`. Next: Wilson deploys `portfolio` + `secret put GROQ_API_KEY` for it; then delete the old
 `wilson-portfolio-chat` Worker and take down the Vercel project (Wilson chose take-down; confirm right before). Groq
 fallback still untested live. Wilson confirmed knowledge.md + knowledge-short.md read well.
+Done 2026-11-18: `portfolio` deployed and live (site + chat verified). Old Worker `wilson-portfolio-chat` deleted; Vercel
+project `wilsonsoon-website-portfolio` removed (URL 404). Groq test: `FORCE_FALLBACK=1` preview version (alias
+groq-test-portfolio.wilsonsoon.workers.dev) -> Groq 401, i.e. the stored GROQ_API_KEY value is rejected; Wilson re-puts
+the NEW key, then re-run the preview upload + curl (preview versions snapshot secrets at upload).

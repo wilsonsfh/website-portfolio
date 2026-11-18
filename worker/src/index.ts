@@ -12,6 +12,7 @@ export interface Env {
   IMAGE_MODEL: string;
   GROQ_MODEL: string;
   GROQ_API_KEY?: string; // secret
+  FORCE_FALLBACK?: string; // "1" skips Workers AI so Groq answers (test via a preview version, never set in wrangler.jsonc)
 }
 
 const DAY = 86_400_000;
@@ -69,7 +70,8 @@ async function chat(body: unknown, env: Env, json: J): Promise<Response> {
   const messages: Msg[] = v.messages;
 
   let reason: string | null = null;
-  if (Date.now() < aiBlockedUntil) reason = "daily_limit";
+  if (env.FORCE_FALLBACK === "1") reason = "forced";
+  else if (Date.now() < aiBlockedUntil) reason = "daily_limit";
   else {
     try {
       const res = await env.AI.run(env.TEXT_MODEL as any, { messages: [{ role: "system", content: SYSTEM }, ...messages], max_tokens: 400, chat_template_kwargs: { enable_thinking: false } } as any);

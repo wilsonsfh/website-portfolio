@@ -36,3 +36,31 @@ safe to expose.
   Turning thinking off (`enable_thinking: false`) gave the right answer in 17 tokens instead of 200+.
 - **Free hosting:** Cloudflare Workers Free serves static files free and unlimited and allows commercial use; Vercel
   Hobby has 100 GB/month and is personal use only. One platform for site + API is simpler.
+
+## 2026-11-18: how `/api`, `/api/chat` and the Worker fit together
+
+`/api` is just a prefix: a label meaning "this request is for the code, not for a file". `/api/chat` and `/api/image`
+are the two endpoints under it. `fetch("/api/chat")` has no domain, which means "the same address this page came from",
+so the same line works on localhost and deployed.
+
+- **Deployed:** every request to `portfolio.wilsonsoon.workers.dev` hits Cloudflare, which checks the path. `/api/*`
+  runs the Worker code (`/api/chat` asks the AI, `/api/image` makes an image, anything else is 404). Every other path
+  (`/`, `/assets/…`, photos) is served straight from the uploaded `dist/` files and the Worker code never runs. That
+  split is `"run_worker_first": ["/api/*"]` in `wrangler.jsonc`.
+- **Localhost:** Vite serves the site but has no AI code, so `vite.config.ts` forwards anything starting with `/api` to
+  the live Worker and hands the answer back. The browser thinks it talked to localhost, and local testing uses the real
+  daily free limit.
+
+**Who picks the endpoint:** the button, not the model. "send" → `askChat()` → `/api/chat` → text model; "image" →
+`makeImage()` → `/api/image` → image model. The Worker is a plain switch on the path (after origin, rate-limit and
+size checks). The model is the only non-deterministic part: it decides what to say or draw, never which model runs.
+Letting the model decide ("tool calling") is more magical but costs more per message and is harder to keep free.
+
+**Deploys and names:** `wrangler.jsonc` is just a file on my laptop; Cloudflare knows nothing until I deploy, and
+nothing syncs on its own. Cloudflare identifies a Worker only by its `name`, not by which file or folder it came from:
+deploy a name that exists and that Worker gets a new version; deploy a new name and you get a brand-new Worker (with no
+secrets, since secrets belong to one Worker). Use `npm run deploy` from the repo root so the site is rebuilt first.
+
+**Testing safely:** `wrangler versions upload --var FORCE_FALLBACK:1 --preview-alias groq-test` uploads a version with
+its own URL (`groq-test-portfolio.wilsonsoon.workers.dev`) while production keeps serving the old one. That is how I
+tested the Groq fallback without touching the live site.
