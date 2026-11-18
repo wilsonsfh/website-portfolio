@@ -5,10 +5,15 @@
   "compatibility_date": "2026-11-17",
   // no account_id here: wrangler takes it from `wrangler login`
   "ai": { "binding": "AI" },
-  // the built site (run `npm run build` in the repo root first); only /api/* reaches the worker code
-  "assets": { "directory": "../dist", "run_worker_first": ["/api/*"] },
+  // the built site (run `npm run build` in the repo root first); only /api/* and /admin* reach the worker code
+  "assets": { "directory": "../dist", "run_worker_first": ["/api/*", "/admin*"] },
   // knowledge.md is bundled as a text module
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  // D1 holds the unanswered questions and Wilson's answers. Create it once with `wrangler d1 create portfolio-qa`,
+  // then put the printed id here. The id below is a PLACEHOLDER (ids are not secret).
+  "d1_databases": [
+    { "binding": "DB", "database_name": "portfolio-qa", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "../db/migrations" }
+  ],
   // Rate Limiting binding (needs wrangler >= 4.36). period must be 10 or 60.
   "ratelimits": [
     { "name": "RL_CHAT", "namespace_id": "7101", "simple": { "limit": 8, "period": 60 } },
@@ -21,5 +26,6 @@
     "IMAGE_MODEL": "@cf/black-forest-labs/flux-1-schnell",
     "GROQ_MODEL": "openai/gpt-oss-20b"
   }
+  // ADMIN_TOKEN (the /admin password) is a secret too: `wrangler secret put ADMIN_TOKEN`
   // GROQ_API_KEY is a secret: `wrangler secret put GROQ_API_KEY` (never put it here)
 }

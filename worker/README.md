@@ -53,3 +53,65 @@ Gemma 4 is a thinking model: the chat call passes `chat_template_kwargs: { enabl
 `knowledge.md` (Workers AI) and `knowledge-short.md` (Groq, under ~1,500 tokens for its ~8K tokens/minute free tier)
 are hand-written and edited directly; nothing regenerates them. Keep them inside the allowlist in
 `../docs/ai-chat-decisions.md`, and keep the preparation-time app paragraph word for word.
+
+## Unanswered questions (D1 + admin)
+
+When the model can't answer from the knowledge it replies with the sentinel `UNKNOWN`. The Worker swaps that for a fixed
+friendly line and logs the visitor's latest message (only that, no conversation, no IP, no identifier) to D1 table
+`questions`, deduped on a normalized form with an `asked_count`. At most 500 questions can be open; past that, new ones
+are not logged. Wilson answers at `https://portfolio.wilsonsoon.workers.dev/admin`; saved answers (newest 40, capped by
+size, cached 5 minutes) are added to the prompt as "Wilson's own answers" for both Workers AI and Groq.
+Design notes: `../docs/design-rationale.md` section 12.
+
+Pieces: `../db/migrations/` (schema), `src/qa.ts` (D1 logging and answers), `src/admin/` (admin page + JSON API,
+`handleAdmin` mounted by `src/index.ts`), `../scripts/wiki-excerpt.mjs` (private wiki excerpt uploader). The repo is
+public: the wiki excerpt lives only in D1 and in gitignored local files.
+
+### Admin auth
+
+`/admin` serves a page that only shows a password box. Every `/admin/api/*` call needs the `ADMIN_TOKEN` Worker secret in
+an `X-Admin-Token` header (constant-time compare). The page keeps what you type in sessionStorage only. 10 failed attempts
+per IP in 10 minutes lock that IP out for the rest of the window (in-memory per isolate, best effort). With no secret set
+the API answers 503. Responses send `Cache-Control: no-store` and `X-Robots-Tag: noindex`. Use a long random token.
+
+### Go-live steps (in order, run by Wilson)
+
+```sh
+cd worker
+npx wrangler d1 create portfolio-qa            # prints a database_id; paste it into database_id in wrangler.jsonc
+npx wrangler d1 migrations apply portfolio-qa --remote   # creates the tables
+npx wrangler secret put ADMIN_TOKEN            # the /admin password (long random string)
+cd .. && npm run deploy                        # site + chat + /admin, with the DB binding
+```
+
+### Wiki excerpt (suggestions)
+
+```sh
+# 1. create scripts/wiki-pages.local.txt (gitignored): one wiki page path per line, relative to the wiki root
+node scripts/wiki-excerpt.mjs --dry-run --root ~/Projects/Personal_LLM_Wiki/wiki   # what would upload
+node scripts/wiki-excerpt.mjs --root ~/Projects/Personal_LLM_Wiki/wiki             # writes scripts/wiki-upload.local.sql
+cd worker && npx wrangler d1 execute portfolio-qa --remote --file ../scripts/wiki-upload.local.sql   # REPLACES all chunks
+```
+
+Pages are cut by heading into about 300 to 600 word chunks (frontmatter, links and "related" sections stripped). The
+"suggest" button retrieves the best chunks (FTS5, porter stemming) and asks Workers AI for a draft from them only.
+Suggestions are stored in `questions.suggestion`, are never read by the chat and never shown to visitors. The draft is
+only a starting point: Wilson edits before saving, and only saved answers go live.
+
+### Local dev
+
+```sh
+cd worker
+npx wrangler d1 migrations apply portfolio-qa --local
+echo 'ADMIN_TOKEN=test' > .dev.vars        # gitignored
+mkdir -p ../dist && npx wrangler dev --local   # /admin on port 8787
+```
+
+`AI` calls fail locally, so logging an unknown question and drafting suggestions need a stubbed `env.AI` (a wrapper entry
+that calls the real handler with a fake `AI`). The D1 paths work as is. Checks: `npm test` and `npm run typecheck`.
+
+### Separate admin Worker (alternative)
+
+`handleAdmin(req, env, { base, authorize })` is a mountable seam. To host it as its own Worker behind Cloudflare Access
+instead (git history has that version), call it from a new Worker with `base: ""` and an `authorize` that checks the
+`Cf-Access-Jwt-Assertion` header or JWT, and drop the `/admin` route here.
