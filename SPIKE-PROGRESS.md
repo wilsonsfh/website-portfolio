@@ -171,3 +171,8 @@ Done before this: dates applied (3eec831), all photos dated. Worker merged, not 
    Spotlight-style bar; retro loading animation; image generation in both the bar and (1) unread; (1) unread answers via
    AI after its scripted opening. Research retro examples with Exa.
 7. Deploy Q (answered in chat): wrangler deploys only the Worker to Cloudflare (*.workers.dev); the site stays on Vercel.
+Answers (2026-11-18): photos icon unrolls the scrolls (no auto-unroll at power-on); stub stays after roll-up; the Photos
+app (grid) opens from a button in the scroll's top strip or by clicking a photo (opens the viewer at that photo).
+Maple art: ORIGINAL lookalikes only (own pixel star-eyed slime, own orange-capped mushroom, own white pixel-glove cursor);
+never download/copy Nexon sprites or the rw-designer cursors. "Bigger": windows open larger by default (readable text).
+Subagents (round 3): v2-knowledge (worker text), v2-scrolls2, v2-retro (theme+top bar+windows+cursor+boot bar), v2-assistant.
