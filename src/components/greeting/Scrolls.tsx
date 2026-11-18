@@ -271,13 +271,13 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const [woke, setWoke] = useState(open); // the photos only render once they have been unrolled
   if (open && !woke) setWoke(true);
 
-  // left edge clears the icon column on desktop; lanes fill the rest
+  // left edge clears the first two icon columns on desktop (the third, in the last row, sits under the lanes); lanes fill the rest
   useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
     const measure = () => {
-      const icons = el.parentElement?.querySelector<HTMLElement>(".dk-icons");
-      el.style.left = window.innerWidth < PHONE ? "0px" : `${icons?.offsetWidth ?? 0}px`;
+      const edge = el.parentElement?.querySelector<HTMLElement>("#dk-icon-messages"); // right-most icon of column 2
+      el.style.left = window.innerWidth < PHONE ? "0px" : `${edge ? Math.round(edge.getBoundingClientRect().right) + 16 : 0}px`;
       setBox({ w: el.clientWidth, h: el.clientHeight });
     };
     measure();

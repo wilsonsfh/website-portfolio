@@ -104,7 +104,7 @@ export const APPS: App[] = [ // reading order: the phone grid wraps in this orde
   { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 460, h: 620, flush: true, render: () => <Messages /> },
   { id: "work", tip: "where i have worked", title: "work", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 680, h: 640, render: () => <Work /> },
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
-  { id: "projects", tip: "things i have built", title: "projects", glyph: "M9 17h6 M10 20.5h4 M12 2.5a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.2 1.1 2.2h5c0-1 .4-1.7 1.1-2.2A6 6 0 0 0 12 2.5z", w: 680, h: 640, render: () => <Projects /> },
+  { id: "projects", tip: "things i have built", title: "projects", glyph: "M12 5.5a5 5 0 0 0-3.5 8.5c.6.5 1 1.1 1 2h5c0-.9.4-1.5 1-2A5 5 0 0 0 12 5.5z M9.5 18.5h5 M10.5 21h3 M12 1.5v2 M7 5.5L5.6 4.1 M17 5.5l1.4-1.4", w: 680, h: 640, render: () => <Projects /> },
   { id: "activities", tip: "what i'm involved in", title: "involvements", glyph: "M6 5h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 1-4 0H6v-4a2 2 0 1 0 0-4z", w: 660, h: 620, render: () => <Activities /> },
   { id: "plain", tip: "the boring version, all of it", title: "plaintext-version.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: () => <MainPage embedded /> },
   { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 480, h: 320, render: () => <Contact /> },
