@@ -77,6 +77,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const [wins, setWins] = useState<Win[]>([]); // every visit starts on the bare desktop
 
   const reduce = useReducedMotion();
+  const [askOpen, setAskOpen] = useState(false); // the assistant panel (top bar icon, desktop icon, ctrl/cmd + k)
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
   const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
   const reqN = useRef(0);
@@ -269,7 +270,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
           )}</Tooltip>
         </span>
         <span className="dk-right">
-          <Assistant />
+          <Assistant open={askOpen} onOpenChange={setAskOpen} />
           <Tooltip text="switch off">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
@@ -303,8 +304,8 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
-            onClick={() => (a.id === "timeline" ? toggleRolls() : toggle(a.id))}
-            aria-expanded={a.id === "timeline" ? rollsOpen : undefined}
+            onClick={() => (a.id === "timeline" ? toggleRolls() : a.id === "assistant" ? setAskOpen(true) : toggle(a.id))}
+            aria-expanded={a.id === "timeline" ? rollsOpen : a.id === "assistant" ? askOpen : undefined}
             {...t}
           >
             <span className="dk-tile" aria-hidden="true">

@@ -8,7 +8,10 @@ import PhotosApp from "./PhotosApp";
 import MainPage from "../MainPage";
 import { skillLine, lede, aboutParagraphs, contacts, ext } from "../../copy";
 
-export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "timeline" | "contact" | "terminal" | "messages" | "plain" | "v1";
+export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "timeline" | "contact" | "terminal" | "messages" | "plain" | "v1" | "assistant";
+
+// speech bubble with a question mark: the assistant (top bar and desktop icon)
+export const ASK_GLYPH = "M4 5h16v11h-8l-4 3.5V16H4z M9.8 8.7a2.2 2.2 0 1 1 3.2 2c-.6.3-1 .8-1 1.4v.3 M12 14.4v.2";
 export type Ctx = {
   open: (id: AppId) => void;
   close: (id: AppId) => void;
@@ -136,6 +139,7 @@ export const APPS: App[] = [ // reading order: the phone grid wraps in this orde
   { id: "activities", tip: "what i'm involved in", title: "involvements", glyph: "M6 5h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 1-4 0H6v-4a2 2 0 1 0 0-4z", w: 660, h: 620, render: () => <Activities /> },
   { id: "plain", tip: "the boring version, all of it", title: "plaintext-version.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: () => <MainPage embedded /> },
   { id: "v1", tip: "my previous website", title: "v1", glyph: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4 3.5v3.7h3.7 M12 8v4.2l3 1.8", w: 1000, h: 640, hFrac: 0.86, flush: true, render: () => <V1 /> },
+  { id: "assistant", tip: "ask me anything", title: "portfolio assistant", glyph: ASK_GLYPH, w: 0, h: 0, render: () => null }, // not a window: opens the assistant panel
   { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 520, h: 560, render: (ctx) => <Contact ctx={ctx} /> },
   { id: "photos", tip: "look through my photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 980, h: 700, flush: true, render: (ctx) => <PhotosApp ctx={ctx} /> },
   { id: "timeline", tip: "scroll through my timeline", title: "timeline", glyph: "M3 5h18v14H3z M7 5v14 M17 5v14 M3 9.5h4 M3 14.5h4 M17 9.5h4 M17 14.5h4", w: 0, h: 0, render: () => null }, // not a window: its icon unrolls the scrolls

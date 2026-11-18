@@ -215,6 +215,7 @@
   #dk-icon-terminal { grid-area: 2 / 2; }
   #dk-icon-projects { grid-area: 3 / 1; }
   #dk-icon-v1 { grid-area: 3 / 2; }
+  #dk-icon-assistant { grid-area: 4 / 2; }
   #dk-icon-activities { grid-area: 4 / 1; }
   #dk-icon-plain { grid-area: 5 / 1; }
   #dk-icon-contact { grid-area: 6 / 1; }
