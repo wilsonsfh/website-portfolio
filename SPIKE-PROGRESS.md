@@ -290,3 +290,15 @@ Public chat answers general questions from general knowledge (same split as the 
 only from knowledge.md, UNKNOWN + logged when missing); code as plain text; chat bubbles keep line breaks. Verified live:
 tokyo, two sum code, internships, favourite food → UNKNOWN, a joke. /admin: dismissed (not deleted) ids 2, 3, 4, 5, 10,
 11, 12, 13 (generic, junk, and test questions); open: 6, 7, 8, 9. Finish window held 1s (SEAL_MS 1700).
+
+## Round 8 (2026-11-18) — v2 merged into main; worktrees gone. Uncommitted, NOT deployed, migration NOT applied
+- `main` == old `v2` (7c76146) on GitHub; all worktrees and v2-* branches removed (folders in the Trash); spikes kept
+  as `archive/spike-*` tags. Work in `/Users/WilsonSoon/Projects/wilson-portfolio` now. Dev server: use port 5173
+  or 4321 (the live Worker only allows those localhost origins, plus 4173 for preview).
+- Assistant: bubble-with-? icon, "portfolio assistant" desktop icon (grid 4/2), open state lifted to Desktop, focus
+  returns to whatever opened it, conversation history in sessionStorage with "clear".
+- Chat log: D1 `chat_log` (migration 0002), logged from /api/chat and /api/image with a per-tab visitor id, 30-day
+  cleanup on insert, /admin "chat log" tab, notices in both chat panels. Worker tests updated (visitorId, DB_TABLES).
+- Verified on localhost:5173 (desktop + 375px): icon position, open/close/focus, two-turn history with context,
+  reload persistence, clear. Chat log NOT verified: needs `npx wrangler d1 migrations apply portfolio-qa --remote`
+  (from worker/) and a deploy.

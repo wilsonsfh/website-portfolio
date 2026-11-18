@@ -280,3 +280,19 @@ wilson" and the model replied `UNKNOWN` to those too, which is how two-sum and g
 No keyword is involved: "about wilson" is the model's reading of the question in context, not a check for the word
 "wilson". On this site "you", "he", "his" and bare questions like "hobbies?" or "outside work?" are read as about him
 (both of those were logged without the word). Vague ones ("what's your favourite language?") can go either way.
+
+**Assistant history (in the browser).** The assistant panel keeps the conversation in `sessionStorage` (`ask-log`, last
+30 exchanges): it survives closing the panel and reloads, and is gone when the tab closes. "clear" empties it. Text
+turns are sent back as context, so follow-ups like "what did he do at the first one?" work. Pictures are big; if the
+storage quota is hit, the words are kept and the pictures dropped ("picture not kept").
+
+**Chat log (on the server).** Separate from the unanswered questions. Every reply from `/api/chat` and every drawn
+picture from `/api/image` writes one row to D1 `chat_log` (migration `0002_chat_log.sql`): visitor, kind, question,
+the reply shown (or "(image)"), provider, time. `visitor` is a random id the browser makes per tab (`visitor-id` in
+sessionStorage, `crypto.randomUUID()`); the Worker accepts it only if it looks like one, otherwise "anon". No IP is
+stored. Each insert runs in a batch with `DELETE ... WHERE created_at < now - 30 days`, so the table never holds more
+than 30 days and a flood can't grow it forever (each row is one D1 write; the free plan allows about 100,000 a day).
+/admin has a "chat log" tab (newest 300 messages, grouped by visitor, newest conversation first) and the database tab
+can page through `chat_log`. Both chat panels say "questions and answers are saved for 30 days so wilson can improve
+the answers." Why D1, not KV: KV's free plan allows 1,000 writes a day (one per message), D1 about 100,000, and D1 was
+already bound and browsable in /admin.

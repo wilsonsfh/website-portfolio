@@ -397,3 +397,9 @@ reach Wilson, and his answers feed back into the chat. Choices:
   knowledge, code as plain text. Chat text keeps its line breaks (pre-wrap). The private wiki excerpt is still read only
   by the admin drafter. Trade-off: anyone can use it as a small general chatbot, within the per-visitor rate limits.
 - **Finish window, shorter.** Held for 1s instead of ~2.7s (300ms wait, 400ms in, 1s, 240ms out).
+- **Portfolio assistant as a desktop app.** The top-bar launcher was easy to miss and its bubble-with-plus read as "new
+  message". It is now a bubble with a question mark, on the top bar and as a "portfolio assistant" desktop icon (row 4,
+  column 2, under v1; after v1 in the phone grid), which opens the same panel. The panel shows the whole conversation,
+  oldest first, newest typed in; past questions are muted so answers lead.
+- **Chat log, disclosed.** Wilson wanted to read what people ask, not just what the assistant couldn't answer. It is
+  a separate log (30 days, per-tab random id, no IP), with a one-line notice under both chat inputs.
