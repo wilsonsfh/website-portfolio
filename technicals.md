@@ -181,3 +181,15 @@ the first deploy with database code.
 "Interests" and listed the activities, so "hobbies", "sports" and "fun" matched nothing. Fixed twice over: the heading now
 says "Hobbies and interests (what he does for fun, sports)", and when nothing matches and the excerpt is small (8 chunks
 or fewer) the whole excerpt goes to the model, which judges relevance.
+
+**Why were there two Workers, and why is it one now?**
+1. `wilson-portfolio-chat`: the first Worker, AI only, while the site was still on Vercel (the site called it through
+   `VITE_AI_URL`).
+2. `portfolio`: created when everything moved to Cloudflare. Changing `name` in `wrangler.jsonc` doesn't rename a Worker;
+   deploying a new name creates a new Worker. So both existed for a while, and the new one had no secrets until I ran
+   `secret put GROQ_API_KEY` for it. After `portfolio` was verified, the old one was deleted (`wrangler delete`).
+3. A separate admin Worker (`portfolio-admin`) was also considered: Cloudflare Access on `workers.dev` protects a whole
+   Worker, not one path, so a second Worker was the only way to put Access on just the admin. It was built (commit
+   4439fbf) and then folded into `/admin` on `portfolio` with an `ADMIN_TOKEN` password, because I wanted one link.
+
+Now: one Worker (`portfolio`) serves the site, `/api/*` and `/admin*`; one D1 database; one `npm run deploy`.

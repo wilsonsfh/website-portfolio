@@ -232,7 +232,7 @@ The model only decides what to say or draw, never which model runs.
 ## 7. Hosting and deploy
 
 - **What.** One Cloudflare Worker, `portfolio`, serves the built site as static assets and `/api/*` from Worker code
-  (`run_worker_first: ["/api/*"]`), at `portfolio.wilsonsoon.workers.dev`. Deploy: `npm run deploy` (build, then
+  (`run_worker_first: ["/api/*", "/admin*"]`), at `portfolio.wilsonsoon.workers.dev`. Deploy: `npm run deploy` (build, then
   `wrangler deploy`).
 - **Why (decided 2026-11-18).** One platform. Same origin, so no CORS and no `VITE_AI_URL`. Static requests are free and
   unlimited on Workers Free. Commercial use is allowed; Vercel Hobby is personal-use only with a 100 GB/month cap.
@@ -240,6 +240,13 @@ The model only decides what to say or draw, never which model runs.
   `VITE_AI_URL` set in Vercel and CORS allowing the Vercel origin. The site was briefly on Vercel (2026-11-15) as a
   temporary publish of the prebuilt Vite output while Wilson's Claude limit reset. The Vercel project and the older
   `wilson-portfolio-chat` Worker are now deleted.
+- **Two Workers, then one.** Day one had two: `wilson-portfolio-chat` (AI only, while the site sat on Vercel) and then
+  `portfolio` (site + AI). Renaming in `wrangler.jsonc` doesn't rename a Worker, it creates a new one, so for a while both
+  existed (the new one without the Groq secret until it was set again). Once `portfolio` was verified, the old Worker was
+  deleted. A second split was considered for the admin: a separate `portfolio-admin` Worker behind Cloudflare Access
+  (Access covers a whole Worker on `workers.dev`, so a separate Worker was the only way to protect just the admin with it).
+  It was built (commit 4439fbf) and then folded into `/admin` on the public Worker with an `ADMIN_TOKEN` password, because
+  Wilson wanted one link. Result: one Worker, one database, one deploy command.
 - **Gotchas recorded.** A Worker is identified only by its name: a new name makes a new Worker with no secrets. Preview
   versions snapshot secrets at upload. Run wrangler from the folder with `wrangler.jsonc`. After a preview upload, the
   newest version is the preview, so run `npm run deploy` before the next `secret put`.
