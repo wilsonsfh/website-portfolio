@@ -69,28 +69,52 @@ function Activities() {
     <div className="dk-prose">
       {activities.map((a) => (
         <article className="item" key={a.title}>
-          <p className="item-head">
-            {a.title}
-            {a.role && <><span className="sep">/</span>{a.role}</>}
-            {a.date && <span className="meta date">{a.date}</span>}
-          </p>
-          {a.descriptions.map((d, i) => <p className="meta" key={i}>{d}</p>)}
+          <h3 className="item-title">{a.title}</h3>
+          {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
+          <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
         </article>
       ))}
     </div>
   );
 }
 
-function Contact() {
+// the rest of the desktop, for whoever arrives here at the end of the tour
+const MORE: { id: AppId | "timeline"; name: string; what: string }[] = [
+  { id: "messages", name: "(1) unread", what: "a short chat with me, tap the replies" },
+  { id: "terminal", name: "terminal", what: "the same things as commands: try help, cat work.txt or ask" },
+  { id: "photos", name: "photos", what: "my photo library, by month" },
+  { id: "timeline", name: "timeline", what: "four film strips of my years: career, people, me and scenery" },
+  { id: "v1", name: "v1", what: "my previous website" },
+];
+
+function Contact({ ctx }: { ctx: Ctx }) {
+  const go = (id: AppId | "timeline") => (id === "timeline" ? ctx.unroll() : ctx.open(id));
   return (
     <div className="dk-prose">
       <ul className="contacts">
         {contacts.map((c) => (
-          <li key={c.label}><span className="meta">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
+          <li key={c.label}><span className="label">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
         ))}
       </ul>
+      <section className="more" aria-label="more on this desktop">
+        <h3>there's more on this desktop</h3>
+        <p className="more-main">
+          <button type="button" className="dk-link" onClick={() => ctx.open("plain")}>plaintext-version.html</button>
+          <span>everything above on one plain page: the clearest place for the full details.</span>
+        </p>
+        <ul>
+          {MORE.map((m) => (
+            <li key={m.id}><button type="button" className="dk-link" onClick={() => go(m.id)}>{m.name}</button> {m.what}</li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
+}
+
+// the old astro site, built with base /v1 into public/v1 (it shares /images, /fonts and /photos with this site)
+function V1() {
+  return <iframe className="dk-frame" src="/v1/index.html" title="v1, my previous website" loading="lazy" />;
 }
 
 export type App = {
@@ -113,7 +137,8 @@ export const APPS: App[] = [ // reading order: the phone grid wraps in this orde
   { id: "projects", tip: "things i have built", title: "projects", glyph: "M12 5.5a5 5 0 0 0-3.5 8.5c.6.5 1 1.1 1 2h5c0-.9.4-1.5 1-2A5 5 0 0 0 12 5.5z M9.5 18.5h5 M10.5 21h3 M12 1.5v2 M7 5.5L5.6 4.1 M17 5.5l1.4-1.4", w: 680, h: 640, render: () => <Projects /> },
   { id: "activities", tip: "what i'm involved in", title: "involvements", glyph: "M6 5h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 1-4 0H6v-4a2 2 0 1 0 0-4z", w: 660, h: 620, render: () => <Activities /> },
   { id: "plain", tip: "the boring version, all of it", title: "plaintext-version.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: () => <MainPage embedded /> },
-  { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 480, h: 320, render: () => <Contact /> },
+  { id: "v1", tip: "my previous website", title: "v1", glyph: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4 3.5v3.7h3.7 M12 8v4.2l3 1.8", w: 1000, h: 640, hFrac: 0.86, flush: true, render: () => <V1 /> },
+  { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 520, h: 560, render: (ctx) => <Contact ctx={ctx} /> },
   { id: "photos", tip: "look through my photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 980, h: 700, flush: true, render: (ctx) => <PhotosApp ctx={ctx} /> },
   { id: "timeline", tip: "scroll through my timeline", title: "timeline", glyph: "M3 5h18v14H3z M7 5v14 M17 5v14 M3 9.5h4 M3 14.5h4 M17 9.5h4 M17 14.5h4", w: 0, h: 0, render: () => null }, // not a window: its icon unrolls the scrolls
 ];
