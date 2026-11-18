@@ -13,8 +13,11 @@ Decisions: `../docs/ai-chat-decisions.md`.
   When the daily limit is used up: 503 `{"error":"image_unavailable","reason":"daily_limit","message"}`.
 - Errors: 400 bad input, 403 origin not allowed, 429 `rate_limited`, 502 upstream, 503 no fallback.
 
-From the site (Vite): `fetch(`${import.meta.env.VITE_CHAT_URL}/api/chat`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({messages, mode:"text"})})`.
-`VITE_CHAT_URL` is just the public worker URL (not a secret). Add the site origin to `ALLOWED_ORIGINS` in `wrangler.jsonc`.
+From the site (Vite): `src/lib/ai.ts` is the one client (used by the top-bar assistant and "(1) unread").
+It reads `import.meta.env.VITE_AI_URL`, the public worker URL (not a secret), e.g. in `.env.local` for dev or the Vercel
+project env for production: `VITE_AI_URL=https://portfolio-chat.<account>.workers.dev` (no trailing slash needed).
+When it is unset the UI says "the assistant isn't connected yet." instead of failing. Add the site origin to
+`ALLOWED_ORIGINS` in `wrangler.jsonc`.
 
 ## Commands you run yourself
 

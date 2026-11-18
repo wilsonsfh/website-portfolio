@@ -2,12 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "re
 import { motion, useReducedMotion } from "motion/react";
 import script from "../../data/chat-script.json";
 import photos from "../../data/photos.json";
+import { LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, type Turn } from "../../lib/ai";
 import "./messages.css";
 
 type Link = { label: string; href: string };
-type Msg = { text?: string; photo?: number; photoAlt?: string; links?: Link[]; needsReview?: boolean };
+type Msg = { text?: string; image?: string; photo?: number; photoAlt?: string; links?: Link[]; needsReview?: boolean };
 type Topic = { id: string; question: string; keywords: string[]; answers: Msg[] };
-type Script = { opening: Msg[]; topics: Topic[]; fallback: Msg };
+type Script = { opening: Msg[]; topics: Topic[] };
 type Item = { id: number; from: "wilson" | "visitor"; msg: Msg };
 
 const S = script as Script;
@@ -17,18 +18,7 @@ const GAP = 120; // between a delivered bubble and the next typing indicator
 const typingMs = (m: Msg) => Math.min(700, Math.max(350, 250 + 10 * (m.text?.length ?? 0)));
 
 // survives closing the window, so reopening continues where it stopped
-const saved = { items: [] as Item[], queue: [...S.opening] as Msg[], asked: [] as string[], id: 0 };
-
-function matchTopic(raw: string): Topic | null {
-  const t = raw.toLowerCase();
-  let best: Topic | null = null;
-  let bestScore = 0;
-  for (const topic of S.topics) {
-    const score = topic.keywords.filter((k) => t.includes(k)).length;
-    if (score > bestScore) { best = topic; bestScore = score; }
-  }
-  return best;
-}
+const saved = { items: [] as Item[], queue: [...S.opening] as Msg[], asked: [] as string[], id: 0, noted: false };
 
 function Bubble({ item, reduced }: { item: Item; reduced: boolean }) {
   const { from, msg } = item;
@@ -41,6 +31,7 @@ function Bubble({ item, reduced }: { item: Item; reduced: boolean }) {
       transition={{ duration: reduced ? 0.15 : 0.25, ease: EASE }}
     >
       <span className="ms-sr">{from === "visitor" ? "you: " : "wilson: "}</span>
+      {msg.image && <img className="ms-gen" src={msg.image} alt={msg.photoAlt} width={260} height={260} />}
       {photo && <img src={photo.src} alt={msg.photoAlt ?? photo.alt} width={240} height={160} decoding="async" />}
       {msg.text && <span>{msg.text}</span>}
       {msg.links && (
@@ -60,6 +51,8 @@ export default function Messages() {
   const [asked, setAsked] = useState<string[]>(saved.asked);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   const log = useRef<HTMLDivElement>(null);
   const stuck = useRef(true);
   const timer = useRef<ReturnType<typeof setTimeout> | 0>(0);
@@ -98,13 +91,28 @@ export default function Messages() {
     else if (!playing.current) tick(0);
   };
 
-  const ask = (text: string, topic: Topic | null) => {
-    push("visitor", { text });
+  // the scripted opening plays out; everything after it is answered by the worker, with the recent thread as context
+  const ask = async (text: string, topic: Topic | null, image = false) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    push("visitor", { text: image ? `draw: ${text}` : text });
     if (topic) { saved.asked = [...saved.asked, topic.id]; setAsked(saved.asked); }
-    saved.queue = [...(topic ? topic.answers : [S.fallback])];
+    saved.queue = [];
     stop();
-    sync();
-    tick(FIRST);
+    let msg: Msg;
+    if (image) {
+      const r = await makeImage(text);
+      msg = r.ok ? { image: r.src, photoAlt: `generated image: ${text}` } : { text: r.message };
+    } else {
+      const turns: Turn[] = saved.items.filter((i) => i.msg.text).map((i) => ({ role: i.from === "visitor" ? "user" : "assistant", content: i.msg.text! }));
+      const r = await askChat(turns);
+      msg = { text: r.ok ? r.answer : r.message };
+    }
+    busyRef.current = false;
+    setBusy(false);
+    push("wilson", msg);
+    if (flags.fallback && !saved.noted) { saved.noted = true; push("wilson", { text: LIMIT_NOTE }); }
   };
 
   useEffect(() => {
@@ -127,14 +135,14 @@ export default function Messages() {
     sync();
   };
 
-  const submit = (e: FormEvent) => {
+  const submit = (e: FormEvent, image = false) => {
     e.preventDefault();
     const text = draft.trim();
     if (!text) return;
     setDraft("");
     auto.current = document.hidden;
     stuck.current = true;
-    ask(text, matchTopic(text));
+    ask(text, null, image);
   };
 
   const remaining = S.topics.filter((t) => !asked.includes(t.id));
@@ -146,18 +154,19 @@ export default function Messages() {
         onScroll={(e) => { const el = e.currentTarget; stuck.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40; }}
       >
         {items.map((it) => <Bubble key={it.id} item={it} reduced={reduced} />)}
-        {typing && <div className="ms-bub ms-wilson ms-typing" aria-hidden="true"><i /><i /><i /></div>}
+        {(typing || busy) && <div className="ms-bub ms-wilson ms-typing" aria-hidden="true"><i /><i /><i /></div>}
       </div>
       <div className="ms-bar">
         <div className="ms-chips">
           {remaining.map((t) => (
-            <button key={t.id} type="button" onClick={() => { stuck.current = true; ask(t.question, t); }}>{t.question}</button>
+            <button key={t.id} type="button" disabled={busy} onClick={() => { stuck.current = true; ask(t.question, t); }}>{t.question}</button>
           ))}
         </div>
         <form className="ms-form" onSubmit={submit}>
           <label className="ms-sr" htmlFor="ms-input">ask wilson something</label>
           <input id="ms-input" value={draft} maxLength={120} autoComplete="off" placeholder="ask something…" onChange={(e) => onDraft(e.target.value)} />
-          <button type="submit" className="ms-send" disabled={!draft.trim()}>send</button>
+          {imageAvailable() && <button type="button" disabled={!draft.trim() || busy} onClick={(e) => submit(e, true)}>image</button>}
+          <button type="submit" className="ms-send" disabled={!draft.trim() || busy}>send</button>
         </form>
       </div>
     </div>
