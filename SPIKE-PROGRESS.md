@@ -219,7 +219,7 @@ FORCE_FALLBACK:1 --preview-alias groq-test`, then `npm run deploy` again so the 
 removed (terminal `exit` opens plaintext window); photos icon = gallery, new film-strip **timeline** icon = scrolls;
 scrolls hidden until clicked on all widths, cream × / "all photos" chips, 0.8s roll-up, shuffled unroll; stray
 "about.txt" dock chip fixed; icon layout (2 columns rows 1–5, row 6 contact/photos/timeline from the left), activities →
-**involvements** (puzzle), projects = static bulb with 3 rays (flicker rejected), plaintext-version.html; clicking an
+**involvements** (puzzle), projects = static bulb with 3 rays (flicker rejected), simple-version.html; clicking an
 open app's icon closes it (minimised → restore); **unanswered questions**: model replies `UNKNOWN` → question logged in
 D1 (deduped, no IPs, cap 500 open) → visitor sees "i don't know that one yet…"; Wilson answers at `/admin` (password =
 ADMIN_TOKEN; retro theme; tabs open/answered/dismissed/database, read-only DB view); saved answers reach the chat within
@@ -316,13 +316,13 @@ Fewer words by default. work: one-line `summary` per job; "more" shows location,
 resume-level ones in work-experience.json, NUS company now "NUS Enterprise") and tags. projects: unchanged by default,
 "more" shows highlights. involvements: title only, "more" shows role/date and the line. about.txt: v1's hero ("hi! i'm
 wilson. i'm also a <typewriter>", based in 🇸🇬), words add "rock climber" and "(learning) guitarist". unread: a short chat
-with "me". plaintext-version.html picks up the app windows' print colours (rust roles, green tags/links/bullets, system
+with "me". simple-version.html picks up the app windows' print colours (rust roles, green tags/links/bullets, system
 font). README rewritten with GIFs in docs/media and the hopping slime + mushroom (docs/media/spirits.svg, generated from
 BootBar.tsx). Verified in `vite preview` at 1400px. Not changed: worker/knowledge*.md and chat-script.json still carry
 some resume-level work details (80+ SEs, 2x DAU, Metabase, BirdNET).
 
 ## Round 11 (2026-11-18)
-plaintext-version.html gets round 10's content: "hi! i'm wilson." + typewriter + "based in 🇸🇬" header, one-line
+simple-version.html gets round 10's content: "hi! i'm wilson." + typewriter + "based in 🇸🇬" header, one-line
 work/projects/involvements with more/less (shared `Item.tsx`, `Typewriter.tsx`), row renamed involvements. Desktop icons
 top-aligned (rows 118px; tighter rows below 840px tall) so tiles stay level when a label wraps. worker/knowledge*.md and
 chat-script.json work lines rewritten from the LinkedIn version (no 80+ SEs, 2x DAU, MVP Studio). Verified in `vite
@@ -333,7 +333,7 @@ Split across subagents (Sonnet: content lists, desktop; Opus: chat bug) plus the
 Live site returns 200.
 - Lists: inline more/less replaced by a bottom-right "expand"/"collapse" with arrows-out/in icon (`Item.tsx`, no
   control when there is nothing to expand). Work shows tags by default; involvements show title + role/date, bullets
-  behind expand. Same on plaintext-version.html.
+  behind expand. Same on simple-version.html.
 - Expand/collapse sits after the default lines and the extra content opens below it, so the control never moves;
   text then icon.
 - Spirits: desktop row under the icon grid (`.dk-mobs`, last grid row; both icon columns are full, so not literally

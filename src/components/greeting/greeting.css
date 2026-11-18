@@ -352,7 +352,7 @@
 .dk-tw::after { content: ""; display: inline-block; width: 0.5em; height: 0.95em; margin-left: 2px; vertical-align: -0.12em; background: currentColor; animation: dk-caret 1s steps(1) infinite; }
 @keyframes dk-caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dk-tw::after { animation: none; } }
-/* plaintext-version.html: the same print colours and type as the app windows */
+/* simple-version.html: the same print colours and type as the app windows */
 .dk-body .page { color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
 .dk-body .page .name { font-weight: 700; }
 .dk-body .page .lede { font-weight: 600; }
@@ -421,7 +421,7 @@
   /* a running tour's caption + bar cover the grid's last rows: room to scroll them clear (the demo does on the desktop stop) */
   .dk:has(.dk-tour-corner:not(.idle)) .dk-icons { padding-bottom: 200px; overflow-y: auto; overscroll-behavior: contain; }
   .dk-tour {
-    justify-content: flex-end; gap: 6px; padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+    flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding: 8px 12px max(8px, env(safe-area-inset-bottom));
     border-top: 2px solid var(--edge); background: var(--title-bg);
   }
   .dk-tstep { margin-right: auto; padding: 0; background: none; border: 0; color: var(--muted); }
@@ -431,6 +431,7 @@
   .dk-tour:has(.dk-ticon) .dk-tstep { font-size: 12px; }
   .dk-tbtn { min-height: 40px; padding: 0 10px; font-size: 13px; white-space: nowrap; box-shadow: 2px 2px 0 var(--drop); }
   .dk:has(.dk-tour-corner) .is-phone .dk-body:not(.flush) { padding-bottom: 76px; } /* the sheet's last lines stay above the bar */
+  .dk:has(.dk-tour-corner:not(.idle)) .is-phone .dk-body:not(.flush) { padding-bottom: 120px; }
 }
 
 .dk-frame { flex: 1; width: 100%; height: 100%; border: 0; background: #fff; }

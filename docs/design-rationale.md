@@ -67,7 +67,7 @@ request: v1 was Astro 5 + Tailwind 3 + vanilla JS; v2 is Vite + React 19 + TypeS
 - Bigger, more prominent app icons came from Wilson's round-3 request. The AI icon had to be original and plain, "NOT a
   Siri icon".
 - Layout (round 4, Wilson's exact arrangement): two columns for rows 1–5 (about.txt | (1) unread, work | terminal,
-  projects, involvements, plaintext-version.html), then contact, photos, timeline in row 6 from the far left. Why two
+  projects, involvements, simple-version.html), then contact, photos, timeline in row 6 from the far left. Why two
   columns: the timeline scrolls start right after the icon block, so a narrow block gives them more room. Short screens
   (under ~780px tall) tighten the rows so row 6 never clips.
 - Glyphs: projects is a static bulb with three rays (a flicker-on-hover version was built and rejected: Wilson didn't
@@ -135,7 +135,7 @@ the last handover.
   looked missing); roll-up takes 0.8s with a soft ease; lanes unroll in a shuffled order with small random gaps (motion
   borrowed from Wilson's scroll reference video: fast start, long settle, no bounce). Opening the scrolls no longer
   minimises open windows (that caused a stray "about.txt" dock chip); the scrolls sit above windows instead.
-- **No page below the desktop** (round 4): the old plain page under the greeting was removed; the plaintext-version.html
+- **No page below the desktop** (round 4): the old plain page under the greeting was removed; the simple-version.html
   window and the top-bar icon cover it, and the terminal's `exit` opens that window.
 - **Photos app** is iCloud-style: chronological grid, sidebar of albums, month jump, square/original toggle, a viewer with
   swipe, zoom to 4x, filmstrip and info. It exists so the 114 photos can be browsed, not only watched drifting.
@@ -353,7 +353,7 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Grain.** Unchanged (same overlay and opacity). The SF text had been set with thin antialiased rendering, which made
   letters lighter so the grain broke them up; that rendering was removed.
 - **Contact ends the tour with the rest of the desktop.** Underlined links to the apps the tour didn't show, each with
-  one line on what it is. plaintext-version.html gets a bordered box because it is the clearest full version.
+  one line on what it is. simple-version.html gets a bordered box because it is the clearest full version.
 - **App text.** System font (San Francisco on Apple devices, like iOS / Telegram), real hierarchy: bold 19px names, rust
   roles (`--warm`), muted dates, green links and tags, bullet lists with green markers. Compared one-accent, two-colour
   and chip-tags; chose two colours inside the print palette (chips read as pills).
@@ -442,11 +442,11 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **The image ask is typed, not sent.** The assistant stop switches to image mode and types "show wilson in pixel art"
   but leaves "draw" to the visitor. Image generation spends the free daily image allocation (section 6), and sending it
   on every tour would let tours use it up. The caption tells the visitor to press draw.
-- **Expand/collapse that never moves.** Lists use one bottom-right "expand"/"collapse" control (`src/components/Item.tsx`)
-  placed after the default lines, with the extra content opening below it. The old inline more/less (round 10) sat in the text; the control now stays where the pointer left it
+- **Expand/collapse beside the summary.** Lists use one right-aligned "expand"/"collapse" control (`src/components/Item.tsx`)
+  placed beside the title/role summary row, with the extra content opening below the summary. The old inline more/less (round 10) sat in the text; the control now stays where the pointer left it
   after a press. Text then icon, right-aligned, so the icon stays put when the word
   changes. No extra content, no control. Work shows tags by default; involvements show title and role/date, with bullets
-  behind expand. Same on plaintext-version.html.
+  behind expand. Same on simple-version.html.
 - **Spirits rest and hop, quietly.** The mushroom and slime sit in a row under the icon grid and under the plaintext
   header. While the setting is "hop", the desktop ones alternate hop and rest every 40s, the same interval as the
   wallpaper photo change, so the screen keeps one rhythm and is not always moving (inferred). A quiet "stop"/"hop" and "hide" control

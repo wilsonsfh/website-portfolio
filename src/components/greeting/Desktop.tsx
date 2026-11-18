@@ -296,25 +296,24 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     return (
       <div className="dk-tour" role="group" aria-label="tour">
         {/* leave the tour from any stop (the desktop, timeline and assistant stops have no window to close) */}
-        <button type="button" className="dk-tbtn dk-ticon" onClick={endTour} aria-label="end tour">×</button>
+        <Tooltip text="end tour">{(t) => <button type="button" className="dk-tbtn dk-ticon" onClick={endTour} aria-label="end tour" {...t}>×</button>}</Tooltip>
         {!plain && (
-          <button type="button" className="dk-tbtn dk-ticon" onClick={auto ? () => setAuto(false) : play} aria-label={auto ? "pause the tour" : "play the tour"}>
+          <Tooltip text={auto ? "pause the tour" : "play the tour"}>{(t) => <button type="button" className="dk-tbtn dk-ticon" onClick={auto ? () => setAuto(false) : play} aria-label={auto ? "pause the tour" : "play the tour"} {...t}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
               <path d={auto ? "M3 2h3v10H3z M8 2h3v10H8z" : "M3.5 1.5l9 5.5-9 5.5z"} />
             </svg>
-          </button>
+          </button>}</Tooltip>
         )}
-        <span className="dk-tstep">{plain ? "plaintext" : `${i + 1} / ${TOUR.length}`}</span>
-        {/* phones: shorter labels so the bar stays one row */}
-        {!plain && <button type="button" className="dk-tbtn skip" onClick={tourSkip}>{phone ? "skip → plaintext" : "skip → view plaintext"}</button>}
+        <Tooltip text={plain ? "simple version" : `tour step ${i + 1} of ${TOUR.length}`}>{(t) => <span className="dk-tstep" {...t}>{plain ? "simple" : `${i + 1} / ${TOUR.length}`}</span>}</Tooltip>
+        {!plain && <Tooltip text="skip the tour and view the simple version">{(t) => <button type="button" className="dk-tbtn skip" onClick={tourSkip} {...t}>skip → (view simple)</button>}</Tooltip>}
         {tour.trail.length > 0 && (
-          <button type="button" className="dk-tbtn" onClick={tourBack} aria-label={plain ? "back to the tour" : "back"}>
+          <Tooltip text={plain ? "back to the tour" : "previous tour step"}>{(t) => <button type="button" className="dk-tbtn" onClick={tourBack} aria-label={plain ? "back to the tour" : "back"} {...t}>
             {plain ? (phone ? "← tour" : "← back to the tour") : phone ? "←" : "← back"}
-          </button>
+          </button>}</Tooltip>
         )}
-        <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${stepTitle(next)}` : undefined}>
+        <Tooltip text={next ? `next: ${stepTitle(next)}` : "finish the tour"}>{(t) => <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${stepTitle(next)}` : undefined} {...t}>
           {next ? (phone ? `${next === "assistant" ? "assistant" : stepTitle(next)} →` : `next: ${stepTitle(next)} →`) : "finish"}
-        </button>
+        </button>}</Tooltip>
       </div>
     );
   };
@@ -356,8 +355,8 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         {/* the clock stays centred; the plain-site icon hangs off its right edge */}
         <span className="dk-mid">
           <span className="dk-clock">{clock}</span>
-          <Tooltip text="plain site">{(t) => (
-          <button type="button" className="dk-plain dk-ibtn" onClick={() => toggle("plain")} aria-label="plain site" {...t}>
+            <Tooltip text="simple site">{(t) => (
+              <button type="button" className="dk-plain dk-ibtn" onClick={() => toggle("plain")} aria-label="simple site" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M6 3.5h8l4 4v13H6z" />
               <path d="M9 12h6 M9 15.5h6" />

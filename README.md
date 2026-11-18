@@ -44,7 +44,7 @@ Live: **https://portfolio.wilsonsoon.workers.dev**
 
 The 11 original reference files are versioned in [referenceideas-for-portfolio/](referenceideas-for-portfolio/README.md),
 with source evidence and unresolved attribution noted there. They are research references, outside the deployed
-`public/` assets. Concise credits also appear below contact and in the plaintext version.
+`public/` assets. Concise credits also appear below contact and in the simple version.
 
 ## Noteworthy bits
 
@@ -64,10 +64,11 @@ MapleStory-flavoured but drawn from scratch. The SVG above is generated from tha
 
 ### First-visit tour
 A small "welcome / tour?" window asks once per tab: **no**, **yes**, or the rightmost orange **view simple** button.
-View simple opens the maximised plaintext version immediately and dismisses onboarding for the tab.
+View simple opens the maximised simple version immediately and dismisses onboarding for the tab.
 Yes: about.txt opens and the tour steps through work, projects,
-involvements and contact, one maximised window at a time, with next / back / "skip → plaintext" in the corner. It ends
+involvements and contact, one maximised window at a time, with next / back / "skip → (view simple)" in the corner. It ends
 with a small "done" window.
+Tour controls explain themselves on hover or keyboard focus; narrow screens wrap the controls so they stay reachable.
 
 <img src="docs/media/tour.gif" width="720" alt="the first-visit onboarding tour">
 
@@ -93,8 +94,9 @@ it at `/admin`; saved answers go back into the chat.
 <img src="docs/media/assistant.gif" width="720" alt="the AI portfolio assistant answering a question">
 
 ### Also
-- **plaintext version.** The full content as a plain page, one top-bar icon away, for skimmers and recruiters.
-- **Theme toggle.** Sun/moon in the top bar, synced with the plaintext footer toggle and the terminal `theme` command.
+- **simple version.** The full content as a plain page, one top-bar icon away, for skimmers and recruiters.
+- **Expand/collapse.** Work, projects and involvements keep the control beside the summary title in both views.
+- **Theme toggle.** Sun/moon in the top bar, synced with the simple footer toggle and the terminal `theme` command.
 - **Phones.** Full-screen sheets, a flowing top bar, a touch cursor (hold a finger down and the pixel arrow appears above it).
 - **Sound.** Web Audio power-off and switch-on sounds with a persisted toggle.
 - **/admin.** Token-gated page to answer unanswered questions and read the chat log (30 days, per-tab random id, no IP,
@@ -121,7 +123,7 @@ it at `/admin`; saved answers go back into the chat.
 
 **Data**
 - D1 (SQLite): unanswered questions, saved answers, chat log, private wiki chunks with FTS5 search.
-- `src/data/*.json`: one content source for both the desktop and the plaintext version.
+- `src/data/*.json`: one content source for both the desktop and the simple version.
 
 **Tooling**
 - Plain Node test scripts for the Worker's pure logic, `tsc` typechecking.
@@ -168,7 +170,7 @@ src/
   components/greeting/   the desktop: windows, apps, boot, tour, terminal, assistant, photos, timeline
   data/                  work, projects, activities, skills and photo JSON
   lib/ai.ts              calls /api/chat and /api/image
-  styles/                global tokens and plaintext page styles
+  styles/                global tokens and simple page styles
 worker/                  Cloudflare Worker: chat, image, admin, D1 logic, knowledge files, tests
 db/migrations/           D1 schema
 scripts/                 photo and wiki-excerpt helpers
