@@ -319,7 +319,7 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Sentinel detection, not guessing.** The model is told to reply exactly `UNKNOWN` when a question about Wilson is not in
   the knowledge. The Worker tests that deterministically (trimmed, case-insensitive, or starts with it), logs the question
   and returns one fixed lowercase line. Phrase-matching "i don't know" in free text would miss variants and misfire on
-  real answers. Declined topics (health, family, money) and non-Wilson questions are declined, not logged.
+  real answers. Declined topics (health, family, money) are declined, not logged. (Since round 7, non-Wilson questions are answered from general knowledge, like the admin drafter; see below.)
 - **Minimal logging.** Only the latest user message, trimmed to 500 characters, deduped on a normalized form (lowercase,
   punctuation and spacing collapsed) with a count and first/last dates. No IP or identifier. A cap of 500 open questions
   bounds abuse. Dismissed questions stay in the table so repeats only bump their count.
@@ -390,3 +390,10 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Picture requests in chat.** "draw a cat" or "image of wilson" typed in text mode used to get a text reply (or the
   "i don't know that one yet" fallback). The assistant and unread now switch to image mode and draw it; the system
   prompt also tells the model to point at the picture button for phrasings the pattern misses.
+- **General questions in the public chat.** The chat and the admin drafter are the same model; only their prompts differ.
+  The chat used to "decline" anything not about Wilson, but in practice it replied UNKNOWN, so visitors saw "i don't know
+  that one yet" and /admin filled with two-sum and geography questions. Now it mirrors the drafter: facts about Wilson
+  only from the public knowledge file (UNKNOWN and logged when missing), anything else answered briefly from general
+  knowledge, code as plain text. Chat text keeps its line breaks (pre-wrap). The private wiki excerpt is still read only
+  by the admin drafter. Trade-off: anyone can use it as a small general chatbot, within the per-visitor rate limits.
+- **Finish window, shorter.** Held for 1s instead of ~2.7s (300ms wait, 400ms in, 1s, 240ms out).

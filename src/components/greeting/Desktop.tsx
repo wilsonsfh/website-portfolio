@@ -42,7 +42,7 @@ const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
 type Tour = { cur: AppId; trail: AppId[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
 const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
-const SEAL_MS = 3400; // the finish window: waits for contact to shrink, 400ms in, held, then out
+const SEAL_MS = 1700; // the finish window: 300ms wait for contact to shrink, 400ms in, held 1s, then out
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);

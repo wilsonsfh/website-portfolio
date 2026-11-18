@@ -13,7 +13,7 @@
   flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px 8px;
   display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.45;
 }
-.ms-bub { position: relative; max-width: 82%; padding: 8px 12px; border-radius: 14px; overflow-wrap: anywhere; }
+.ms-bub { position: relative; max-width: 82%; padding: 8px 12px; border-radius: 14px; overflow-wrap: anywhere; white-space: pre-wrap; } /* code answers keep their lines */
 .ms-wilson { align-self: flex-start; border-bottom-left-radius: 4px; background: var(--ms-wilson-bg); color: var(--ms-wilson-fg); transform-origin: 0% 100%; }
 .ms-visitor { align-self: flex-end; border-bottom-right-radius: 4px; background: var(--ms-visitor-bg); color: var(--ms-visitor-fg); transform-origin: 100% 100%; }
 .ms-bub img { display: block; width: 100%; max-width: 240px; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: rgba(128, 128, 128, 0.3); }

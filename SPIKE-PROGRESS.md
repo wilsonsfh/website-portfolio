@@ -284,3 +284,9 @@ no / yes (yes focused; Escape = no; blocks clicks until answered). Yes → about
 marked done. All tour steps maximised; the under-about.txt bar placement was removed. Verified in a production preview
 (`vite preview`) at 1400px and 375px: question, yes, no, Escape, return visit with nothing open. Dev-only note: React
 StrictMode re-runs Scrolls' mount effect, which moves focus to the timeline icon in `npm run dev` only.
+
+## Round 7b (2026-11-18)
+Public chat answers general questions from general knowledge (same split as the admin drafter; facts about Wilson still
+only from knowledge.md, UNKNOWN + logged when missing); code as plain text; chat bubbles keep line breaks. Verified live:
+tokyo, two sum code, internships, favourite food → UNKNOWN, a joke. /admin: dismissed (not deleted) ids 2, 3, 4, 5, 10,
+11, 12, 13 (generic, junk, and test questions); open: 6, 7, 8, 9. Finish window held 1s (SEAL_MS 1700).

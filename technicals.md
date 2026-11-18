@@ -251,3 +251,8 @@ not the admin page. The live `/admin` is already deployed and is the place to an
 on the deployed Worker (real model, real D1). Locally, `cd worker && npx wrangler dev --local` serves `/admin` on :8787
 with a local, empty D1 and `ADMIN_TOKEN` from `.dev.vars`, but suggest fails there because Workers AI only runs
 remotely (see worker/README.md "Local dev").
+
+**Why there were "two models".** There is one text model (`TEXT_MODEL`, gemma 4 26B on Workers AI). The public chat and
+the /admin suggest button call it with different system prompts and different context: the chat gets `knowledge.md`
+(public facts) plus saved answers; suggest gets chunks of the private wiki excerpt from D1. Since round 7 both prompts
+split questions the same way: about Wilson → only from their context, anything else → general knowledge.
