@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt } from "../src/logic.ts";
+import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime } from "../src/logic.ts";
 
 // fallback decision
 assert.equal(limitReason(new Error("3036: You have used up your daily free allocation of 10,000 neurons")), "daily_limit");
@@ -57,4 +57,20 @@ assert.equal(buildAnswersSection(many).split("- q:").length - 1, 40); // newest 
 const big = [{ question: "q1", answer: "x".repeat(60) }, { question: "q2", answer: "y".repeat(60) }, { question: "q3", answer: "z" }];
 const capped = buildAnswersSection(big, 40, 100);
 assert.ok(capped.includes("q1") && !capped.includes("q2") && !capped.includes("q3")); // stops at the char cap, keeps order
+// image of wilson: reference photos only when the prompt is about him; always a stylised illustration
+assert.ok(refersToWilson("wilson climbing a mountain"));
+assert.ok(refersToWilson("draw yourself as a knight"));
+assert.ok(refersToWilson("Draw YOU surfing"));
+assert.ok(!refersToWilson("a cat on a skateboard"));
+assert.ok(!refersToWilson("draw me a dragon")); // "me" is the visitor
+assert.ok(unsafeForWilson("wilson naked"));
+assert.ok(unsafeForWilson("you holding a gun"));
+assert.ok(!unsafeForWilson("you playing guitar"));
+const wp = wilsonPrompt("a realistic photo of wilson playing volleyball");
+assert.ok(!/realistic|photo\b/i.test(wp.split("SCENE:")[1])); // photoreal words are dropped from the scene
+assert.ok(wp.includes("image 0") && /illustration/i.test(wp));
+assert.ok(wilsonPrompt("wilson as pixel art").includes("pixel art"));
+assert.equal(imageMime("/9j/4AAQ"), "image/jpeg");
+assert.equal(imageMime("iVBORw0K"), "image/png");
+assert.equal(imageMime("UklGRiQ"), "image/webp");
 console.log("logic tests ok");

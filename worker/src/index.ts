@@ -3,7 +3,7 @@ import knowledgeShort from "../knowledge-short.md";
 import { handleAdmin } from "./admin/handler.ts";
 import { FailLimiter, tokenEquals } from "./admin/logic.ts";
 import { logUnknown, answersSections } from "./qa.ts";
-import { FixedWindow, UNKNOWN_REPLY, UNKNOWN_TOKEN, isUnknown, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, type Msg } from "./logic.ts";
+import { FixedWindow, UNKNOWN_REPLY, UNKNOWN_TOKEN, isUnknown, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, type Msg } from "./logic.ts";
 
 interface RateLimiter { limit(o: { key: string }): Promise<{ success: boolean }> }
 export interface Env {
@@ -14,6 +14,8 @@ export interface Env {
   ALLOWED_ORIGINS: string;
   TEXT_MODEL: string;
   IMAGE_MODEL: string;
+  WILSON_IMAGE_MODEL: string; // FLUX.2: takes reference photos, used when a prompt is about wilson
+  ASSETS: Fetcher; // the built site, for wilson's reference photos (dist/ai-ref)
   GROQ_MODEL: string;
   ADMIN_TOKEN?: string; // secret: `wrangler secret put ADMIN_TOKEN`, the /admin password
   GROQ_API_KEY?: string; // secret
@@ -64,7 +66,7 @@ export default {
     let body: unknown;
     try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
 
-    return isImage ? image(body, env, json) : chat(body, env, json, ctx);
+    return isImage ? image(body, env, json, req.url) : chat(body, env, json, ctx);
   },
 } satisfies ExportedHandler<Env>;
 
@@ -128,15 +130,36 @@ async function chat(body: unknown, env: Env, json: J, ctx: ExecutionContext): Pr
   return finish(answer, { provider: "groq", fallback: true, reason, imageAvailable: false });
 }
 
-async function image(body: unknown, env: Env, json: J): Promise<Response> {
+// wilson's face for FLUX.2: two crops under 512px (the model's limit), served from the site's own assets
+const REFS = ["/ai-ref/wilson-1.jpg", "/ai-ref/wilson-2.jpg"];
+
+async function image(body: unknown, env: Env, json: J, url: string): Promise<Response> {
   const v = validateImagePrompt(body);
   if (!v.ok) return json({ error: "bad_request", message: v.error }, 400);
   const unavailable = () => json({ error: "image_unavailable", reason: "daily_limit", message: "image generation is unavailable today: the daily limit is reached." }, 503);
   if (Date.now() < aiBlockedUntil) return unavailable();
+  const ofWilson = refersToWilson(v.prompt);
+  if (ofWilson && unsafeForWilson(v.prompt)) return json({ error: "bad_request", message: "let's keep pictures of wilson friendly. try another scene." }, 400);
   try {
-    const res = (await env.AI.run(env.IMAGE_MODEL as any, { prompt: v.prompt, steps: 4 } as any)) as { image?: string };
+    let res: { image?: string };
+    if (ofWilson) {
+      // FLUX.2 takes multipart form data; the photos go in as input_image_0 and input_image_1
+      const form = new FormData();
+      form.append("prompt", wilsonPrompt(v.prompt));
+      form.append("width", "768");
+      form.append("height", "768");
+      for (const [i, path] of REFS.entries()) {
+        const r = await env.ASSETS.fetch(new Request(new URL(path, url)));
+        if (!r.ok) return json({ error: "reference_missing" }, 500);
+        form.append(`input_image_${i}`, await r.blob());
+      }
+      const body = new Response(form);
+      res = (await env.AI.run(env.WILSON_IMAGE_MODEL as any, { multipart: { body: body.body, contentType: body.headers.get("content-type") } } as any)) as { image?: string };
+    } else {
+      res = (await env.AI.run(env.IMAGE_MODEL as any, { prompt: v.prompt, steps: 4 } as any)) as { image?: string };
+    }
     if (!res?.image) return json({ error: "empty_image" }, 502);
-    return json({ image: res.image, mime: "image/jpeg", provider: "workers-ai" });
+    return json({ image: res.image, mime: imageMime(res.image), provider: "workers-ai" });
   } catch (e) {
     const reason = limitReason(e);
     if (!reason) return json({ error: "upstream_error", message: String((e as Error)?.message ?? e) }, 502);

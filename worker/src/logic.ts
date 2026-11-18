@@ -105,3 +105,33 @@ export function buildAnswersSection(rows: Answered[], maxItems = 40, maxChars = 
   }
   return lines.length ? `\n\nWILSON'S OWN ANSWERS (his own words; use them like KNOWLEDGE):\n${lines.join("\n")}` : "";
 }
+
+// ---- images of wilson: FLUX.2 gets his reference photos only when the prompt is about him ----
+
+/** The prompt asks for wilson ("wilson", or "you"/"yourself" said to his site). "me" is the visitor, so it does not count. */
+export function refersToWilson(prompt: string): boolean {
+  return /\b(wilson|you|yourself|him)\b/i.test(prompt);
+}
+
+/** Scenes his face should never be put in. A small list on top of the model's own safety filter. */
+export function unsafeForWilson(prompt: string): boolean {
+  return /\b(nude|naked|nsfw|sexy|sexual|lingerie|underwear|bikini|kiss\w*|blood\w*|gore|dead|corpse|kill\w*|murder\w*|gun|guns|weapon\w*|knife|drunk|drugs?|smok\w*|prison|jail|arrest\w*|nazi\w*|racist)\b/i.test(prompt);
+}
+
+const STYLES = ["pixel art", "cartoon", "watercolor", "comic book", "anime", "claymation", "sticker"];
+const PHOTO_WORDS = /\b(photo\w*|realistic|photorealistic|hyperrealistic|hyper-realistic|real life|real-life|dslr|4k|8k|cinematic|portrait photo)\b/gi;
+
+/** The prompt sent with the reference photos: always an illustration (never photoreal), in the style asked for or cartoon. */
+export function wilsonPrompt(prompt: string): string {
+  const style = STYLES.find((s) => prompt.toLowerCase().includes(s)) ?? "cartoon";
+  const scene = prompt.replace(PHOTO_WORDS, "").replace(/\s{2,}/g, " ").trim();
+  return `a ${style} illustration, clearly drawn and not a photograph. the person in it is the young man from image 0 and image 1: keep his face, hair and glasses recognisable. SCENE: ${scene}`;
+}
+
+/** Media type of a base64 image from its first bytes (FLUX.2 does not say which format it returns). */
+export function imageMime(b64: string): string {
+  if (b64.startsWith("/9j/")) return "image/jpeg";
+  if (b64.startsWith("iVBOR")) return "image/png";
+  if (b64.startsWith("UklGR")) return "image/webp";
+  return "image/jpeg";
+}
