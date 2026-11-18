@@ -320,3 +320,10 @@ with "me". plaintext-version.html picks up the app windows' print colours (rust 
 font). README rewritten with GIFs in docs/media and the hopping slime + mushroom (docs/media/spirits.svg, generated from
 BootBar.tsx). Verified in `vite preview` at 1400px. Not changed: worker/knowledge*.md and chat-script.json still carry
 some resume-level work details (80+ SEs, 2x DAU, Metabase, BirdNET).
+
+## Round 11 (2026-11-18)
+plaintext-version.html gets round 10's content: "hi! i'm wilson." + typewriter + "based in 🇸🇬" header, one-line
+work/projects/involvements with more/less (shared `Item.tsx`, `Typewriter.tsx`), row renamed involvements. Desktop icons
+top-aligned (rows 118px; tighter rows below 840px tall) so tiles stay level when a label wraps. worker/knowledge*.md and
+chat-script.json work lines rewritten from the LinkedIn version (no 80+ SEs, 2x DAU, MVP Studio). Verified in `vite
+preview` at 1400x900, 1400x800, 375px; worker tests pass.
