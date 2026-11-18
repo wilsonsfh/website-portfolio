@@ -17,6 +17,7 @@
 .ms-wilson { align-self: flex-start; border-bottom-left-radius: 4px; background: var(--ms-wilson-bg); color: var(--ms-wilson-fg); transform-origin: 0% 100%; }
 .ms-visitor { align-self: flex-end; border-bottom-right-radius: 4px; background: var(--ms-visitor-bg); color: var(--ms-visitor-fg); transform-origin: 100% 100%; }
 .ms-bub img { display: block; width: 100%; max-width: 240px; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: rgba(128, 128, 128, 0.3); }
+.ms-bub img.ms-gen { aspect-ratio: auto; object-fit: contain; max-width: 260px; }
 .ms-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .ms-links:not(:first-child) { margin-top: 4px; }
 .dk-body .ms-bub a { color: inherit; text-decoration-color: currentColor; }
