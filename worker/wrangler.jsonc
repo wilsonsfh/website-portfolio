@@ -9,6 +9,11 @@
   "assets": { "directory": "../dist", "run_worker_first": ["/api/*"] },
   // knowledge.md is bundled as a text module
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  // D1 holds the unanswered questions and Wilson's answers. Create it once with `wrangler d1 create portfolio-qa`,
+  // then put the printed id here and in ../admin/wrangler.jsonc. The id below is a PLACEHOLDER (ids are not secret).
+  "d1_databases": [
+    { "binding": "DB", "database_name": "portfolio-qa", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "../db/migrations" }
+  ],
   // Rate Limiting binding (needs wrangler >= 4.36). period must be 10 or 60.
   "ratelimits": [
     { "name": "RL_CHAT", "namespace_id": "7101", "simple": { "limit": 8, "period": 60 } },

@@ -70,3 +70,38 @@ export function nextUtcMidnight(now = Date.now()): number {
   const d = new Date(now);
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1);
 }
+
+// ---- unanswered questions ----
+
+/** The model replies with exactly this when the answer is not in KNOWLEDGE. */
+export const UNKNOWN_TOKEN = "UNKNOWN";
+export const UNKNOWN_REPLY = "i don't know that one yet. you can ask wilson directly through the contact app.";
+export const MAX_OPEN_QUESTIONS = 500;
+
+/** True when the reply is the sentinel: trimmed, any case, optionally followed by punctuation or more text. */
+export function isUnknown(reply: string): boolean {
+  return /^["'`*\s]*unknown(?![\p{L}\p{N}])/iu.test(reply);
+}
+
+/** Dedupe key: lowercase, punctuation and runs of whitespace collapsed to single spaces. */
+export function normalizeQuestion(q: string): string {
+  return q.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+export type Answered = { question: string; answer: string };
+
+/** "Wilson's own answers" block for the prompt. Rows must be newest first; stops before maxChars is exceeded. */
+export function buildAnswersSection(rows: Answered[], maxItems = 40, maxChars = 6000): string {
+  const lines: string[] = [];
+  let size = 0;
+  for (const r of rows.slice(0, maxItems)) {
+    const q = r.question.replace(/\s+/g, " ").trim();
+    const a = r.answer.replace(/\s+/g, " ").trim();
+    if (!q || !a) continue;
+    const line = `- q: ${q}\n  a: ${a}`;
+    if (size + line.length + 1 > maxChars) break;
+    lines.push(line);
+    size += line.length + 1;
+  }
+  return lines.length ? `\n\nWILSON'S OWN ANSWERS (his own words; use them like KNOWLEDGE):\n${lines.join("\n")}` : "";
+}
