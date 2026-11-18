@@ -7,28 +7,26 @@ Based in Singapore, studying computer science at the National University of Sing
 
 ## Work experience
 
-### Solutions Engineering Intern, Cloudflare (May 2026 to Aug 2026, Singapore)
-- Gave technical demos to senior Solutions Engineering leaders at a cross-regional meeting of 80+ SEs.
-- Shadowed SEs on live customer calls and helped find new clients at a regional client summit.
-- Built a security assessment tool. It checks a client's account against Cloudflare's WAF, SSL/TLS, Rate Limiting and Bot Management products. It gives SEs talking points for discovery and upsell, and an easier way to explain fixes to clients.
-- Scoped and shipped better scoring across those products, based on research with SEs. It is now used across client accounts and still running after he handed it over.
-- Built a Linux desktop that runs in the browser on Cloudflare Containers. It powers a series of hands-on labs where clients and SEs can set up and test security policies without a VM or a local install.
+### Solutions Engineering Intern, Cloudflare (May 2026 to Aug 2026, APJC)
+- Built a security assessment web app (on an existing codebase) to replace gathering client data by hand. It gives guided fixes, historical comparisons, a scored view of an account's security posture with live traffic summaries, and auto-generated slide decks. This shortened the time Customer Engineers spend preparing for technical discovery.
+- Built a Linux desktop that runs in the browser on isolated Cloudflare Containers, for hands-on labs where users set up and test security policies against their own accounts. Each container's traffic goes through the WARP client over a VPN-like tunnel.
+- Found why containers re-enrolled as new WARP devices on every restart, and added automatic deregistration so unused entries did not overload the device inventory before a workshop.
 - Tags: Zero Trust, Workers, Durable Objects, KV.
 
-### Product Management Intern, Glints (Dec 2025 to Apr 2026, Singapore and Jakarta)
-- Ran user interviews with jobseekers and small-business employers to understand how they hire and what they need. The PM and engineering teams used the findings to decide which features to build for Singapore and Malaysia.
-- Represented Glints at school events and industry sessions to collect product feedback and meet potential clients.
-- More than doubled jobseeker daily active users through experiments and partnerships. Wrote SQL in Metabase to decide scope and to cut the time spent looking things up by hand.
+### Product Management Intern, Glints (Dec 2025 to Apr 2026, Singapore and Jakarta, Indonesia)
+- Grew daily active users among jobseekers looking at small and medium businesses (SMEs) and SME employers, through A/B-tested job navigation and partnerships with organisations and communities to raise brand awareness.
+- Ran competitor analysis across Singapore's talent ecosystem and led 10 user research interviews with jobseekers on how they search and navigate the job portal. Turned the findings and triaged bug reports into technical requirements, such as a better bottom navigation bar placement and a map-based nearby job search.
+- Built reusable SQL database views for the Singapore and Malaysia jobseeker and employer funnels, and automated daily KPI reporting for the regional growth team, cutting database lookup time.
 - Tags: SQL, Metabase, User Research, Product Analytics.
 
-### Software Engineering Intern, NUS Enterprise Minimum Viable Product Studio (May 2025 to Jul 2025, Singapore)
-- Worked on a web app for researchers to study bird patterns, built with React, Django and PostgreSQL.
-- Added the BirdNET machine learning classifier, using the eBird API and GPS coordinates, to identify bird species across regions. It was more accurate than labelling by hand.
-- Wrote Python scripts to move large batches of bird audio recordings between local storage and Google Cloud Storage. This cut down manual data entry.
+### Software Engineering Intern, NUS Enterprise (May 2025 to Jul 2025, Singapore)
+- Worked on an existing web app that supports researchers with bioacoustic analysis of birds.
+- Improved bird species identification across sub-regions of Singapore by integrating a bird machine learning classifier, an open database and GPS coordinate data, to make classification more accurate.
 - Tags: React, Django, PostgreSQL, Python, Google Cloud Storage, BirdNET.
 
 ### Software Engineering Intern, Singapore Land Authority (Nov 2020 to Feb 2021, Singapore)
-- Made it easier to pull building data into geospatial tools such as Autodesk Revit, using a C# plugin and the open-source Buildings and Habitats object Model (BHoM).
+- Integrated the open-source Buildings and Habitats object Model (BHoM) as a common format so building data works across software.
+- Wrote plug-in code to standardise data transfer between software applications.
 - Tags: C#, Autodesk Revit, BHoM.
 
 ## The preparation-time app at Cloudflare
