@@ -403,3 +403,16 @@ reach Wilson, and his answers feed back into the chat. Choices:
   oldest first, newest typed in; past questions are muted so answers lead.
 - **Chat log, disclosed.** Wilson wanted to read what people ask, not just what the assistant couldn't answer. It is
   a separate log (30 days, per-tab random id, no IP), with a one-line notice under both chat inputs.
+- **Three tour button colours.** skip → plaintext is rust (`--warm`), ← back is ink (`--fg`), next / finish is green
+  (`--accent`), so the three choices read apart at a glance over a maximised window (text contrast 5.2:1, 10.1:1,
+  5.2:1). Finishing after a skip now plays the same ending as the full tour: plaintext shrinks back to a window and the
+  done window shows.
+- **"there's more on this desktop" in plaintext too.** The plaintext page is where skimmers land, so its "get in touch"
+  row now ends with the same links as the contact window (one shared `More` component, which also lists the portfolio
+  assistant and opens its panel), minus the link to plaintext
+  itself.
+- **Theme toggle in the top bar.** A sun (light) / moon (dark) button left of the assistant icon, with the same tooltip
+  and pressed-state pattern as the sound button. It flips the same `dark` class and `localStorage.theme` as the
+  plaintext footer toggle and the terminal's `theme`, and watches the class so all three agree. Phones (< 640px) could
+  not fit name + centred clock + five icons, so there the bar flows left to right, the name shortens to "wilson" and
+  icons are 34px wide (checked at 360 and 375px: no overlap, no overflow).

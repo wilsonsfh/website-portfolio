@@ -303,3 +303,10 @@ tokyo, two sum code, internships, favourite food → UNKNOWN, a joke. /admin: di
   reload persistence, clear. Chat log NOT verified: needs `npx wrangler d1 migrations apply portfolio-qa --remote`
   (from worker/) and a deploy.
 - Live check: one chat logged to chat_log (visitor deploy-check-0000, a test row; expires in 30 days); /admin/api/chats → 401 without or with a wrong token.
+
+## Round 9 (2026-11-18)
+Tour buttons: skip rust, back ink, next green. Finish after skip → plaintext shrinks back + done window. "there's more
+on this desktop" (shared `More` in apps.tsx) also at the end of plaintext's "get in touch" (without the self-link),
+both lists include "portfolio assistant" (opens the panel via `ctx.ask`). Top bar: sun/moon theme toggle left of the
+assistant icon, synced with the plaintext toggle and terminal `theme`; phones (<640px): flowing bar, name "wilson",
+34px icons. Verified on localhost:5173 at 1400, 375, 360px.

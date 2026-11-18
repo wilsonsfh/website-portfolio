@@ -69,6 +69,18 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const root = useRef<HTMLDivElement>(null);
   const vp = useViewport();
   const [sound, setSound] = useState(getSoundOn);
+  // theme: the `dark` class on <html> (also set by the plaintext page's toggle and the terminal's `theme`), kept in sync
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  useEffect(() => {
+    const mo = new MutationObserver(() => setDark(document.documentElement.classList.contains("dark")));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
+  const toggleTheme = () => {
+    const next = !dark;
+    document.documentElement.classList.toggle("dark", next);
+    try { localStorage.setItem("theme", next ? "dark" : "light"); } catch {}
+  };
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
   // first visit: a small window asks "tour?" before anything opens; yes starts the tour, no opens contact
@@ -204,6 +216,12 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const t = window.setTimeout(() => setSealed(false), SEAL_MS);
     return () => clearTimeout(t);
   }, [sealed]);
+  // finish after skipping to plaintext: plaintext stays open but shrinks back to a window, then the same done window
+  const plainFinish = () => {
+    setWins((ws) => ws.map((w) => (w.id === "plain" ? { ...w, max: false } : w)));
+    endTour();
+    setSealed(true);
+  };
   const tourBack = () => {
     if (!tour) return;
     const trail = [...tour.trail];
@@ -223,13 +241,13 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
       <div className="dk-tour" role="group" aria-label="tour">
         <span className="dk-tstep">{plain ? "plaintext" : `${i + 1} / ${TOUR.length}`}</span>
         {/* phones: shorter labels so the bar stays one row */}
-        {!plain && <button type="button" className="dk-tbtn" onClick={tourSkip}>{phone ? "skip → plaintext" : "skip → view plaintext"}</button>}
+        {!plain && <button type="button" className="dk-tbtn skip" onClick={tourSkip}>{phone ? "skip → plaintext" : "skip → view plaintext"}</button>}
         {tour.trail.length > 0 && (
           <button type="button" className="dk-tbtn" onClick={tourBack} aria-label={plain ? "back to the tour" : "back"}>
             {plain ? (phone ? "← tour" : "← back to the tour") : phone ? "←" : "← back"}
           </button>
         )}
-        <button type="button" className="dk-tbtn primary" onClick={plain ? endTour : tourNext} aria-label={next ? `next: ${appById(next).title}` : undefined}>
+        <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${appById(next).title}` : undefined}>
           {next ? (phone ? `${appById(next).title} →` : `next: ${appById(next).title} →`) : "finish"}
         </button>
       </div>
@@ -240,7 +258,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const toggle = (id: AppId) => (wins.some((w) => w.id === id && (phone || !w.min)) ? close(id) : open(id));
 
   const ctx: Ctx = {
-    open, close, photoReq,
+    open, close, photoReq, ask: () => setAskOpen(true),
     unroll: (from) => { setRollsFrom(from ?? "icon"); setRollsOpen(true); },
     // back from a photo opened on the scrolls: unrolled from Photos, that window stays (it is under the scrolls); otherwise it closes
     toTimeline: () => (rollsFrom === "photos" ? setRollsOpen(true) : close("photos", true)),
@@ -255,7 +273,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
-          <span className="dk-name">wilson soon, 2026</span>
+          <span className="dk-name">wilson<span className="dk-name-rest"> soon, 2026</span></span>
         </span>
         {/* the clock stays centred; the plain-site icon hangs off its right edge */}
         <span className="dk-mid">
@@ -270,6 +288,15 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
           )}</Tooltip>
         </span>
         <span className="dk-right">
+          <Tooltip text={dark ? "dark theme" : "light theme"}>{(t) => (
+          <button type="button" className="dk-plain dk-ibtn" aria-label="dark theme" aria-pressed={dark} onClick={toggleTheme} {...t}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {dark
+                ? <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z" />
+                : <path d="M12 8.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z M12 3v2 M12 19v2 M5.6 5.6l1.4 1.4 M17 17l1.4 1.4 M3 12h2 M19 12h2 M5.6 18.4L7 17 M17 7l1.4-1.4" />}
+            </svg>
+          </button>
+          )}</Tooltip>
           <Assistant open={askOpen} onOpenChange={setAskOpen} />
           <Tooltip text="switch off">{(t) => (
           <button type="button" className="dk-plain dk-ibtn" onClick={onPowerOff} aria-label="power off" {...t}>

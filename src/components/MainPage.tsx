@@ -60,7 +60,7 @@ function ThemeToggle() {
   );
 }
 
-export default function MainPage({ embedded = false }: { embedded?: boolean }) {
+export default function MainPage({ embedded = false, more }: { embedded?: boolean; more?: ReactNode }) {
   // embedded (inside a desktop window): no #main id or main landmark, no full-height page, tighter padding
   const Root = embedded ? "div" : "main";
   return (
@@ -125,6 +125,7 @@ export default function MainPage({ embedded = false }: { embedded?: boolean }) {
                 <li key={c.label}><span className="meta">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
               ))}
             </ul>
+            {more /* in the desktop's plaintext window: links to the other apps */}
           </Row>
         </div>
 

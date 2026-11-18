@@ -166,6 +166,16 @@
   font: inherit; color: var(--muted); transition: transform 160ms ease-out, color 160ms ease;
 }
 .dk-ibtn { width: 40px; padding: 0; display: grid; place-items: center; }
+/* phones: five icons, a name and the clock don't fit a centred layout, so the bar flows left to right with a short name */
+@media (max-width: 639.98px) {
+  .dk-bar { display: flex; }
+  .dk-left { flex: none; padding-left: 12px; }
+  .dk-name-rest { display: none; }
+  .dk-mid { margin-left: 10px; }
+  .dk-mid .dk-plain { position: static; margin-left: 2px; }
+  .dk-right { margin-left: auto; }
+  .dk-ibtn { width: 34px; }
+}
 .dk-plain:active { transform: scale(0.97); }
 .dk-plain:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 @media (hover: hover) and (pointer: fine) { .dk-plain:hover { color: var(--fg); } }
@@ -330,12 +340,12 @@
 .dk-body .contacts a { color: var(--accent); font-weight: 600; }
 
 /* contact: the rest of the desktop, as underlined links */
-.dk-prose .more { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line); }
-.dk-prose .more h3 { margin: 0; font-size: 17px; font-weight: 700; }
-.dk-prose .more ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
-.dk-prose .more-main { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--edge); border-radius: 4px; background: var(--title-bg); }
-.dk-prose .more-main .dk-link { font-size: 17px; font-weight: 700; align-self: flex-start; }
-.dk-prose .more-main span { font-size: 15px; }
+.more { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line); }
+.more h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.more ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
+.more-main { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--edge); border-radius: 4px; background: var(--title-bg); }
+.more-main .dk-link { font-size: 17px; font-weight: 700; align-self: flex-start; }
+.more-main span { font-size: 15px; }
 .dk-link {
   padding: 0; background: none; border: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer;
   text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 2px;
@@ -358,9 +368,10 @@
   transition: transform 160ms ease-out, background-color 160ms ease;
 }
 .dk-tbtn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+.dk-tbtn.skip { background: var(--warm); border-color: var(--warm); } /* three fills: skip rust, back ink, next green (all >= 5:1 with their text) */
 .dk-tbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--drop); }
 .dk-tbtn:focus-visible { outline: 2px solid var(--on-wall); outline-offset: 2px; }
-@media (hover: hover) and (pointer: fine) { .dk-tbtn:hover { background: var(--muted); } .dk-tbtn.primary:hover { background: var(--fg); border-color: var(--edge); } }
+@media (hover: hover) and (pointer: fine) { .dk-tbtn:hover { background: var(--muted); } .dk-tbtn.primary:hover { background: var(--fg); border-color: var(--edge); } .dk-tbtn.skip:hover { background: color-mix(in srgb, var(--warm) 80%, var(--fg)); } }
 @media (max-width: 639.98px) {
   .dk-tour-corner { left: 0; right: 0; bottom: 0; }
   .dk-tour {
