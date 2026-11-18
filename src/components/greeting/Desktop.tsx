@@ -33,13 +33,6 @@ function useViewport() {
 type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean; min?: boolean }; // w/h: set once the visitor resizes
 const PHONE = 640;
 const MAX_INSET = 8; // gap around a maximized window
-const SCROLLS_KEY = "scrolls-b"; // sessionStorage: the scrolls have auto-opened once this session
-
-// true on the first power-on of a session, when the photo scrolls unroll by themselves
-const scrollsAutoOpen = (focusOnMount: boolean) => {
-  if (!focusOnMount) return false;
-  try { return sessionStorage.getItem(SCROLLS_KEY) === null; } catch { return true; }
-};
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
@@ -68,15 +61,23 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const [sound, setSound] = useState(getSoundOn);
   const phone = vp.w < PHONE;
   const zRef = useRef(11);
-  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE && !scrollsAutoOpen(focusOnMount) ? [place("about", 0, 11, focusOnMount)] : []));
+  const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up to the clickable stub; the stub exists whenever the desktop is on
-  const showRolls = () => setRollsOpen(true);
+  const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
+  const reqN = useRef(0);
   // unrolling sends the open windows to the dock first (phone has sheets and no dock: lanes just cover them)
   const toggleRolls = () => {
     if (!rollsOpen && !phone) wins.filter((w) => !w.min).forEach((w) => minimize(w.id, false));
     setRollsOpen(!rollsOpen);
+  };
+
+  // a photo on the scrolls (or "all photos") opens the Photos app like its own grid does; phone sheets would sit under the lanes, so they roll up
+  const showPhoto = (id: string | null) => {
+    setPhotoReq({ id, n: ++reqN.current });
+    if (phone) setRollsOpen(false);
+    open("photos");
   };
 
   const open = (id: AppId) => {
@@ -94,6 +95,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   };
   const close = (id: AppId) => {
     setWins((ws) => ws.filter((w) => w.id !== id));
+    if (id === "photos") setPhotoReq(null); // a reopened window starts on the grid
     document.getElementById(`dk-icon-${id}`)?.focus({ preventScroll: true });
   };
   const move = (id: AppId, x: number, y: number) =>
@@ -122,24 +124,14 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
     if (focusOnMount && !root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // the first power-on of a session unrolls the photos once the screen has settled
-  useEffect(() => {
-    if (!scrollsAutoOpen(focusOnMount)) return;
-    const t = window.setTimeout(() => {
-      try { sessionStorage.setItem(SCROLLS_KEY, "1"); } catch {}
-      showRolls();
-    }, 400);
-    return () => clearTimeout(t);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const ctx: Ctx = { open, exit: onPlain, unroll: toggleRolls };
+  const ctx: Ctx = { open, exit: onPlain, unroll: toggleRolls, photoReq };
   const top = Math.max(0, ...wins.filter((w) => phone || !w.min).map((w) => w.z));
   const docked = phone ? [] : wins.filter((w) => w.min);
 
   return (
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
-      <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} />
+      <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} />
       <header className="dk-bar">
         <span className="dk-left">
           <span className="dk-name">wilson soon, 2026</span>
@@ -182,12 +174,13 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
 
       <nav className="dk-icons" aria-label="apps">
         {APPS.map((a) => (
-          <Tooltip key={a.id} text={a.tip}>{(t) => (
+          <Tooltip key={a.id} text={a.id === "photos" && rollsOpen ? "roll them up" : a.tip}>{(t) => (
           <button
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
-            onClick={() => open(a.id)}
+            onClick={() => (a.id === "photos" ? toggleRolls() : open(a.id))}
+            aria-expanded={a.id === "photos" ? rollsOpen : undefined}
             {...t}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

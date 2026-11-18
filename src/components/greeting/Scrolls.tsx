@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type KeyboardEvent as ReactKeyboardEvent, type FocusEvent as ReactFocusEvent } from "react";
 import Tooltip from "./Tooltip";
 import story from "../../data/story.json";
 import "./scrolls.css";
@@ -11,8 +11,9 @@ const GAP = 8; // between lanes
 const PAD = 8; // around the lanes
 const CHROME = 60; // lane height minus picture height: bands, padding, caption
 const MIN_PIC = 80; // smallest picture height before the lanes scroll instead of squeezing
-const FOOT = 44; // strip under the lanes: holds the close button and keeps the strip clear of the lanes
+const HEAD = 44; // strip above the lanes: holds "all photos" and the close button, so neither covers a lane
 const ITEM_GAP = 16;
+const CLICK_PX = 6; // a press that moved less than this is a click, not a drag
 
 // roll out: drawer-style ease, staggered top first; roll up: together, faster, enter/exit ease
 const OPEN_MS = 900;
@@ -68,10 +69,15 @@ function Picture({ item, live, reduced }: { item: Item; live: boolean; reduced: 
 }
 
 function Cell({ item, ph, live, reduced }: { item: Item; ph: number; live: boolean; reduced: boolean }) {
+  const clickable = live && !!item.src; // the first copy is the real one; the rest are loop padding
   const pw = Math.round((ph * item.w) / item.h);
   return (
-    <figure className="sc-item" style={{ width: Math.max(pw, 96), marginRight: ITEM_GAP }}>
-      <div className="sc-pic" style={{ width: pw, height: ph }}>
+    <figure className="sc-item" data-id={item.src ? item.id : undefined} style={{ width: Math.max(pw, 96), marginRight: ITEM_GAP }}>
+      <div
+        className="sc-pic"
+        style={{ width: pw, height: ph }}
+        {...(clickable ? { tabIndex: 0, role: "button", "aria-label": `open ${item.caption || "photo"}`, "data-open": "" } : {})}
+      >
         <Picture item={item} live={live} reduced={reduced} />
       </div>
       {item.src && (
@@ -86,17 +92,17 @@ function Cell({ item, ph, live, reduced }: { item: Item; ph: number; live: boole
 
 type LaneProps = {
   id: string; label: string; items: Item[]; ph: number; h: number; reduced: boolean;
-  index: number; driftOn: { current: boolean }; woke: boolean;
+  index: number; driftOn: { current: boolean }; woke: boolean; onPhoto: (id: string) => void;
 };
 
-function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LaneProps) {
+function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke, onPhoto }: LaneProps) {
   const view = useRef<HTMLDivElement>(null);
   const first = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const [reps, setReps] = useState(3);
   const st = useRef({
-    x: 0, v: 0, g: 0, L: 0, resumeAt: 0, down: false, coast: false, hover: false,
-    lastX: 0, samples: [] as { t: number; x: number }[],
+    x: 0, v: 0, g: 0, L: 0, resumeAt: 0, down: false, coast: false, hover: false, focus: false,
+    lastX: 0, startX: 0, startY: 0, moved: 0, samples: [] as { t: number; x: number }[],
   });
 
   // enough copies that the track always covers the viewport: one copy is the loop length
@@ -105,15 +111,16 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
     const f = first.current;
     if (!v || !f) return;
     const measure = () => {
-      st.current.L = f.offsetWidth;
-      setReps(Math.max(2, Math.ceil(v.clientWidth / Math.max(f.offsetWidth, 1)) + 1));
+      const L = f.getBoundingClientRect().width; // fractional, so the loop seam never jumps
+      st.current.L = L;
+      setReps(Math.max(2, Math.ceil(v.clientWidth / Math.max(L, 1)) + 1));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(v);
     ro.observe(f);
     return () => ro.disconnect();
-  }, [items.length, ph]);
+  }, [items.length, ph, woke]); // woke: the first copy only exists once the lanes have been unrolled
 
   // one rAF loop per lane writes the transform directly, no React state per frame
   useEffect(() => {
@@ -131,7 +138,7 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
           k.v *= Math.pow(DECAY, dt);
           if (Math.abs(k.v) < 8) { k.coast = false; k.resumeAt = now + RESUME_MS; }
         } else {
-          const go = driftOn.current && !reduced && !document.hidden && !k.hover && now >= k.resumeAt;
+          const go = driftOn.current && !reduced && !document.hidden && !k.hover && !k.focus && now >= k.resumeAt;
           k.g = Math.min(1, Math.max(0, k.g + (go ? dt : -dt) / RAMP_MS));
           k.x += (dir * speed * k.g * dt) / 1000;
         }
@@ -153,7 +160,9 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
     k.coast = false;
     k.v = 0;
     k.g = 0;
-    k.lastX = e.clientX;
+    k.lastX = k.startX = e.clientX;
+    k.startY = e.clientY;
+    k.moved = 0;
     k.samples = [{ t: e.timeStamp, x: e.clientX }];
   };
   const move = (e: RPointerEvent) => {
@@ -161,6 +170,7 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
     if (!k.down) return;
     k.x += e.clientX - k.lastX;
     k.lastX = e.clientX;
+    k.moved = Math.max(k.moved, Math.abs(e.clientX - k.startX), Math.abs(e.clientY - k.startY));
     k.samples.push({ t: e.timeStamp, x: e.clientX });
     while (k.samples.length > 2 && e.timeStamp - k.samples[0].t > 100) k.samples.shift();
   };
@@ -174,11 +184,36 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
     k.v = !reduced && fresh && dtMs > 0 ? ((e.clientX - a.x) / dtMs) * 1000 : 0;
     k.coast = Math.abs(k.v) >= 8;
     k.resumeAt = performance.now() + RESUME_MS;
+    if (k.moved < CLICK_PX) {
+      // pointer capture retargets the click to the lane, so find the picture under the pointer
+      const id = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>("[data-id]")?.dataset.id;
+      if (id) onPhoto(id);
+    }
   };
   const cancel = () => {
     const k = st.current;
     k.down = false;
     k.resumeAt = performance.now() + RESUME_MS;
+  };
+  const key = (e: ReactKeyboardEvent) => {
+    const t = e.target as HTMLElement;
+    if ((e.key === "Enter" || e.key === " ") && t.matches("[data-open]")) {
+      e.preventDefault();
+      const id = t.closest<HTMLElement>("[data-id]")?.dataset.id;
+      if (id) onPhoto(id);
+    }
+  };
+  // keyboard focus: bring the picture into view (overflow:hidden would scroll the lane) and hold the drift
+  const focusIn = (e: ReactFocusEvent<HTMLDivElement>) => {
+    const k = st.current;
+    const t = e.target as HTMLElement;
+    k.focus = true;
+    if (!t.matches(":focus-visible")) return;
+    e.currentTarget.scrollLeft = 0;
+    const v = e.currentTarget.getBoundingClientRect();
+    const r = t.getBoundingClientRect();
+    if (r.left < v.left) k.x += v.left - r.left;
+    else if (r.right > v.right) k.x -= r.right - v.right;
   };
   const hover = (on: boolean) => (e: RPointerEvent) => { if (e.pointerType === "mouse") st.current.hover = on; };
 
@@ -196,6 +231,9 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke }: LanePr
           onPointerCancel={cancel}
           onPointerEnter={hover(true)}
           onPointerLeave={hover(false)}
+          onKeyDown={key}
+          onFocus={focusIn}
+          onBlur={() => { st.current.focus = false; }}
         >
           <div className="sc-track" ref={track}>
             {woke && Array.from({ length: reps }, (_, c) => (
@@ -220,11 +258,11 @@ const revealed = (clip: HTMLElement) => {
   return m ? 1 - Number(m[1]) / 100 : 1;
 };
 
-type Props = { open: boolean; reduced: boolean; onToggle: () => void };
+type Props = { open: boolean; reduced: boolean; onToggle: () => void; onPhoto: (id: string) => void; onAll: () => void };
 
 const el_focus = (root: HTMLElement | null, sel: string) => root?.querySelector<HTMLElement>(sel)?.focus({ preventScroll: true });
 
-export default function Scrolls({ open, reduced, onToggle }: Props) {
+export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const anims = useRef<Animation[][]>([]); // per lane: [paper reveal, roller]
@@ -308,12 +346,16 @@ export default function Scrolls({ open, reduced, onToggle }: Props) {
   }, [box.w]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const n = story.lanes.length;
-  const fit = Math.floor((box.h - FOOT - PAD * 2 - GAP * (n - 1)) / n);
+  const fit = Math.floor((box.h - HEAD - PAD * 2 - GAP * (n - 1)) / n);
   const laneH = Math.max(fit, MIN_PIC + CHROME);
   const ph = laneH - CHROME;
 
   return (
     <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root}>
+      <div className="sc-head">
+        <button type="button" className="sc-all" onClick={onAll}>all photos</button>
+        <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>
+      </div>
       <div className="sc-lanes" inert={!open}>
         {story.lanes.map((l, i) => (
           <Lane
@@ -327,6 +369,7 @@ export default function Scrolls({ open, reduced, onToggle }: Props) {
             h={laneH}
             reduced={reduced}
             woke={woke}
+            onPhoto={onPhoto}
           />
         ))}
       </div>
@@ -335,9 +378,6 @@ export default function Scrolls({ open, reduced, onToggle }: Props) {
           <button type="button" className="sc-stub" onClick={onToggle} aria-label="unroll my photos" aria-expanded={false} {...t} />
         )}</Tooltip>
       )}
-      <div className="sc-foot">
-        <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>
-      </div>
     </div>
   );
 }
