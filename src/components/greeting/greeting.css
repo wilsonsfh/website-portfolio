@@ -205,8 +205,8 @@
   grid-auto-columns: 104px; align-content: start; gap: 6px;
 }
 /* desktop placement, one cell each (column / row); the phone grid below drops these and wraps in reading order
-   two columns (the scroll lanes start after them); rows 1-5 as listed, row6: contact, photos, timeline
-   row1: about, (1) unread / row2: work, terminal / row3: projects / row4: involvements / row5: plaintext-version / row6: contact, photos, timeline */
+   two columns (the scroll lanes start after them); the timeline sits directly above photos
+   row1: about, (1) unread / row2: work, terminal / row3: projects, v1 / row4: involvements / row5: plaintext-version, timeline / row6: contact, photos */
 @media (min-width: 640px) {
   .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(2, 104px); grid-template-rows: repeat(6, 108px); grid-auto-columns: auto; }
   #dk-icon-about { grid-area: 1 / 1; }
@@ -214,11 +214,12 @@
   #dk-icon-work { grid-area: 2 / 1; }
   #dk-icon-terminal { grid-area: 2 / 2; }
   #dk-icon-projects { grid-area: 3 / 1; }
+  #dk-icon-v1 { grid-area: 3 / 2; }
   #dk-icon-activities { grid-area: 4 / 1; }
   #dk-icon-plain { grid-area: 5 / 1; }
   #dk-icon-contact { grid-area: 6 / 1; }
   #dk-icon-photos { grid-area: 6 / 2; }
-  #dk-icon-timeline { grid-area: 6 / 3; }
+  #dk-icon-timeline { grid-area: 5 / 2; }
 }
 /* short laptop screens: tighter rows so all six fit */
 @media (min-width: 640px) and (max-height: 780px) {

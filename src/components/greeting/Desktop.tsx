@@ -121,13 +121,61 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     if (focusOnMount && !root.current?.contains(document.activeElement)) root.current?.focus({ preventScroll: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ctx: Ctx = { open, exit: () => open("plain"), unroll: toggleRolls, photoReq };
+  const endTour = () => {
+    setTour(null);
+    try { sessionStorage.setItem(TOUR_KEY, "1"); } catch {}
+  };
+  const focusWin = (id: AppId) => {
+    const z = ++zRef.current;
+    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, min: false } : w)));
+  };
+  const tourTo = (id: AppId) => {
+    if (!tour) return;
+    open(id);
+    setTour({ cur: id, trail: [...tour.trail, tour.cur] });
+  };
+  const tourNext = () => {
+    if (!tour) return;
+    const i = TOUR.indexOf(tour.cur);
+    if (i < 0 || i === TOUR.length - 1) endTour();
+    else tourTo(TOUR[i + 1]);
+  };
+  const tourBack = () => {
+    if (!tour) return;
+    const trail = [...tour.trail];
+    const prev = trail.pop();
+    if (!prev) return;
+    open(prev); // brings it to the front (or reopens it if it was closed)
+    setTour({ cur: prev, trail });
+  };
+  // skip: plaintext opens and the tour stays in the corner (back to the tour, or finish) until finished or plaintext is closed
+  const tourSkip = () => tourTo("plain");
+  const tourBar = () => {
+    if (!tour) return null;
+    const plain = tour.cur === "plain";
+    const i = TOUR.indexOf(tour.cur);
+    const next = plain ? undefined : TOUR[i + 1];
+    return (
+      <div className="dk-tour" role="group" aria-label="tour">
+        <span className="dk-tstep">{plain ? "plaintext" : `${i + 1} / ${TOUR.length}`}</span>
+        {i === 0 && <button type="button" className="dk-tbtn" onClick={tourSkip}>skip → view plaintext</button>}
+        {tour.trail.length > 0 && <button type="button" className="dk-tbtn" onClick={tourBack}>{plain ? "← back to the tour" : "← back"}</button>}
+        <button type="button" className="dk-tbtn primary" onClick={plain ? endTour : tourNext}>{next ? `next: ${appById(next).title} →` : "finish"}</button>
+      </div>
+    );
+  };
+
+  // an icon opens its window; pressed again, an open window closes and a minimised one restores
+  const toggle = (id: AppId) => (wins.some((w) => w.id === id && (phone || !w.min)) ? close(id) : open(id));
+
+  const ctx: Ctx = { open, close, unroll: () => setRollsOpen(true), photoReq, toTimeline: () => close("photos", true) };
   const top = Math.max(0, ...wins.filter((w) => phone || !w.min).map((w) => w.z));
   const docked = phone ? [] : wins.filter((w) => w.min);
 
   return (
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
+      <TouchCursor />
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} />
       <header className="dk-bar">
         <span className="dk-left">
@@ -137,7 +185,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
         <span className="dk-mid">
           <span className="dk-clock">{clock}</span>
           <Tooltip text="plain site">{(t) => (
-          <button type="button" className="dk-plain dk-ibtn" onClick={() => open("plain")} aria-label="plain site" {...t}>
+          <button type="button" className="dk-plain dk-ibtn" onClick={() => toggle("plain")} aria-label="plain site" {...t}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M6 3.5h8l4 4v13H6z" />
               <path d="M9 12h6 M9 15.5h6" />
@@ -180,7 +228,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
             type="button"
             id={`dk-icon-${a.id}`}
             className="dk-icon"
-            onClick={() => (a.id === "timeline" ? toggleRolls() : wins.some((w) => w.id === a.id && (phone || !w.min)) ? close(a.id) : open(a.id))} // an open window closes; a minimised one restores
+            onClick={() => (a.id === "timeline" ? toggleRolls() : toggle(a.id))}
             aria-expanded={a.id === "timeline" ? rollsOpen : undefined}
             {...t}
           >
