@@ -7,14 +7,14 @@
   --line: rgba(18, 61, 43, 0.22); --line-strong: rgba(18, 61, 43, 0.55);
   --title-bg: #E4DBBE; --edge: #123D2B; --drop: rgba(6, 23, 15, 0.5);
   --wall-lift: #3D6C6A; --wall-tint: #2E6346; --on-wall: #F1EAD3;
-  --tile-bg: #F1EAD3; --tile-ink: #123D2B;
+  --tile-bg: #F1EAD3; --tile-ink: #123D2B; --err: #A2412A; --warm: #9A4A1C;
 }
 :root.dark .gr-root, :root.dark .tt {
   --bg: #0F2A1E; --fg: #EAE3C9; --muted: #A9BCA6; --accent: #B5DB7A;
   --line: rgba(234, 227, 201, 0.16); --line-strong: rgba(234, 227, 201, 0.4);
   --title-bg: #163626; --edge: rgba(234, 227, 201, 0.55); --drop: rgba(0, 0, 0, 0.5);
   --wall-lift: #314F4B; --wall-tint: #1F4A33; --on-wall: #EAE3C9;
-  --tile-bg: #E2DABD; --tile-ink: #0F2A1E;
+  --tile-bg: #E2DABD; --tile-ink: #0F2A1E; --err: #F0A090; --warm: #E9B489;
 }
 .gr-root {
   position: relative; z-index: 0; height: 100vh; height: 100dvh; overflow: hidden;
@@ -297,21 +297,90 @@
 .dk-rz[data-d="se"] { bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: nwse-resize; }
 .dk-body { flex: 1; min-height: 0; overflow: auto; padding: 16px 18px 20px; overscroll-behavior: contain; }
 .dk-body.flush { padding: 0; overflow: hidden; display: flex; }
-.dk-prose { display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.65; }
-.dk-prose .item { margin-bottom: 4px; }
+/* app text: the system font (san francisco on apple devices, like ios / telegram), a real size and weight
+   hierarchy, ink for names, green for links, a warm rust for dates and roles */
+.dk-prose {
+  display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  max-width: 68ch;
+}
+.dk-prose p { margin: 0; }
+.dk-prose .lede { font-size: 20px; line-height: 1.4; font-weight: 700; letter-spacing: -0.01em; }
+.dk-prose .skills { font-size: 14px; color: var(--muted); }
+.dk-prose b { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; }
+.dk-prose .item { display: flex; flex-direction: column; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.dk-prose .item:last-child { border-bottom: 0; padding-bottom: 0; }
+.dk-prose .item-title { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; font-size: 19px; line-height: 1.3; font-weight: 700; letter-spacing: -0.01em; }
+.dk-prose .item-title > a { color: var(--fg); }
+.dk-prose .item-sub { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+.dk-prose .role { font-size: 15px; font-weight: 600; color: var(--warm); }
+.dk-prose .date { font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dk-prose .points { margin: 2px 0 0; padding-left: 18px; list-style: disc; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.55; }
+.dk-prose .points li::marker { color: var(--accent); }
+.dk-prose .desc { font-size: 15px; }
+.dk-prose .tags { font-size: 13px; font-weight: 600; color: var(--accent); }
+.dk-prose .links { display: inline-flex; gap: 12px; font-size: 14px; font-weight: 600; }
+.dk-prose .links a { color: var(--accent); }
 .dk-body a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; border-radius: 2px; }
 .dk-body a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .dk-body a:hover { color: var(--accent); text-decoration-color: currentColor; } }
-.dk-body .contacts li { grid-template-columns: 64px 1fr; font-size: 15px; }
+.dk-body .contacts li { grid-template-columns: 80px 1fr; font-size: 16px; }
+.dk-body .contacts .label { font-size: 13px; font-weight: 700; color: var(--warm); }
+.dk-body .contacts a { color: var(--accent); font-weight: 600; }
 
+/* contact: the rest of the desktop, as underlined links */
+.dk-prose .more { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line); }
+.dk-prose .more h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.dk-prose .more ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
+.dk-prose .more-main { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--edge); border-radius: 4px; background: var(--title-bg); }
+.dk-prose .more-main .dk-link { font-size: 17px; font-weight: 700; align-self: flex-start; }
+.dk-prose .more-main span { font-size: 15px; }
+.dk-link {
+  padding: 0; background: none; border: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer;
+  text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 2px;
+}
+.dk-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .dk-link:hover { color: var(--fg); } }
+
+/* tour bar: fixed in the screen's bottom-right corner while the tour runs (also after "skip", until finish or the
+   plaintext window closes); a full-width footer on phones */
+.dk-tour-corner { position: absolute; right: 16px; bottom: 16px; z-index: 999; animation: dk-tour-in 200ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@keyframes dk-tour-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.dk-tour { display: flex; align-items: center; gap: 8px; }
+.dk-tstep { padding: 0 6px; font-size: 13px; color: var(--on-wall); font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px var(--drop); }
+.dk-tbtn {
+  min-height: 40px; padding: 0 14px; background: var(--bg); color: var(--fg); border: 2px solid var(--edge); border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--drop); font: inherit; font-size: 14px; font-weight: 500; text-transform: lowercase; cursor: pointer;
+  transition: transform 160ms ease-out, background-color 160ms ease;
+}
+.dk-tbtn.primary { background: var(--fg); color: var(--bg); }
+.dk-tbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--drop); }
+.dk-tbtn:focus-visible { outline: 2px solid var(--on-wall); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .dk-tbtn:hover { background: var(--title-bg); } .dk-tbtn.primary:hover { background: var(--accent); } }
+@media (max-width: 639.98px) {
+  .dk-tour-corner { left: 0; right: 0; bottom: 0; }
+  .dk-tour {
+    justify-content: flex-end; flex-wrap: wrap; padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+    border-top: 2px solid var(--edge); background: var(--title-bg);
+  }
+  .dk-tstep { margin-right: auto; color: var(--muted); text-shadow: none; }
+  .dk-tbtn { min-height: 44px; }
+  .dk:has(.dk-tour-corner) .is-phone .dk-body:not(.flush) { padding-bottom: 76px; } /* the sheet's last lines stay above the bar */
+}
+
+.dk-frame { flex: 1; width: 100%; height: 100%; border: 0; background: #fff; }
 .dk-term {
   width: 100%; height: 100%; overflow: auto; padding: 12px 14px; overscroll-behavior: contain; cursor: text;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; line-height: 1.6;
 }
 .dk-term p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted); }
-.dk-term p.in { color: var(--fg); }
-.dk-term form { margin: 0; }
-.dk-term label { display: flex; align-items: center; gap: 0; }
+.dk-term p.in { color: var(--fg); margin-top: 6px; }
+.dk-term p.head { color: var(--fg); font-weight: 700; }
+.dk-term p.err { color: var(--err); }
+.dk-term .dk-prompt { color: var(--accent); font-weight: 600; }
+.dk-term .dk-wait { animation: dk-blink 1s steps(2, start) infinite; }
+@keyframes dk-blink { to { opacity: 0.35; } }
+.dk-line { display: flex; align-items: center; gap: 0; min-height: 44px; } /* a full-height tap target on phones */
 .dk-term input {
   flex: 1; min-width: 0; background: none; border: 0; outline: 0; padding: 0; margin: 0;
   font: inherit; color: var(--fg); caret-color: var(--accent);
@@ -349,6 +418,7 @@
   .dk-wall img { transition-duration: 200ms; }
   .gr-off.gone { transition: none; }
   .gr-off.gone .gr-ring { animation: none; }
-  .gr-hop { animation: none; }
+  .gr-hop, .dk-term .dk-wait, .dk-tour-corner { animation: none; }
+  .dk-tbtn:active { transform: none; }
   .gr-power:active, .dk-plain:active, .dk-icon:active, .dk-wbtn:active, .dk-back:active, .dk-dock-item:active { transform: none; }
 }
