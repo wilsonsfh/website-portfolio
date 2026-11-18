@@ -306,7 +306,8 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
         const from = prev && !instant ? Number(getComputedStyle(paper).opacity) : to;
         next = [paper.animate([{ opacity: from }, { opacity: to }], { duration: instant ? 0 : FADE_MS, easing: "ease-out", fill: "both" })];
       } else {
-        const lo = (STUB - ROLLER) / Math.max(lane.offsetWidth - ROLLER, 1); // reveal fraction at which the roller's right edge sits at STUB
+        // reveal fraction at which the roller's right edge sits at STUB; on a phone it rolls away completely (no stub)
+        const lo = window.innerWidth < PHONE ? 0 : (STUB - ROLLER) / Math.max(lane.offsetWidth - ROLLER, 1);
         const to = open ? 1 : lo;
         const from = prev && !instant ? revealed(clip) : to;
         const opts: KeyframeAnimationOptions = {

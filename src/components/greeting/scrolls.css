@@ -92,5 +92,8 @@
 @media (max-width: 639.98px) {
   .sc { z-index: 900; }
   .sc:not(.sc-rolled) .sc-lanes { pointer-events: auto; }
+  /* no stub on a phone: once the roll-up (CLOSE_MS) ends, the whole scroll hides; the photos icon brings it back */
+  .sc { transition: visibility 0s; }
+  .sc-rolled { visibility: hidden; transition-delay: 320ms; }
 }
 @media (prefers-reduced-motion: reduce) { .sc-close:active, .sc-stub:active, .sc-all:active { transform: none; } }
