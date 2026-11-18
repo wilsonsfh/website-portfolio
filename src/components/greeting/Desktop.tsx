@@ -190,9 +190,11 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
             onClick={() => open(a.id)}
             {...t}
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d={a.glyph} />
-            </svg>
+            <span className="dk-tile" aria-hidden="true">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter">
+                <path d={a.glyph} />
+              </svg>
+            </span>
             <span>{a.title}</span>
           </button>
           )}</Tooltip>
