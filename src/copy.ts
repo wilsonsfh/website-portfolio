@@ -4,6 +4,8 @@ export const skillLine = Object.values(skills).flat().join(", ").toLowerCase();
 
 export const lede =
   "based in singapore, studying computer science at the national university of singapore and passionate about building all things tech and aesthetics.";
+// v1's version, used under "hi! i'm wilson" in about.txt and the plaintext page
+export const ledeFlag = lede.replace("based in singapore", "based in 🇸🇬");
 
 export const aboutParagraphs = [
   "i'm currently thinking about how to be a better individual contributor as a software engineer with AI. i'm also interested in product thinking and building something people want, and learning how to ace prioritisations of a hundred things.",

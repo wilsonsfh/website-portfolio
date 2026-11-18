@@ -2,7 +2,9 @@ import { useEffect, useId, useState, type ReactNode } from "react";
 import workExperience from "../data/work-experience.json";
 import projects from "../data/projects.json";
 import activities from "../data/activities.json";
-import { skillLine, lede, aboutParagraphs, contacts, ext } from "../copy";
+import { skillLine, ledeFlag, aboutParagraphs, contacts, ext } from "../copy";
+import Item from "./Item";
+import Typewriter from "./Typewriter";
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -67,8 +69,9 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
     <Root id={embedded ? undefined : "main"} className={`page${embedded ? " embedded" : ""}`}>
       <div className="column">
         <header className="intro">
-          <h1 className="name">wilson.</h1>
-          <p className="lede">{lede}</p>
+          <h1 className="name">hi! i'm wilson.</h1>
+          <p className="lede">i'm also a <Typewriter /></p>
+          <p className="lede">{ledeFlag}</p>
         </header>
 
         <div className="rows">
@@ -79,43 +82,56 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
 
           <Row label="work">
             {workExperience.map((job) => (
-              <article className="item" key={job.company + job.date}>
-                <p className="item-head">
+              <Item
+                key={job.company + job.date}
+                head="item-head"
+                title={<>
                   <a href={job.website} {...ext(job.website)}>{job.company}</a>
                   <span className="sep">/</span><span className="role">{job.role}</span>
                   <span className="meta date">{job.date}</span>
-                </p>
-                <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
-              </article>
+                </>}
+                more={<>
+                  <p className="meta">{job.location}</p>
+                  <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
+                  <p className="meta tags">{job.tags.join(", ")}</p>
+                </>}
+              >
+                <p className="desc">{job.summary}</p>
+              </Item>
             ))}
           </Row>
 
           <Row label="projects">
             {projects.map((p) => (
-              <article className="item" key={p.title}>
-                <p className="item-head">
+              <Item
+                key={p.title}
+                head="item-head"
+                title={<>
                   {p.title}
                   <span className="links">
                     {p.github && <a href={p.github} {...ext(p.github)}>github</a>}
                     {p.live && <a href={p.live} {...ext(p.live)}>live</a>}
                   </span>
-                </p>
+                </>}
+                more={<ul className="points">{p.highlights.map((h, i) => <li key={i}>{h}</li>)}</ul>}
+              >
                 <p className="desc">{p.description}</p>
                 <p className="meta tags">{p.tags.join(", ")}</p>
-              </article>
+              </Item>
             ))}
           </Row>
 
-          <Row label="activities">
+          <Row label="involvements">
             {activities.map((a) => (
-              <article className="item" key={a.title}>
-                <p className="item-head">
-                  {a.title}
-                  {a.role && <><span className="sep">/</span><span className="role">{a.role}</span></>}
-                  {a.date && <span className="meta date">{a.date}</span>}
-                </p>
-                <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
-              </article>
+              <Item
+                key={a.title}
+                head="item-head"
+                title={a.title}
+                more={<>
+                  {(a.role || a.date) && <p className="meta">{a.role && <span className="role">{a.role}</span>}{a.role && a.date && " · "}{a.date}</p>}
+                  <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
+                </>}
+              />
             ))}
           </Row>
 

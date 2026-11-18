@@ -218,7 +218,7 @@
    two columns (the scroll lanes start after them); the timeline sits directly above photos
    row1: about, (1) unread / row2: work, terminal / row3: projects, v1 / row4: involvements / row5: plaintext-version, timeline / row6: contact, photos */
 @media (min-width: 640px) {
-  .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(2, 104px); grid-template-rows: repeat(6, 108px); grid-auto-columns: auto; }
+  .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(2, 104px); grid-template-rows: repeat(6, 118px); grid-auto-columns: auto; }
   #dk-icon-about { grid-area: 1 / 1; }
   #dk-icon-messages { grid-area: 1 / 2; }
   #dk-icon-work { grid-area: 2 / 1; }
@@ -233,14 +233,15 @@
   #dk-icon-timeline { grid-area: 5 / 2; }
 }
 /* short laptop screens: tighter rows so all six fit */
-@media (min-width: 640px) and (max-height: 780px) {
+@media (min-width: 640px) and (max-height: 840px) {
   .dk-icons { padding: 12px 16px; grid-template-rows: repeat(6, 100px); gap: 4px; }
-  .dk-icon { height: 100px; }
+  .dk-icon { height: 100px; padding-top: 4px; gap: 6px; }
 }
-/* icon: a cream paper tile with an ink glyph and a hard print shadow, cream label on the green field */
+/* icon: a cream paper tile with an ink glyph and a hard print shadow, cream label on the green field.
+   top-aligned, so tiles in a row stay level when a label wraps to two lines */
 .dk-icon {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-  width: 104px; height: 108px; padding: 0; background: none; border: 0; border-radius: 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px;
+  width: 104px; height: 108px; padding: 10px 0 0; background: none; border: 0; border-radius: 4px;
   color: var(--on-wall); cursor: pointer; font: inherit; font-size: 14px; font-weight: 500; text-transform: lowercase;
   transition: transform 160ms ease-out, background-color 160ms ease;
 }
@@ -332,8 +333,9 @@
 .dk-prose .tags { font-size: 13px; font-weight: 600; color: var(--accent); }
 .dk-prose .links { display: inline-flex; gap: 12px; font-size: 14px; font-weight: 600; }
 .dk-prose .links a { color: var(--accent); }
-.dk-prose .dk-more { font-size: 13px; }
-.dk-prose .item-more:not([hidden]) { display: flex; flex-direction: column; gap: 6px; }
+.dk-prose .dk-more, .dk-body .page .dk-more { font-size: 13px; }
+.dk-body .page .item-head .dk-more { margin-left: 10px; }
+.dk-prose .item-more:not([hidden]), .dk-body .page .item-more:not([hidden]) { display: flex; flex-direction: column; gap: 6px; }
 /* about.txt: v1's typewriter word, with a block caret that blinks (still under reduced motion) */
 .dk-tw { color: var(--accent); }
 .dk-tw::after { content: ""; display: inline-block; width: 0.5em; height: 0.95em; margin-left: 2px; vertical-align: -0.12em; background: currentColor; animation: dk-caret 1s steps(1) infinite; }

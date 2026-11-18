@@ -1,5 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
-import { useReducedMotion } from "motion/react";
+import type { ReactNode } from "react";
 import workExperience from "../../data/work-experience.json";
 import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
@@ -7,7 +6,9 @@ import Terminal from "./Terminal";
 import Messages from "./Messages";
 import PhotosApp from "./PhotosApp";
 import MainPage from "../MainPage";
-import { skillLine, lede, aboutParagraphs, contacts, ext } from "../../copy";
+import Item from "../Item";
+import Typewriter from "../Typewriter";
+import { skillLine, ledeFlag, aboutParagraphs, contacts, ext } from "../../copy";
 
 export type AppId = "about" | "work" | "projects" | "activities" | "photos" | "timeline" | "contact" | "terminal" | "messages" | "plain" | "v1" | "assistant";
 
@@ -22,61 +23,14 @@ export type Ctx = {
   ask: () => void; // open the portfolio assistant panel
 };
 
-// v1's hero line: types a word, deletes it, types the next (a plain swap every 3s under reduced motion)
-const WORDS = ["software engineer", "product manager", "dancer", "fullstack developer", "nature lover", "tea lover", "singaporean", "photographer", "rock climber", "(learning) guitarist", "volleyball beginner"];
-
-function Typewriter() {
-  const reduce = useReducedMotion();
-  const [text, setText] = useState(WORDS[0]);
-  useEffect(() => {
-    let w = 0, n = WORDS[0].length, del = true, t = 0;
-    const tick = () => {
-      if (reduce) { w = (w + 1) % WORDS.length; setText(WORDS[w]); t = window.setTimeout(tick, 3000); return; }
-      if (del) {
-        n--;
-        if (n === 0) { del = false; w = (w + 1) % WORDS.length; }
-      } else if (n < WORDS[w].length) n++;
-      else { del = true; t = window.setTimeout(tick, 1600); return; }
-      setText(WORDS[w].slice(0, n));
-      t = window.setTimeout(tick, del ? 40 : n === 0 ? 300 : 80);
-    };
-    t = window.setTimeout(tick, reduce ? 3000 : 1600);
-    return () => window.clearTimeout(t);
-  }, [reduce]);
-  return (
-    <>
-      <span className="dk-tw" aria-hidden="true">{text}</span>
-      <span className="sr-only">{WORDS.join(", ")}</span>
-    </>
-  );
-}
-
 function About() {
   return (
     <div className="dk-prose">
       <p className="lede">hi! i'm wilson. i'm also a <Typewriter /></p>
-      <p>{lede.replace("based in singapore", "based in 🇸🇬")}</p>
+      <p>{ledeFlag}</p>
       {aboutParagraphs.map((t) => <p key={t}>{t}</p>)}
       <p className="skills"><b>skills</b>{skillLine}</p>
     </div>
-  );
-}
-
-// one item: the title row ends in a more/less toggle; `more` shows only when expanded
-function Item({ title, more, children }: { title: ReactNode; more: ReactNode; children?: ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  return (
-    <article className="item">
-      <h3 className="item-title">
-        {title}
-        <button type="button" className="dk-link dk-more" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
-          {open ? "less" : "more"}
-        </button>
-      </h3>
-      {children}
-      <div className="item-more" id={id} hidden={!open}>{more}</div>
-    </article>
   );
 }
 
