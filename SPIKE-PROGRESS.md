@@ -183,3 +183,4 @@ in v2-retro; now on v2-boot (subagent). Worker CORS now allows https://wilsonsoo
 Deploy order: Wilson runs wrangler from worker/ (name comes from wrangler.jsonc, no --name needed) -> set VITE_AI_URL in
 Vercel env -> rebuild + redeploy the site (ask first).
 Merged 2026-11-18: retro boot bar (381e516, BootBar.tsx; original pixel slime + mushroom, hover/tap = big hop). Not yet eyeballed at 375px or live speed.
+Merged 2026-11-18: phone has no stub (rolled scroll hides after CLOSE_MS; photos icon reopens). Desktop stub unchanged.
