@@ -276,3 +276,4 @@ mode go to image mode (assistant + unread); prompt rule points at the picture bu
 1400px (bar aligned to about's right edge, maximised steps, finish) and 375px (two-row bar); wantsImage on 22 samples
 (1 accepted false positive: "image of wilson's career"); tsc, worker tests, build.
 **Not verified:** real iPhone "jump to"; the new prompt rule on the live model.
+**Deployed:** commit b468b16, Worker version f1287347 (live bundle checked; chat answers a vague picture request with the picture-button pointer). Not pushed.
