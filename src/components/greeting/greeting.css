@@ -93,6 +93,39 @@
   to { opacity: 1; transform: none; }
 }
 
+/* boot bar: a segmented fill (cream frame, accent green) with an original slime and mushroom hopping along its top.
+   Fill and walkers share one stepped timeline (16 steps) that ends just before the desktop takes over at 1100ms. */
+.gr-load { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.gr-lane { width: min(280px, 72vw); opacity: 0; animation: gr-lane-in 160ms ease-out 260ms both; }
+@keyframes gr-lane-in { to { opacity: 1; } }
+.gr-hops { position: relative; height: 44px; }
+.gr-mob { position: absolute; bottom: 4px; padding: 6px 0 0; pointer-events: auto; animation: gr-walk 800ms steps(16, end) 300ms both; }
+.gr-slime { --end: calc(100% - 42px); }
+.gr-mush { --end: calc(100% - 96px); }
+@keyframes gr-walk { from { left: 0; } to { left: var(--end); } }
+.gr-hop { display: block; transform-origin: 50% 100%; animation: gr-hop 440ms linear infinite; }
+.gr-mush .gr-hop { animation-delay: -220ms; }
+.gr-hop svg { display: block; }
+/* squash on landing, stretch on take-off, a short rest between hops */
+@keyframes gr-hop {
+  0% { transform: translateY(0) scale(1.1, 0.88); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  12% { transform: translateY(-4px) scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  38% { transform: translateY(-13px) scale(1, 1); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  64% { transform: translateY(0) scale(1.1, 0.88); }
+  80% { transform: translateY(0) scale(1, 1); }
+  100% { transform: translateY(0) scale(1.1, 0.88); }
+}
+.gr-track { position: relative; height: 16px; border: 2px solid #EAE3C9; background: #0B2A1D; }
+.gr-fill {
+  position: absolute; inset: 0; background: #B5DB7A; transform-origin: 0 50%;
+  animation: gr-fill 800ms steps(16, end) 300ms both;
+}
+@keyframes gr-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.gr-track::after { /* segment gaps */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent calc(100% - 2px), #0B2A1D 0) 0 0 / calc(100% / 16) 100%;
+}
+
 /* crt off: the picture squashes to a line, the line shrinks to a dot, the dot fades (~420ms, faster than switch-on) */
 .gr-crt { position: absolute; inset: 0; z-index: 1; }
 .gr-crt.closing { animation: gr-squash 420ms cubic-bezier(0.23, 1, 0.32, 1) both; }
@@ -295,5 +328,6 @@
   .dk-wall img { transition-duration: 200ms; }
   .gr-off.gone { transition: none; }
   .gr-off.gone .gr-ring { animation: none; }
+  .gr-hop { animation: none; }
   .gr-power:active, .dk-plain:active, .dk-icon:active, .dk-wbtn:active, .dk-back:active, .dk-dock-item:active { transform: none; }
 }
