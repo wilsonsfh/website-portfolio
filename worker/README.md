@@ -21,7 +21,6 @@ From the site (Vite): `fetch(`${import.meta.env.VITE_CHAT_URL}/api/chat`, {metho
 ```sh
 cd worker
 npm install
-npm run build:knowledge        # regenerate knowledge.md (review it first!)
 npx wrangler login             # opens browser; use the PERSONAL account on Workers Free
 npx wrangler secret put GROQ_API_KEY   # paste the key from console.groq.com when prompted
 # edit ALLOWED_ORIGINS in wrangler.jsonc to include the real site origin(s)
@@ -45,3 +44,9 @@ Checks: `npm run typecheck`, `npm test`.
 
 `TEXT_MODEL` `@cf/google/gemma-4-26b-a4b-it`, `IMAGE_MODEL` `@cf/black-forest-labs/flux-1-schnell`,
 `GROQ_MODEL` `openai/gpt-oss-20b`. Re-check the Workers AI catalog before deploy: models get deprecated often.
+
+## Knowledge
+
+`knowledge.md` (Workers AI) and `knowledge-short.md` (Groq, under ~1,500 tokens for its ~8K tokens/minute free tier)
+are hand-written and edited directly; nothing regenerates them. Keep them inside the allowlist in
+`../docs/ai-chat-decisions.md`, and keep the preparation-time app paragraph word for word.
