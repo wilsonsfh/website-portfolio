@@ -8,13 +8,12 @@ export interface Env {
 }
 
 /**
- * The admin as one mountable module. Mount it from the separate admin worker (base "", auth = Cloudflare Access, see
- * index.ts) or from the public worker under "/admin" (base "/admin", auth = e.g. an ADMIN_TOKEN check). Env needs only
- * AI, DB and TEXT_MODEL.
+ * The admin as one mountable module (mounted at "/admin" by the public worker, see ../index.ts). Env needs only AI, DB
+ * and TEXT_MODEL. The HTML page is public (it only shows a password box); every /api call goes through `authorize`.
  */
 export interface Mount {
-  base: string; // "" or "/admin": path prefix the admin is served under
-  authorize: (req: Request) => Promise<boolean>; // pluggable auth; false -> 403
+  base: string; // path prefix the admin is served under, e.g. "/admin"
+  authorize: (req: Request) => Promise<Response | null>; // pluggable auth: null = allowed, else the refusal to send
 }
 
 const STATUSES = ["open", "answered", "dismissed"];
@@ -25,18 +24,20 @@ const ORDER: Record<string, string> = {
 };
 const COLS = "id, question, asked_count, first_asked, last_asked, status, answer, answered_at, suggestion, suggested_at";
 
-const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
 
 export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise<Response> {
-  if (!(await mount.authorize(req))) return json({ error: "forbidden" }, 403);
   const url = new URL(req.url);
   const path = url.pathname.startsWith(mount.base) ? url.pathname.slice(mount.base.length) || "/" : null;
   if (path === null) return json({ error: "not_found" }, 404);
-  if (req.method !== "GET" && !sameOrigin(req.headers.get("Origin"), req.url)) return json({ error: "bad_origin" }, 403);
 
   if (req.method === "GET" && path === "/") {
-    return new Response(page(mount.base), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+    return new Response(page(mount.base), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
   }
+  if (!path.startsWith("/api/")) return json({ error: "not_found" }, 404);
+  if (req.method !== "GET" && !sameOrigin(req.headers.get("Origin"), req.url)) return json({ error: "bad_origin" }, 403);
+  const refused = await mount.authorize(req);
+  if (refused) return refused;
   if (req.method === "GET" && path === "/api/questions") {
     const status = url.searchParams.get("status") ?? "open";
     if (!STATUSES.includes(status)) return json({ error: "bad_status" }, 400);

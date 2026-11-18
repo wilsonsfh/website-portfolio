@@ -28,6 +28,8 @@ const PAGE = String.raw`<!doctype html>
   textarea { width: 100%; min-height: 5rem; font: inherit; text-transform: none; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .5rem; resize: vertical; }
   .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; align-items: center; }
   .msg { color: var(--muted); font-size: .85rem; }
+  #login { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  input { font: inherit; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: .35rem .6rem; }
   .empty { color: var(--muted); }
 </style>
 </head>
@@ -35,6 +37,12 @@ const PAGE = String.raw`<!doctype html>
 <main>
   <h1>questions the assistant couldn't answer</h1>
   <p class="sub">answers you save go live in the chat within about 5 minutes. suggestions are drafts for you only.</p>
+  <form id="login" hidden>
+    <label for="tok">password</label>
+    <input id="tok" type="password" autocomplete="current-password">
+    <button class="primary">enter</button>
+    <span class="msg" id="loginmsg"></span>
+  </form>
   <nav id="tabs"></nav>
   <section id="list"></section>
 </main>
@@ -51,10 +59,20 @@ function el(tag, text, cls) {
   if (cls) e.className = cls;
   return e;
 }
+function token() { try { return sessionStorage.getItem("admin-token") || ""; } catch (e) { return ""; } }
 function api(method, path, body) {
-  return fetch(BASE + path, { method: method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined })
-    .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+  return fetch(BASE + path, { method: method, headers: { "Content-Type": "application/json", "X-Admin-Token": token() }, body: body ? JSON.stringify(body) : undefined })
+    .then(function (r) { return r.json().then(function (j) {
+      if (r.status === 401 || r.status === 429) { showLogin(r.status === 429 ? "too many tries, wait a few minutes." : (token() ? "wrong password." : "")); throw new Error("login"); }
+      if (!r.ok) throw new Error(j.error || r.status); return j; }); });
 }
+var loginEl = document.getElementById("login");
+function showLogin(m) { loginEl.hidden = false; tabsEl.textContent = ""; listEl.textContent = ""; document.getElementById("loginmsg").textContent = m || ""; document.getElementById("tok").focus(); }
+loginEl.onsubmit = function (e) {
+  e.preventDefault();
+  try { sessionStorage.setItem("admin-token", document.getElementById("tok").value); } catch (x) {}
+  loginEl.hidden = true; load();
+};
 function day(iso) { return iso ? iso.slice(0, 10) : ""; }
 
 function drawTabs(counts) {
@@ -88,7 +106,7 @@ function card(q) {
     var b = el("button", label, cls);
     b.onclick = function () {
       b.disabled = true; msg.textContent = "...";
-      fn().catch(function (e) { if (e.message !== "empty" && e.message !== "cancelled") msg.textContent = "failed: " + e.message; else if (e.message === "cancelled") msg.textContent = ""; b.disabled = false; });
+      fn().catch(function (e) { if (e.message === "login") return; if (e.message !== "empty" && e.message !== "cancelled") msg.textContent = "failed: " + e.message; else if (e.message === "cancelled") msg.textContent = ""; b.disabled = false; });
     };
     row.appendChild(b);
   }
@@ -127,7 +145,7 @@ function load() {
     listEl.textContent = "";
     if (!j.questions.length) listEl.appendChild(el("p", "nothing here.", "empty"));
     j.questions.forEach(function (q) { listEl.appendChild(card(q)); });
-  }).catch(function (e) { listEl.textContent = "could not load: " + e.message; });
+  }).catch(function (e) { if (e.message !== "login") listEl.textContent = "could not load: " + e.message; });
 }
 var NOTHING = "nothing in the wiki about this";
 load();

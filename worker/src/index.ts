@@ -1,5 +1,7 @@
 import knowledge from "../knowledge.md";
 import knowledgeShort from "../knowledge-short.md";
+import { handleAdmin } from "./admin/handler.ts";
+import { FailLimiter, tokenEquals } from "./admin/logic.ts";
 import { logUnknown, answersSections } from "./qa.ts";
 import { FixedWindow, UNKNOWN_REPLY, UNKNOWN_TOKEN, isUnknown, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, type Msg } from "./logic.ts";
 
@@ -13,6 +15,7 @@ export interface Env {
   TEXT_MODEL: string;
   IMAGE_MODEL: string;
   GROQ_MODEL: string;
+  ADMIN_TOKEN?: string; // secret: `wrangler secret put ADMIN_TOKEN`, the /admin password
   GROQ_API_KEY?: string; // secret
   FORCE_FALLBACK?: string; // "1" skips Workers AI so Groq answers (test via a preview version, never set in wrangler.jsonc)
 }
@@ -22,6 +25,8 @@ const DAILY = { chat: 60, image: 4 }; // per visitor per UTC-ish day (per isolat
 const day = new FixedWindow();
 // When Workers AI said "daily limit", skip it until the reset instead of burning calls.
 let aiBlockedUntil = 0;
+const adminFails = new FailLimiter(10, 10 * 60_000); // failed /admin logins per IP
+
 
 const system = (k: string) => `you are the assistant on wilson soon's portfolio site. answer questions about wilson only from the KNOWLEDGE block below.
 rules:
@@ -44,6 +49,7 @@ export default {
       new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json", ...cors } });
 
     const url = new URL(req.url);
+    if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) return admin(req, env);
     if (req.method === "OPTIONS") return new Response(null, { status: origin ? 204 : 403, headers: cors });
     if (req.method !== "POST" || (url.pathname !== "/api/chat" && url.pathname !== "/api/image")) return json({ error: "not_found" }, 404);
     if (req.headers.get("Origin") && !origin) return json({ error: "origin_not_allowed" }, 403);
@@ -61,6 +67,24 @@ export default {
     return isImage ? image(body, env, json) : chat(body, env, json, ctx);
   },
 } satisfies ExportedHandler<Env>;
+
+/** Wilson's unanswered-questions admin, mounted at /admin. The page is public; its API needs the ADMIN_TOKEN secret. */
+async function admin(req: Request, env: Env): Promise<Response> {
+  const refuse = (error: string, status: number) =>
+    new Response(JSON.stringify({ error }), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
+  if (!env.DB) return refuse("no_database", 503);
+  const ip = req.headers.get("CF-Connecting-IP") ?? "unknown";
+  return handleAdmin(req, { AI: env.AI, DB: env.DB, TEXT_MODEL: env.TEXT_MODEL }, {
+    base: "/admin",
+    authorize: async (r) => {
+      if (!env.ADMIN_TOKEN) return refuse("admin_disabled", 503); // no secret set = locked
+      if (adminFails.blocked(ip)) return refuse("rate_limited", 429);
+      if (tokenEquals(r.headers.get("X-Admin-Token") ?? "", env.ADMIN_TOKEN)) return null;
+      adminFails.fail(ip);
+      return refuse("unauthorized", 401);
+    },
+  });
+}
 
 type J = (b: unknown, s?: number) => Response;
 

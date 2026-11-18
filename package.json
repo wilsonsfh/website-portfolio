@@ -8,7 +8,6 @@
     "preview": "vite preview",
     "deploy": "npm run build && cd worker && npx wrangler deploy",
     "photos:add": "node scripts/photos-add.mjs",
-    "deploy:admin": "cd admin && npx wrangler deploy",
     "wiki:excerpt": "node scripts/wiki-excerpt.mjs"
   },
   "dependencies": {

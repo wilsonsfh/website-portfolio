@@ -45,3 +45,32 @@ ${parts.join("\n\n---\n\n")}`;
 export function sameOrigin(origin: string | null, url: string): boolean {
   return !origin || origin === new URL(url).origin;
 }
+
+/** Constant-time string compare (no early exit on the first differing byte). */
+export function tokenEquals(a: string, b: string): boolean {
+  const x = new TextEncoder().encode(a), y = new TextEncoder().encode(b);
+  let d = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) d |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return d === 0;
+}
+
+/** Failed-login counter per key (per isolate, best effort). Blocks a key for the rest of its window. */
+export class FailLimiter {
+  private m = new Map<string, { n: number; reset: number }>();
+  private max: number;
+  private windowMs: number;
+  constructor(max: number, windowMs: number) {
+    this.max = max;
+    this.windowMs = windowMs;
+  }
+  blocked(key: string, now = Date.now()): boolean {
+    const c = this.m.get(key);
+    return !!c && c.reset > now && c.n >= this.max;
+  }
+  fail(key: string, now = Date.now()): void {
+    if (this.m.size > 2000) for (const [k, v] of this.m) if (v.reset <= now) this.m.delete(k);
+    const c = this.m.get(key);
+    if (!c || c.reset <= now) this.m.set(key, { n: 1, reset: now + this.windowMs });
+    else c.n++;
+  }
+}

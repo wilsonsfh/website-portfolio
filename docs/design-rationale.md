@@ -308,12 +308,13 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **One D1 database, two Workers.** The public Worker writes questions and reads answers; the admin Worker reads, answers
   and drafts. Answers are cached in memory for 5 minutes, so most chat requests never touch D1, and a saved answer goes
   live within that window. Both providers get the answers (Groq a shorter list, because of its token limit).
-- **Separate admin Worker.** Cloudflare Access attaches to a whole Worker hostname. Keeping the admin in its own Worker
-  lets Access protect it while the public Worker stays open, and the Worker still refuses requests without the Access
-  header. The admin code is one mountable handler, so it could instead live under `/admin` on the public Worker with a token.
+- **Admin at `/admin` on the public Worker, token-gated.** Wilson wanted one link. Cloudflare Access on `workers.dev`
+  covers a whole Worker, not a path, so it cannot protect `/admin` alone (a custom domain would allow path-scoped Access
+  later). Instead the page is public but shows only a password box, and every admin API call needs the `ADMIN_TOKEN`
+  secret (constant-time compare, per-IP failed-attempt lockout, token kept in sessionStorage, `no-store` and `noindex`).
+  The admin is one mountable handler with a pluggable `authorize`, so moving it to its own Worker behind Access is a small change.
 - **The wiki excerpt lives in D1, never in the repo.** The repo is public. Wilson picks the pages, a local script chunks
   them and uploads with `wrangler d1 execute`; the page list and generated SQL are gitignored. Retrieval is FTS5 in D1.
 - **Suggestions are never public.** A draft is stored in its own column, shown only in the admin and written from the wiki
   excerpt only. Nothing reaches visitors until Wilson edits and saves it as an answer.
-- **Known limits.** A follow-up message ("and what about that?") is logged without its context. The admin page trusts
-  Cloudflare Access for identity and sets no passwords.
+- **Known limits.** A follow-up message ("and what about that?") is logged without its context. The admin has one shared password (the token) and no accounts.
