@@ -1,4 +1,4 @@
-import { DB_TABLES, NOTHING, dbPage, ftsQuery, sameOrigin, suggestMessages, type Chunk } from "./logic.ts";
+import { DB_TABLES, dbPage, ftsQuery, sameOrigin, suggestMessages, type Chunk } from "./logic.ts";
 import { page } from "./page.ts";
 
 export interface Env {
@@ -87,7 +87,7 @@ export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise
 
 const changed = (r: D1Result) => (r.meta.changes ? json({ ok: true }) : json({ error: "not_found" }, 404));
 
-/** Draft an answer from the top wiki chunks. Stored for the admin only; never read by the public worker. */
+/** Draft an answer from the top wiki chunks (or general knowledge). Stored for the admin only; never read by the public worker. */
 async function suggest(env: Env, id: number, now: string): Promise<Response> {
   const row = await env.DB.prepare("SELECT question FROM questions WHERE id = ?").bind(id).first<{ question: string }>();
   if (!row) return json({ error: "not_found" }, 404);
@@ -106,16 +106,15 @@ async function suggest(env: Env, id: number, now: string): Promise<Response> {
     if (all.length <= 8) chunks.push(...all);
   }
 
-  let suggestion = NOTHING;
-  if (chunks.length) {
-    try {
-      const res = (await env.AI.run(env.TEXT_MODEL as any, { messages: suggestMessages(row.question, chunks), max_tokens: 300, chat_template_kwargs: { enable_thinking: false } } as any)) as any;
-      const t = res?.response ?? res?.choices?.[0]?.message?.content;
-      if (typeof t !== "string" || !t.trim()) return json({ error: "empty_answer" }, 502);
-      suggestion = t.trim();
-    } catch (e) {
-      return json({ error: "ai_error", message: String((e as Error)?.message ?? e) }, 502);
-    }
+  // always asked, even with no excerpt: a question that is not about wilson is answered from general knowledge
+  let suggestion: string;
+  try {
+    const res = (await env.AI.run(env.TEXT_MODEL as any, { messages: suggestMessages(row.question, chunks), max_tokens: 300, chat_template_kwargs: { enable_thinking: false } } as any)) as any;
+    const t = res?.response ?? res?.choices?.[0]?.message?.content;
+    if (typeof t !== "string" || !t.trim()) return json({ error: "empty_answer" }, 502);
+    suggestion = t.trim();
+  } catch (e) {
+    return json({ error: "ai_error", message: String((e as Error)?.message ?? e) }, 502);
   }
   await env.DB.prepare("UPDATE questions SET suggestion = ?, suggested_at = ? WHERE id = ?").bind(suggestion, now, id).run();
   return json({ suggestion, suggested_at: now });

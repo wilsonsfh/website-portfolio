@@ -12,6 +12,10 @@ const msgs = suggestMessages("hobbies?", [{ page: "p", heading: "h1", text: "he 
 assert.equal(msgs[1].content, "hobbies?");
 assert.ok(msgs[0].content.includes("[h1]\nhe climbs") && !msgs[0].content.includes("[h2]")); // char cap drops later chunks
 assert.ok(msgs[0].content.includes(NOTHING));
+// questions not about wilson are answered from general knowledge; with no excerpt the prompt says so
+const none = suggestMessages("what is a cloudflare worker?", []);
+assert.ok(none[0].content.includes("general knowledge"));
+assert.ok(none[0].content.includes("(no excerpt matched this question)"));
 
 // origin
 assert.ok(sameOrigin(null, "https://a.workers.dev/api"));

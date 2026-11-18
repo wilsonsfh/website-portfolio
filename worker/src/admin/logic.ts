@@ -18,7 +18,7 @@ export type Chunk = { page: string; heading: string; text: string };
 
 export const NOTHING = "nothing in the wiki about this";
 
-/** Messages for drafting an answer ONLY from wiki excerpts. */
+/** Messages for drafting an answer: facts about wilson ONLY from wiki excerpts; anything else from general knowledge. */
 export function suggestMessages(question: string, chunks: Chunk[], maxChars = 9000) {
   let size = 0;
   const parts: string[] = [];
@@ -29,15 +29,16 @@ export function suggestMessages(question: string, chunks: Chunk[], maxChars = 90
     size += piece.length;
   }
   const system = `you draft answers for the portfolio site of wilson soon. a visitor asked a question the site's assistant could not answer.
-write a short draft answer (1 to 3 sentences) using ONLY the EXCERPT below.
+write a short draft answer (1 to 3 sentences).
+first decide what the question is about:
+- about wilson (his life, work, studies, interests, opinions): use ONLY the EXCERPT below. never invent or guess facts about him. if the excerpt does not contain the answer, reply with exactly: ${NOTHING}
+- anything else (a general, technical or off-topic question, small talk, a joke): answer it helpfully from your general knowledge, and do not claim it is something wilson said or did.
 rules:
 - lowercase, friendly and casual, like the site. no first person ("i"): write about wilson in the third person or state the fact directly.
 - start with the answer itself. no preamble, no lists.
-- never invent or guess. do not add facts that are not in the excerpt.
 - the draft will be published to the public after wilson reviews it, so leave out anything private: health, family, relationships, money, grades, job search, salary, other people's names.
-- if the excerpt does not contain the answer, reply with exactly: ${NOTHING}
 EXCERPT:
-${parts.join("\n\n---\n\n")}`;
+${parts.length ? parts.join("\n\n---\n\n") : "(no excerpt matched this question)"}`;
   return [{ role: "system" as const, content: system }, { role: "user" as const, content: question }];
 }
 
