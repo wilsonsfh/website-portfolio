@@ -21,6 +21,7 @@ export type Ctx = {
   photoReq: { id: string | null; n: number } | null; // a scroll asked the Photos app to show a photo (id) or the grid (null)
   toTimeline: () => void; // "back" from a photo opened on the scrolls: close Photos and unroll them again
   ask: () => void; // open the portfolio assistant panel
+  touchReq: number; // bumped by the tour's finish on plaintext: its "get in touch" row opens and scrolls into view
 };
 
 function About() {
@@ -44,11 +45,11 @@ function Work() {
           more={<>
             <p className="date">{job.location}</p>
             <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
-            {job.tags.length > 0 && <p className="tags">{job.tags.join(" · ")}</p>}
           </>}
         >
           <p className="item-sub"><span className="role">{job.role}</span><span className="date">{job.date}</span></p>
           <p className="desc">{job.summary}</p>
+          {job.tags.length > 0 && <p className="tags">{job.tags.join(" · ")}</p>}
         </Item>
       ))}
     </div>
@@ -85,11 +86,10 @@ function Activities() {
         <Item
           key={a.title}
           title={a.title}
-          more={<>
-            {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
-            <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
-          </>}
-        />
+          more={a.descriptions.length > 0 && <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>}
+        >
+          {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
+        </Item>
       ))}
     </div>
   );
@@ -163,7 +163,7 @@ export const APPS: App[] = [ // reading order: the phone grid wraps in this orde
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
   { id: "projects", tip: "things i have built", title: "projects", glyph: "M12 5.5a5 5 0 0 0-3.5 8.5c.6.5 1 1.1 1 2h5c0-.9.4-1.5 1-2A5 5 0 0 0 12 5.5z M9.5 18.5h5 M10.5 21h3 M12 1.5v2 M7 5.5L5.6 4.1 M17 5.5l1.4-1.4", w: 680, h: 640, render: () => <Projects /> },
   { id: "activities", tip: "what i'm involved in", title: "involvements", glyph: "M6 5h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 1-4 0H6v-4a2 2 0 1 0 0-4z", w: 660, h: 620, render: () => <Activities /> },
-  { id: "plain", tip: "the boring version, all of it", title: "plaintext-version.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: (ctx) => <MainPage embedded more={<More ctx={ctx} inPlain />} /> },
+  { id: "plain", tip: "the clean version", title: "plaintext-version.html", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M10.5 12l-2 2 2 2 M13.5 12l2 2-2 2", w: 820, h: 560, hFrac: 0.86, render: (ctx) => <MainPage embedded more={<More ctx={ctx} inPlain />} touchReq={ctx.touchReq} /> },
   { id: "v1", tip: "my previous website", title: "v1", glyph: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4 3.5v3.7h3.7 M12 8v4.2l3 1.8", w: 1000, h: 640, hFrac: 0.86, flush: true, render: () => <V1 /> },
   { id: "assistant", tip: "ask me anything", title: "portfolio assistant", glyph: ASK_GLYPH, w: 0, h: 0, render: () => null }, // not a window: opens the assistant panel
   { id: "contact", tip: "ways to reach me", title: "contact", glyph: "M3 6h18v12H3z M3 7l9 7 9-7", w: 520, h: 560, render: (ctx) => <Contact ctx={ctx} /> },

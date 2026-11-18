@@ -1,16 +1,30 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import workExperience from "../data/work-experience.json";
 import projects from "../data/projects.json";
 import activities from "../data/activities.json";
 import { skillLine, ledeFlag, aboutParagraphs, contacts, ext } from "../copy";
 import Item from "./Item";
 import Typewriter from "./Typewriter";
+import { Sprite, MUSH, SLIME } from "./greeting/BootBar";
+import { useSpirits, SpiritCtl } from "./Spirits";
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
+// openReq: each new value opens the row and scrolls it into view (the tour's finish on plaintext asks for "get in touch")
+function Row({ label, children, openReq }: { label: string; children: ReactNode; openReq?: number }) {
   const [open, setOpen] = useState(false);
   const id = `${useId()}-${label.replace(/\s+/g, "-")}`; // unique: MainPage can render twice (page + desktop window)
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!openReq) return;
+    setOpen(true);
+    // after the window has shrunk back and the panel has opened
+    const t = window.setTimeout(() => {
+      const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      ref.current?.scrollIntoView({ block: "start", behavior: smooth ? "smooth" : "auto" });
+    }, 320);
+    return () => clearTimeout(t);
+  }, [openReq]);
   return (
-    <section className="row">
+    <section className="row" ref={ref}>
       <h2 className="row-heading">
         <button
           type="button"
@@ -62,9 +76,10 @@ function ThemeToggle() {
   );
 }
 
-export default function MainPage({ embedded = false, more }: { embedded?: boolean; more?: ReactNode }) {
+export default function MainPage({ embedded = false, more, touchReq }: { embedded?: boolean; more?: ReactNode; touchReq?: number }) {
   // embedded (inside a desktop window): no #main id or main landmark, no full-height page, tighter padding
   const Root = embedded ? "div" : "main";
+  const [spirits, setSpirits] = useSpirits();
   return (
     <Root id={embedded ? undefined : "main"} className={`page${embedded ? " embedded" : ""}`}>
       <div className="column">
@@ -72,6 +87,15 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
           <h1 className="name">hi! i'm wilson.</h1>
           <p className="lede">i'm also a <Typewriter /></p>
           <p className="lede">{ledeFlag}</p>
+          <span className={`spirits-row${spirits === "still" ? " spirits-still" : ""}`}>
+            {spirits !== "hidden" && (
+              <span className="spirits" aria-hidden="true">
+                <span className="spirit"><span className="gr-hop"><Sprite rows={MUSH} /></span></span>
+                <span className="spirit"><span className="gr-hop"><Sprite rows={SLIME} /></span></span>
+              </span>
+            )}
+            <SpiritCtl mode={spirits} set={setSpirits} />
+          </span>
         </header>
 
         <div className="rows">
@@ -93,10 +117,10 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
                 more={<>
                   <p className="meta">{job.location}</p>
                   <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
-                  <p className="meta tags">{job.tags.join(", ")}</p>
                 </>}
               >
                 <p className="desc">{job.summary}</p>
+                {job.tags.length > 0 && <p className="meta tags">{job.tags.join(", ")}</p>}
               </Item>
             ))}
           </Row>
@@ -127,15 +151,14 @@ export default function MainPage({ embedded = false, more }: { embedded?: boolea
                 key={a.title}
                 head="item-head"
                 title={a.title}
-                more={<>
-                  {(a.role || a.date) && <p className="meta">{a.role && <span className="role">{a.role}</span>}{a.role && a.date && " · "}{a.date}</p>}
-                  <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>
-                </>}
-              />
+                more={a.descriptions.length > 0 && <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>}
+              >
+                {(a.role || a.date) && <p className="meta">{a.role && <span className="role">{a.role}</span>}{a.role && a.date && " · "}{a.date}</p>}
+              </Item>
             ))}
           </Row>
 
-          <Row label="get in touch">
+          <Row label="get in touch" openReq={touchReq}>
             <ul className="contacts">
               {contacts.map((c) => (
                 <li key={c.label}><span className="meta label">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>

@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
 import Scrolls from "./Scrolls";
 import Assistant from "./Assistant";
-import Wallpaper from "./Wallpaper";
+import Wallpaper, { EVERY } from "./Wallpaper";
 import TouchCursor from "./TouchCursor";
-import { Sprite, SLIME, MUSH } from "./BootBar";
+import TourDemo from "./TourDemo";
+import { Sprite, Mob, SLIME, MUSH } from "./BootBar";
 import Window, { BAR, MIN_W, MIN_H, clamp } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
 import { getSoundOn, setSoundOn } from "./sound";
+import { useSpirits, SpiritCtl } from "../Spirits";
 
 const time = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -36,13 +39,34 @@ function useViewport() {
 type Win = { id: AppId; x: number; y: number; z: number; focus: boolean; w?: number; h?: number; max?: boolean; min?: boolean }; // w/h: set once the visitor resizes
 const PHONE = 640;
 
-// onboarding: about.txt opens first, then "next" walks these in order (each window stacks on the last)
-const TOUR: AppId[] = ["about", "work", "projects", "activities", "contact"];
+// onboarding: "next" walks these in order, one maximised window at a time. a step is a window, or one of the
+// non-window stops: the bare desktop, the unrolled timeline, the assistant panel
+type Step = AppId | "desktop";
+const NOWIN: Step[] = ["desktop", "timeline", "assistant"];
+// me first (content), then the desktop itself (features)
+const TOUR: Step[] = ["about", "work", "projects", "activities", "contact", "desktop", "timeline", "photos", "terminal", "messages", "assistant"];
+// every stop says what you're looking at, one or two short sentences
+const CAPTION: Partial<Record<Step, string>> = {
+  about: "who i am, in a few lines. the word after \"i'm also a\" keeps changing.",
+  work: "where i've worked, one line each. expand for what i did and where.",
+  projects: "things i've built, with links to the code or the live site. expand for the details.",
+  activities: "what i'm involved in outside work. expand for what i did there.",
+  contact: "ways to reach me: email, github, x or linkedin. next, a look around the desktop.",
+  desktop: "a desktop, not a page. icons open windows you can drag and resize. poke the slime or the mushroom and they hop.",
+  timeline: "four paper lanes of my years: career, people, me and scenery. drag to throw them; click a photo to open it.",
+  photos: "my photo library: by month, albums, and a viewer with swipe and zoom.",
+  terminal: "the same things as commands: try help, cat work.txt or ask <question>.",
+  messages: 'a short chat with "me" that plays itself. tap the replies.',
+  assistant: "ask anything about me. it answers from notes i wrote, and can draw pictures from the image button.",
+};
+const stepTitle = (s: Step) => (s === "desktop" ? "desktop" : appById(s).title);
 const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
-type Tour = { cur: AppId; trail: AppId[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
+type Tour = { cur: Step; trail: Step[] }; // cur: a TOUR step, or "plain" after "skip"; trail: where the visitor came from, for "back"
+const LAST_KEY = "tour-last"; // sessionStorage: the last TOUR step reached, while the tour is unfinished
+const lastStep = (): Step | null => { try { const v = sessionStorage.getItem(LAST_KEY) as Step | null; return v && TOUR.includes(v) ? v : null; } catch { return null; } };
 const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
-const SEAL_MS = 1700; // the finish window: 300ms wait for contact to shrink, 400ms in, held 1s, then out
+const SEAL_MS = 2200; // the finish window: 300ms wait for contact to shrink, 400ms in, held 1.5s, then out
 
 const size = (id: AppId, vw: number, vh: number) => {
   const a = appById(id);
@@ -86,8 +110,20 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   // first visit: a small window asks "tour?" before anything opens; yes starts the tour, no opens contact
   const [asking, setAsking] = useState(() => !tourDone());
   const [tour, setTour] = useState<Tour | null>(null);
+  const [last, setLastState] = useState(lastStep); // where an unfinished tour was left, for "resume tour"
+  const setLast = (id: Step | null) => {
+    setLastState(id);
+    try { if (id) sessionStorage.setItem(LAST_KEY, id); else sessionStorage.removeItem(LAST_KEY); } catch {}
+  };
   const [wins, setWins] = useState<Win[]>([]); // every visit starts on the bare desktop
-
+  const [spirits, setSpirits] = useSpirits();
+  // left hopping, the desktop spirits take turns: hop for one wallpaper photo, rest for the next
+  const [resting, setResting] = useState(false);
+  useEffect(() => {
+    const t = window.setInterval(() => setResting((r) => !r), EVERY);
+    return () => clearInterval(t);
+  }, []);
+  const [touchReq, setTouchReq] = useState(0); // bumped by finish on plaintext: its "get in touch" row opens
   const reduce = useReducedMotion();
   const [askOpen, setAskOpen] = useState(false); // the assistant panel (top bar icon, desktop icon, ctrl/cmd + k)
   const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the timeline icon unrolls them
@@ -128,7 +164,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
       // the tour steps back to the last window it came from that is still open, or ends
       const trail = tour.trail.filter((t) => t !== id && wins.some((w) => w.id === t));
       const prev = trail.pop();
-      if (prev) { setTour({ cur: prev, trail }); focusWin(prev); return; } else endTour();
+      if (prev) { setTour({ cur: prev, trail }); focusWin(prev as AppId); return; } else endTour(); // prev is an open window
     }
     if (id === "photos") {
       setPhotoReq(null); // a reopened window starts on the grid
@@ -172,23 +208,39 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z, min: false } : w)));
   };
   // one window at a time, maximised: the current stage's window closes as the next one opens
-  const tourShow = (cur: AppId, id: AppId) => {
+  const tourShow = (cur: Step, id: Step) => {
     const z = ++zRef.current;
-    setWins((ws) => [...ws.filter((w) => w.id !== cur && w.id !== id), { ...place(id, 0, z, true), max: true }]);
+    // the non-window stops: the timeline unrolls, the assistant panel opens; leaving them puts them away
+    if (cur === "timeline" || id === "timeline") { setRollsFrom("icon"); setRollsOpen(id === "timeline"); }
+    if (cur === "assistant" || id === "assistant") setAskOpen(id === "assistant");
+    const keep = (ws: Win[]) => ws.filter((w) => w.id !== cur && w.id !== id);
+    if (NOWIN.includes(id)) setWins(keep);
+    else setWins((ws) => [...keep(ws), { ...place(id as AppId, 0, z, true), max: true }]);
+  };
+  // the tour starts (or restarts, or resumes) at a step: one maximised window, like answering yes
+  const startTour = (at: Step) => {
+    const z = ++zRef.current;
+    setTour({ cur: at, trail: [] });
+    setWins(NOWIN.includes(at) ? [] : [{ ...place(at as AppId, 0, z, true), max: true }]);
+    setRollsFrom("icon");
+    setRollsOpen(at === "timeline");
+    setAskOpen(at === "assistant");
   };
   const answer = (yes: boolean) => {
     setAsking(false);
     const z = ++zRef.current;
-    if (yes) { setTour({ cur: "about", trail: [] }); setWins([{ ...place("about", 0, z, true), max: true }]); }
+    if (yes) startTour(TOUR[0]);
     else { endTour(); setWins([place("contact", 0, z, true)]); }
   };
+  // remember the furthest-left step: the last TOUR step shown (plaintext keeps the step it was skipped from)
+  useEffect(() => { if (tour && TOUR.includes(tour.cur)) setLast(tour.cur); }, [tour?.cur]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!asking) return;
     const on = (e: KeyboardEvent) => { if (e.key === "Escape") answer(false); };
     window.addEventListener("keydown", on);
     return () => window.removeEventListener("keydown", on);
   }); // re-bound each render so answer sees the current state
-  const tourTo = (id: AppId) => {
+  const tourTo = (id: Step) => {
     if (!tour) return;
     tourShow(tour.cur, id);
     setTour({ cur: id, trail: [...tour.trail, tour.cur] });
@@ -206,9 +258,11 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const z = ++zRef.current;
     setWins((ws) => ws.filter((w) => w.id === "contact").map((w) => ({ ...w, z, min: false, max: false })));
     setRollsOpen(false);
+    setAskOpen(false);
     setPhotoReq(null);
     fromTl.current = false;
     endTour();
+    setLast(null);
     setSealed(true);
   };
   useEffect(() => {
@@ -219,7 +273,9 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   // finish after skipping to plaintext: plaintext stays open but shrinks back to a window, then the same done window
   const plainFinish = () => {
     setWins((ws) => ws.map((w) => (w.id === "plain" ? { ...w, max: false } : w)));
+    setTouchReq((n) => n + 1);
     endTour();
+    setLast(null);
     setSealed(true);
   };
   const tourBack = () => {
@@ -247,8 +303,8 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
             {plain ? (phone ? "← tour" : "← back to the tour") : phone ? "←" : "← back"}
           </button>
         )}
-        <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${appById(next).title}` : undefined}>
-          {next ? (phone ? `${appById(next).title} →` : `next: ${appById(next).title} →`) : "finish"}
+        <button type="button" className="dk-tbtn primary" onClick={plain ? plainFinish : tourNext} aria-label={next ? `next: ${stepTitle(next)}` : undefined}>
+          {next ? (phone ? `${stepTitle(next)} →` : `next: ${stepTitle(next)} →`) : "finish"}
         </button>
       </div>
     );
@@ -258,7 +314,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   const toggle = (id: AppId) => (wins.some((w) => w.id === id && (phone || !w.min)) ? close(id) : open(id));
 
   const ctx: Ctx = {
-    open, close, photoReq, ask: () => setAskOpen(true),
+    open, close, photoReq, ask: () => setAskOpen(true), touchReq,
     unroll: (from) => { setRollsFrom(from ?? "icon"); setRollsOpen(true); },
     // back from a photo opened on the scrolls: unrolled from Photos, that window stays (it is under the scrolls); otherwise it closes
     toTimeline: () => (rollsFrom === "photos" ? setRollsOpen(true) : close("photos", true)),
@@ -270,6 +326,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
       <TouchCursor />
+      <TourDemo step={tour?.cur ?? null} title={tour ? stepTitle(tour.cur) : ""} />
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
@@ -344,9 +401,37 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
           </button>
           )}</Tooltip>
         ))}
+        {/* decorative: the spirits live on the desktop, last row; hover or tap hops */}
+        <div className={`dk-mobs${spirits === "still" || resting ? " spirits-still" : ""}`}>
+          {spirits !== "hidden" && (
+            <span className="dk-mobs-art" aria-hidden="true">
+              <Mob kind="mush" rows={MUSH} />
+              <Mob kind="slime" rows={SLIME} />
+            </span>
+          )}
+          <SpiritCtl mode={spirits} set={setSpirits} />
+        </div>
       </nav>
 
-      {tour && <div className="dk-tour-corner">{tourBar()}</div>}
+      {tour && (() => {
+        const corner = (
+          <div className={`dk-tour-corner${tour.cur === "assistant" ? " over" : ""}`}>
+            {CAPTION[tour.cur] && <p className="dk-tcap">{CAPTION[tour.cur]}</p>}
+            {tourBar()}
+          </div>
+        );
+        // the assistant panel is portalled to <body>: on its stop the tour follows it there, above it, so "next" stays reachable
+        return tour.cur === "assistant" ? createPortal(corner, document.body) : corner;
+      })()}
+      {/* no tour running: a way back in (resume where they left, or from the start) */}
+      {!tour && !asking && !sealed && (
+        <div className="dk-tour-corner idle">
+          <div className="dk-tour" role="group" aria-label="tour">
+            {last && <button type="button" className="dk-tbtn primary" onClick={() => startTour(last)}>resume tour</button>}
+            <button type="button" className="dk-tbtn" onClick={() => startTour(TOUR[0])}>tour again</button>
+          </div>
+        </div>
+      )}
       <AnimatePresence>
         {asking && (
           // blocks the desktop until answered; Escape = no

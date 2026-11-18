@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, visitorId, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime } from "../src/logic.ts";
+import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, visitorId, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, chatPersona, unknownReply, systemPrompt } from "../src/logic.ts";
 
 // fallback decision
 assert.equal(limitReason(new Error("3036: You have used up your daily free allocation of 10,000 neurons")), "daily_limit");
@@ -82,3 +82,20 @@ assert.equal(visitorId({ visitor: 42 }), "anon");
 assert.equal(visitorId({ visitor: "short" }), "anon");
 assert.equal(visitorId({ visitor: "x'; DROP TABLE chat_log; --" }), "anon");
 assert.equal(visitorId(null), "anon");
+
+// persona: "(1) unread" sends as:"wilson" and is answered by wilson in the first person; anything else is the site assistant
+assert.equal(chatPersona({ as: "wilson" }), "wilson");
+assert.equal(chatPersona({}), "assistant");
+assert.equal(chatPersona({ as: "admin" }), "assistant");
+assert.equal(chatPersona(null), "assistant");
+assert.equal(unknownReply("assistant"), UNKNOWN_REPLY);
+assert.ok(!/\bwilson\b/.test(unknownReply("wilson"))); // wilson doesn't refer to himself in the third person
+assert.ok(unknownReply("wilson") === unknownReply("wilson").toLowerCase());
+const pa = systemPrompt("assistant", "K-BODY"), pw = systemPrompt("wilson", "K-BODY");
+assert.ok(pa.endsWith("KNOWLEDGE:\nK-BODY") && pw.endsWith("KNOWLEDGE:\nK-BODY"));
+assert.ok(pa.includes("you are the assistant on wilson soon's portfolio site"));
+assert.ok(pw.includes("you are wilson soon") && /first person/.test(pw) && !pw.includes("you are the assistant"));
+assert.ok(/honest/.test(pw)); // asked "are you a bot?", it says it is an ai stand-in, not the real wilson
+// small talk and follow-ups are not "facts about wilson", so they must not fall to UNKNOWN (both personas)
+for (const p of [pa, pw]) assert.ok(/how's wilson/.test(p) && /what do you mean/.test(p));
+console.log("persona tests ok");

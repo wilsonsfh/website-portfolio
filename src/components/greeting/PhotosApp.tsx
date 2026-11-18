@@ -20,7 +20,10 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
   const [density, setDensity] = useState(1);
   const [cur, setCur] = useState(0);
   const [viewing, setViewing] = useState(false);
-  const [fromTl, setFromTl] = useState(false); // the viewer was opened from the scrolls, so "back" returns there
+  // flow: the visitor came from the scrolls (id: the photo they clicked, null for "all photos"); the grid keeps "back to
+  // photo" and "timeline" until they leave. viaTl: the viewer shows that photo, so its back goes to the scrolls
+  const [flow, setFlow] = useState<{ id: string | null } | null>(null);
+  const [viaTl, setViaTl] = useState(false);
   const reduce = !!useReducedMotion();
   const compact = width < COMPACT;
 
@@ -57,12 +60,20 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
   useEffect(() => {
     const req = ctx.photoReq;
     if (!req) return;
-    const i = req.id ? ITEMS.findIndex((x) => x.id === req.id) : -1;
-    if (i < 0) { setViewing(false); return; }
+    setFlow({ id: req.id });
+    if (!showOrigin(req.id)) setViewing(false);
+  }, [ctx.photoReq]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // the clicked photo in the viewer, as opened from the scrolls
+  const showOrigin = (id: string | null) => {
+    const i = id ? ITEMS.findIndex((x) => x.id === id) : -1;
+    if (i < 0) return false;
     if (album === "library") setCur(i); else { pending.current = i; setAlbum("library"); }
     setViewing(true);
-    setFromTl(true);
-  }, [ctx.photoReq]); // eslint-disable-line react-hooks/exhaustive-deps
+    setViaTl(true);
+    return true;
+  };
+  const leaveFlow = () => { setFlow(null); setViaTl(false); };
 
   const jump = (key: string) => {
     const g = groups.find((x) => x.key === key);
@@ -147,6 +158,8 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
       </nav>
       <div className="ph-main" inert={viewing}>
         <div className="ph-bar">
+          {flow && flow.id && <button type="button" className="ph-btn" onClick={() => showOrigin(flow.id)}>← back to photo</button>}
+          {flow && <button type="button" className="ph-btn" onClick={() => { leaveFlow(); ctx.toTimeline(); }}>← timeline</button>}
           <h2 className="ph-title">{label}<span>{items.length} {items.length === 1 ? "item" : "items"}</span></h2>
           <label className="ph-field">
             <span className="sr-only">jump to month</span>
@@ -187,7 +200,7 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
                       tabIndex={i === cur ? 0 : -1}
                       aria-label={`${it.caption}, ${fmtDate(it.date)}${it.type === "video" ? ", video" : ""}`}
                       style={{ "--ar": it.w / it.h } as CSSProperties}
-                      onClick={() => { setCur(i); setViewing(true); }}
+                      onClick={() => { setCur(i); setViewing(true); setViaTl(false); }}
                     >
                       <img src={it.type === "video" ? it.poster ?? "" : it.src ?? ""} alt="" loading="lazy" decoding="async" draggable={false} />
                       {it.type === "video" && <span className="ph-play" aria-hidden="true">▶</span>}
@@ -203,9 +216,10 @@ export default function PhotosApp({ ctx }: { ctx: Ctx }) {
       {viewing && items[cur] && (
         <PhotoViewer
           items={items} index={cur} onIndex={setCur} reduced={reduce} compact={compact}
-          backLabel={fromTl ? "timeline" : "grid"}
+          backLabel={viaTl ? "timeline" : "grid"}
+          onLibrary={viaTl ? () => setViewing(false) : undefined}
           onClose={() => {
-            if (fromTl) { setFromTl(false); wasViewing.current = false; ctx.toTimeline(); } // the scrolls take focus, not the grid
+            if (viaTl) { leaveFlow(); wasViewing.current = false; ctx.toTimeline(); } // the scrolls take focus, not the grid
             setViewing(false);
           }}
         />

@@ -49,8 +49,9 @@ async function post(path: string, body: object, signal?: AbortSignal): Promise<R
   return { ok: false, message: data.message ?? "something went wrong, try again." };
 }
 
-export async function askChat(turns: Turn[], signal?: AbortSignal): Promise<Result<{ answer: string }>> {
-  const r = await post("/api/chat", { messages: fit(turns), mode: "text" }, signal);
+// as "wilson" ("(1) unread"), the worker answers as wilson in the first person; otherwise as the site assistant
+export async function askChat(turns: Turn[], signal?: AbortSignal, as?: "wilson"): Promise<Result<{ answer: string }>> {
+  const r = await post("/api/chat", { messages: fit(turns), mode: "text", ...(as && { as }) }, signal);
   if (!r.ok) return r;
   if (r.data.fallback) flags.fallback = true;
   return { ok: true, answer: String(r.data.answer ?? "") };

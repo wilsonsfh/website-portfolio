@@ -2,14 +2,14 @@
 /* retro two-tone print: deep green ink + cream paper. Overrides the site tokens inside the greeting only
    (and on the body-level tooltips). Wallpaper: grayscale photo -> screen(--wall-lift) -> multiply(--wall-tint),
    so photo black lands on --wall-tint x --wall-lift (#0B2A1D) and photo white on --wall-tint. */
-.gr-root, .tt {
+.gr-root, .tt, .dk-tour-corner.over {
   --bg: #F1EAD3; --fg: #123D2B; --muted: #3E5E4D; --accent: #1A6E3E;
   --line: rgba(18, 61, 43, 0.22); --line-strong: rgba(18, 61, 43, 0.55);
   --title-bg: #E4DBBE; --edge: #123D2B; --drop: rgba(6, 23, 15, 0.5);
   --wall-lift: #3D6C6A; --wall-tint: #2E6346; --on-wall: #F1EAD3;
   --tile-bg: #F1EAD3; --tile-ink: #123D2B; --err: #A2412A; --warm: #9A4A1C;
 }
-:root.dark .gr-root, :root.dark .tt {
+:root.dark .gr-root, :root.dark .tt, :root.dark .dk-tour-corner.over {
   --bg: #0F2A1E; --fg: #EAE3C9; --muted: #A9BCA6; --accent: #B5DB7A;
   --line: rgba(234, 227, 201, 0.16); --line-strong: rgba(234, 227, 201, 0.4);
   --title-bg: #163626; --edge: rgba(234, 227, 201, 0.55); --drop: rgba(0, 0, 0, 0.5);
@@ -218,7 +218,7 @@
    two columns (the scroll lanes start after them); the timeline sits directly above photos
    row1: about, (1) unread / row2: work, terminal / row3: projects, v1 / row4: involvements / row5: plaintext-version, timeline / row6: contact, photos */
 @media (min-width: 640px) {
-  .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(2, 104px); grid-template-rows: repeat(6, 118px); grid-auto-columns: auto; }
+  .dk-icons { grid-auto-flow: row; grid-template-columns: repeat(2, 104px); grid-template-rows: repeat(6, 118px) 56px; grid-auto-columns: auto; }
   #dk-icon-about { grid-area: 1 / 1; }
   #dk-icon-messages { grid-area: 1 / 2; }
   #dk-icon-work { grid-area: 2 / 1; }
@@ -231,12 +231,20 @@
   #dk-icon-contact { grid-area: 6 / 1; }
   #dk-icon-photos { grid-area: 6 / 2; }
   #dk-icon-timeline { grid-area: 5 / 2; }
+  .dk-mobs { grid-area: 7 / 1 / 8 / 3; }
 }
 /* short laptop screens: tighter rows so all six fit */
 @media (min-width: 640px) and (max-height: 840px) {
-  .dk-icons { padding: 12px 16px; grid-template-rows: repeat(6, 100px); gap: 4px; }
+  .dk-icons { padding: 12px 16px; grid-template-rows: repeat(6, 100px) 44px; gap: 4px; }
+  .dk-icons .dk-mobs { height: 44px; }
   .dk-icon { height: 100px; padding-top: 4px; gap: 6px; }
 }
+/* the spirits: the last row of the icon grid, sitting still on the wall (no walk-in, just the hop loop) */
+.dk-mobs { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: center; gap: 18px; height: 56px; pointer-events: none; }
+.dk-mobs .gr-mob { position: relative; bottom: auto; animation: none; }
+.dk-mobs-art { display: flex; align-items: flex-end; gap: 18px; }
+.dk-mobs .spirit-btn { pointer-events: auto; color: var(--on-wall); opacity: 0.6; } /* cream on the green wall, quiet */
+@media (hover: hover) and (pointer: fine) { .dk-mobs .spirit-btn:hover { opacity: 1; } }
 /* icon: a cream paper tile with an ink glyph and a hard print shadow, cream label on the green field.
    top-aligned, so tiles in a row stay level when a label wraps to two lines */
 .dk-icon {
@@ -333,8 +341,8 @@
 .dk-prose .tags { font-size: 13px; font-weight: 600; color: var(--accent); }
 .dk-prose .links { display: inline-flex; gap: 12px; font-size: 14px; font-weight: 600; }
 .dk-prose .links a { color: var(--accent); }
-.dk-prose .dk-more, .dk-body .page .dk-more { font-size: 13px; }
-.dk-body .page .item-head .dk-more { margin-left: 10px; }
+.dk-prose .item-toggle, .dk-body .page .item-toggle { font-size: 13px; font-weight: 600; color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .dk-prose .item-toggle:hover, .dk-body .page .item-toggle:hover { color: var(--fg); } }
 .dk-prose .item-more:not([hidden]), .dk-body .page .item-more:not([hidden]) { display: flex; flex-direction: column; gap: 6px; }
 /* about.txt: v1's typewriter word, with a block caret that blinks (still under reduced motion) */
 .dk-tw { color: var(--accent); }
@@ -377,6 +385,12 @@
 .dk-tour-corner { position: absolute; right: 16px; bottom: 16px; z-index: 999; animation: dk-tour-in 200ms cubic-bezier(0.23, 1, 0.32, 1) both; }
 @keyframes dk-tour-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .dk-tour { display: flex; align-items: center; gap: 8px; }
+.dk-tour-corner.over { position: fixed; z-index: 2100; } /* portalled to <body>, above the assistant panel */
+/* a feature stop's caption, on paper above the buttons */
+.dk-tcap {
+  max-width: 340px; margin: 0 0 8px auto; padding: 10px 12px; background: var(--bg); color: var(--fg);
+  border: 2px solid var(--edge); border-radius: 4px; font-size: 14px; line-height: 1.45; text-transform: lowercase;
+}
 .dk-tstep {
   min-height: 40px; padding: 0 10px; display: grid; place-items: center; background: var(--bg); color: var(--fg);
   border: 2px solid var(--edge); border-radius: 4px; font-size: 13px; font-variant-numeric: tabular-nums;
@@ -391,8 +405,12 @@
 .dk-tbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--drop); }
 .dk-tbtn:focus-visible { outline: 2px solid var(--on-wall); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .dk-tbtn:hover { background: var(--muted); } .dk-tbtn.primary:hover { background: var(--fg); border-color: var(--edge); } .dk-tbtn.skip:hover { background: color-mix(in srgb, var(--warm) 80%, var(--fg)); } }
+/* idle (no tour running): just the buttons, no bar */
 @media (max-width: 639.98px) {
   .dk-tour-corner { left: 0; right: 0; bottom: 0; }
+  .dk-tcap { max-width: none; margin: 0; border-width: 2px 0 0; border-radius: 0; font-size: 13px; }
+  .dk-tour-corner.idle .dk-tour { padding: 8px 12px max(8px, env(safe-area-inset-bottom)); border: 0; background: none; }
+  .dk:has(.dk-tour-corner.idle) .dk-icons { padding-bottom: 64px; }
   .dk-tour {
     justify-content: flex-end; gap: 6px; padding: 8px 12px max(8px, env(safe-area-inset-bottom));
     border-top: 2px solid var(--edge); background: var(--title-bg);
@@ -449,6 +467,9 @@
   background: var(--cur-arrow) 0 0 / 100% 100% no-repeat;
 }
 .dk-touch.glove { width: 28px; height: 28px; margin-left: -9px; background-image: var(--cur-glove); }
+/* the tour's demo cursor: glides to a target, squashes on the press */
+.dk-demo { transform-origin: 30% 0; transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1), scale 100ms ease-out; }
+.dk-demo.press { scale: 0.8; }
 @media (hover: hover) and (pointer: fine) {
   .gr-root { cursor: var(--cur-arrow) 1 1, auto; }
   .gr-root :is(button:not(:disabled), a[href], summary, label, select, input[type="range"], [role="button"], .ph-tile) {

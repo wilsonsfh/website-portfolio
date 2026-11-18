@@ -7,7 +7,7 @@ import Tooltip from "./Tooltip";
 import "./messages.css";
 
 type Link = { label: string; href: string };
-type Msg = { text?: string; image?: string; photo?: number; photoAlt?: string; links?: Link[]; needsReview?: boolean };
+type Msg = { text?: string; image?: string; photo?: number; photoAlt?: string; links?: Link[]; needsReview?: boolean; notice?: boolean }; // notice: a status line (limit note, error), never sent to the model
 type Topic = { id: string; question: string; keywords: string[]; answers: Msg[] };
 type Script = { opening: Msg[]; topics: Topic[] };
 type Item = { id: number; from: "wilson" | "visitor"; msg: Msg };
@@ -104,16 +104,16 @@ export default function Messages() {
     let msg: Msg;
     if (image) {
       const r = await makeImage(text);
-      msg = r.ok ? { image: r.src, photoAlt: `generated image: ${text}` } : { text: r.message };
+      msg = r.ok ? { image: r.src, photoAlt: `generated image: ${text}` } : { text: r.message, notice: true };
     } else {
-      const turns: Turn[] = saved.items.filter((i) => i.msg.text).map((i) => ({ role: i.from === "visitor" ? "user" : "assistant", content: i.msg.text! }));
-      const r = await askChat(turns);
-      msg = { text: r.ok ? r.answer : r.message };
+      const turns: Turn[] = saved.items.filter((i) => i.msg.text && !i.msg.notice).map((i) => ({ role: i.from === "visitor" ? "user" : "assistant", content: i.msg.text! }));
+      const r = await askChat(turns, undefined, "wilson");
+      msg = r.ok ? { text: r.answer } : { text: r.message, notice: true };
     }
     busyRef.current = false;
     setBusy(false);
     push("wilson", msg);
-    if (flags.fallback && !saved.noted) { saved.noted = true; push("wilson", { text: LIMIT_NOTE }); }
+    if (flags.fallback && !saved.noted) { saved.noted = true; push("wilson", { text: LIMIT_NOTE, notice: true }); }
   };
 
   useEffect(() => {

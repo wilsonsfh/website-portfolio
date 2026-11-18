@@ -327,3 +327,32 @@ work/projects/involvements with more/less (shared `Item.tsx`, `Typewriter.tsx`),
 top-aligned (rows 118px; tighter rows below 840px tall) so tiles stay level when a label wraps. worker/knowledge*.md and
 chat-script.json work lines rewritten from the LinkedIn version (no 80+ SEs, 2x DAU, MVP Studio). Verified in `vite
 preview` at 1400x900, 1400x800, 375px; worker tests pass.
+
+## Round 12 (2026-11-18) — done, not committed, not deployed
+Split across subagents (Sonnet: content lists, desktop; Opus: chat bug) plus the tour work in the main session.
+- Lists: inline more/less replaced by a bottom-right "expand"/"collapse" with arrows-out/in icon (`Item.tsx`, no
+  control when there is nothing to expand). Work shows tags by default; involvements show title + role/date, bullets
+  behind expand. Same on plaintext-version.html.
+- Spirits: desktop row under the icon grid (`.dk-mobs`, last grid row; both icon columns are full, so not literally
+  under about.txt) and under the plaintext header. Quiet "stop"/"hop" and "hide" ("show spirits" once hidden) beside
+  them, one shared setting in localStorage `spirits` (`Spirits.tsx`).
+- Tour re-entry: bottom-right "resume tour" (sessionStorage `tour-last`) and "tour again" when no tour is running.
+- Photos from the timeline: viewer has "← timeline" and "library"; library has "← back to photo" and "← timeline".
+- Tour → plaintext → finish: plaintext's "get in touch" opens and scrolls into view (`touchReq` via Ctx → MainPage).
+- plaintext tooltip: "the clean version".
+- Tour: Wilson picked variant b, now the only tour (11 stops): about, work, projects, involvements, contact, then
+  desktop, timeline, photos, terminal, (1) unread, assistant. Every stop has a one-or-two-sentence caption above the
+  tour bar (`CAPTION` in Desktop.tsx). On the assistant stop the tour corner is portalled to <body> above the panel.
+  The "done" window is held 1.5s (SEAL_MS 2200).
+- Tour demo (`TourDemo.tsx`): on work/projects/involvements a pixel cursor glides to the first "expand", presses it
+  (squash), presses "collapse" 1s later; on terminal it press-holds the input and types + runs `whoami` and `ls`.
+  Any real pointerdown/keydown stops it; reduced motion skips it. Not tested: stopping it by hand mid-demo.
+- Scrolls fade out (380ms) as they roll up, so timeline -> photos no longer shows the roll over the new window.
+- Expand/collapse sits right after the default lines and the extra content opens below it, so the control never moves.
+- Chat: "(1) unread" now sends `as:"wilson"` → first-person persona; small talk and follow-ups no longer fall to
+  UNKNOWN; limit/error notices left out of the model history. Workers AI really was out of daily neurons (4006).
+  NEEDS `npm run deploy` (frontend + worker together). Maximise-button focus ring not reproduced, not changed.
+- Verified: tsc, build, worker tests; tour a/b/c step order, timeline + assistant stops, item 7, at ~606px wide;
+  agents checked lists and photos at 1400px. Not seen: 375px for the photos flow.
+- Open: Groq 429 after ~4 calls/min shows "out of answers for today" (misleading); /admin has Wilson's test questions
+  ("so hows wilson", "what do you mean") to dismiss; chat_log has debug-agent-0001/0002 test rows.

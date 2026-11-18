@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 const COUNT = 16;
-const EVERY = 40000; // ms between photos
+export const EVERY = 40000; // ms between photos (the desktop spirits rest and hop at the same rate)
 const FADE = 1200; // ms crossfade
 const src = (i: number) => `/photos/wall/photo-${String(i + 1).padStart(2, "0")}.jpg`;
 const pick = (not: number) => {

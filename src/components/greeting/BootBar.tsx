@@ -61,7 +61,7 @@ const BIG: Record<string, Keyframe[]> = {
   ],
 };
 
-function Mob({ kind, rows }: { kind: "slime" | "mush"; rows: string[] }) {
+export function Mob({ kind, rows }: { kind: "slime" | "mush"; rows: string[] }) {
   const hop = useRef<HTMLSpanElement>(null);
   const reduce = useReducedMotion();
   const big = () => {
