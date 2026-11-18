@@ -178,3 +178,7 @@ never download/copy Nexon sprites or the rw-designer cursors. "Bigger": windows 
 Subagents (round 3): v2-knowledge (worker text), v2-scrolls2, v2-retro (theme+top bar+windows+cursor+boot bar), v2-assistant.
 Merged 2026-11-18: knowledge rewrite (913c46a), scrolls round 3 (a119fd2). Open: phone stub z-index covers the Photos sheet's left edge (pending Wilson's phone-stub choice: 1 shift icons / 2 right edge / 3 none). Waiting: v2-retro, v2-assistant.
 Merged 2026-11-18: assistant + (1) unread AI (merge after a119fd2). Tested only against a mock worker; needs VITE_AI_URL after deploy. chat-script.json topic answers now unused (left in place). Waiting: v2-retro.
+Merged 2026-11-18: v2-retro (47bdd1b; kept the "unroll my photos" tip, took retro's bigger window sizes). Boot bar was NOT
+in v2-retro; now on v2-boot (subagent). Worker CORS now allows https://wilsonsoon-website-portfolio.vercel.app (70fc4ff).
+Deploy order: Wilson runs wrangler from worker/ (name comes from wrangler.jsonc, no --name needed) -> set VITE_AI_URL in
+Vercel env -> rebuild + redeploy the site (ask first).
