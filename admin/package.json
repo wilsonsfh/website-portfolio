@@ -1,0 +1,16 @@
+{
+  "name": "wilson-portfolio-admin-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types test/logic.test.ts && node ../scripts/wiki-chunk.test.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261117.1",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.36.0"
+  }
+}

@@ -24,7 +24,7 @@ CREATE TABLE wiki_chunks (
 );
 
 -- Full-text index over the chunks (external content, kept in sync by triggers).
-CREATE VIRTUAL TABLE wiki_chunks_fts USING fts5(heading, text, content='wiki_chunks', content_rowid='id');
+CREATE VIRTUAL TABLE wiki_chunks_fts USING fts5(heading, text, content='wiki_chunks', content_rowid='id', tokenize='porter unicode61');
 CREATE TRIGGER wiki_chunks_ai AFTER INSERT ON wiki_chunks BEGIN
   INSERT INTO wiki_chunks_fts (rowid, heading, text) VALUES (new.id, new.heading, new.text);
 END;
