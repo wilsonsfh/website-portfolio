@@ -7,6 +7,15 @@
 :root.dark .sc {
   --sc-paper: #1d1d1c; --sc-ink: #e6e6e3; --sc-dim: #9a9a96; --sc-rule: rgba(255, 255, 255, 0.24); --sc-edge: rgba(255, 255, 255, 0.12);
 }
+/* backdrop: a solid dark-green sheet behind the lanes, so the icons (phone) and half-covered windows (desktop) never
+   show through the gaps. It fades in as the lanes start and out as soon as they roll up (so a photo's window shows); it takes the pointer. */
+.sc::before {
+  content: ""; position: absolute; inset: 0; pointer-events: auto;
+  background: var(--sc-back, #24533A);
+  opacity: 1; transition: opacity 200ms ease-out;
+}
+.sc-rolled::before { opacity: 0; pointer-events: none; }
+.sc-head, .sc-lanes { position: relative; }
 .sc-lanes { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 8px; overflow-y: auto; overscroll-behavior: contain; }
 .sc-lane { position: relative; flex: none; width: 100%; }
 
@@ -23,7 +32,7 @@
     linear-gradient(var(--sc-rule), var(--sc-rule)) 0 0 / 100% 1px no-repeat,
     linear-gradient(var(--sc-rule), var(--sc-rule)) 0 4px / 100% 1px no-repeat;
 }
-.sc-view { position: relative; flex: 1; min-height: 0; margin: 0 14px 0 52px; overflow: hidden; touch-action: pan-y; cursor: grab; }
+.sc-view { position: relative; flex: 1; min-height: 0; margin: 0 14px 0 var(--sc-view-l); overflow: hidden; touch-action: pan-y; cursor: grab; }
 .sc-track { display: flex; width: max-content; height: 100%; align-items: center; }
 .sc-copy { display: flex; flex: none; }
 
@@ -44,12 +53,14 @@
 .sc-item figcaption span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sc-item figcaption time { color: var(--sc-dim); }
 
-/* label roller on the left end */
+/* label roller on the left end: narrow, so the pictures get the width (narrower still on phones) */
+.sc { --sc-spool: 30px; --sc-view-l: 38px; }
+@media (max-width: 639.98px) { .sc { --sc-spool: 22px; --sc-view-l: 28px; } .sc-spool span { font-size: 10px; letter-spacing: 0.02em; } }
 .sc-spool {
-  position: absolute; top: 0; bottom: 0; left: 0; width: 44px; display: grid; place-items: center;
+  position: absolute; top: 0; bottom: 0; left: 0; width: var(--sc-spool); display: grid; place-items: center;
   background: var(--sc-paper); border: 1px solid var(--sc-edge); border-radius: 3px; color: var(--sc-ink); pointer-events: auto;
 }
-.sc-spool span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; letter-spacing: 0.04em; text-transform: lowercase; white-space: nowrap; }
+.sc-spool span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; letter-spacing: 0.04em; text-transform: lowercase; white-space: nowrap; }
 
 /* travelling roller: the element spans the lane minus the bar, so translateX(100%) lands the bar at the right end */
 .sc-roll { position: absolute; top: 0; bottom: 0; left: 0; width: calc(100% - 14px); pointer-events: none; }

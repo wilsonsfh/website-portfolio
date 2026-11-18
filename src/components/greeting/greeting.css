@@ -28,10 +28,10 @@
 }
 /* scrolls and messages keep their own markup; only their palettes follow the print theme here */
 .gr-root .sc {
-  --sc-paper: #EDE5CB; --sc-ink: #123D2B; --sc-dim: #3E5E4D; --sc-rule: rgba(18, 61, 43, 0.3); --sc-edge: rgba(18, 61, 43, 0.22);
+  --sc-back: #24533A; --sc-paper: #EDE5CB; --sc-ink: #123D2B; --sc-dim: #3E5E4D; --sc-rule: rgba(18, 61, 43, 0.3); --sc-edge: rgba(18, 61, 43, 0.22);
 }
 :root.dark .gr-root .sc {
-  --sc-paper: #163626; --sc-ink: #EAE3C9; --sc-dim: #A9BCA6; --sc-rule: rgba(234, 227, 201, 0.28); --sc-edge: rgba(234, 227, 201, 0.16);
+  --sc-back: #06110C; --sc-paper: #163626; --sc-ink: #EAE3C9; --sc-dim: #A9BCA6; --sc-rule: rgba(234, 227, 201, 0.28); --sc-edge: rgba(234, 227, 201, 0.16);
 }
 .gr-root .ms { --ms-wilson-bg: #123D2B; --ms-wilson-fg: #F1EAD3; --ms-visitor-bg: #E0D6B6; --ms-visitor-fg: #123D2B; }
 :root.dark .gr-root .ms { --ms-wilson-bg: #EAE3C9; --ms-wilson-fg: #0F2A1E; --ms-visitor-bg: #1E4431; --ms-visitor-fg: #EAE3C9; }

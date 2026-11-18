@@ -100,7 +100,7 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke, onPhoto 
   const track = useRef<HTMLDivElement>(null);
   const [reps, setReps] = useState(3);
   const st = useRef({
-    x: 0, v: 0, g: 0, L: 0, resumeAt: 0, down: false, coast: false, hover: false, focus: false,
+    x: 0, v: 0, g: 0, L: 0, resumeAt: 0, down: false, coast: false, focus: false,
     lastX: 0, startX: 0, startY: 0, moved: 0, samples: [] as { t: number; x: number }[],
   });
 
@@ -137,7 +137,7 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke, onPhoto 
           k.v *= Math.pow(DECAY, dt);
           if (Math.abs(k.v) < 8) { k.coast = false; k.resumeAt = now + RESUME_MS; }
         } else {
-          const go = driftOn.current && !reduced && !document.hidden && !k.hover && !k.focus && now >= k.resumeAt;
+          const go = driftOn.current && !reduced && !document.hidden && !k.focus && now >= k.resumeAt; // hovering does not pause it
           k.g = Math.min(1, Math.max(0, k.g + (go ? dt : -dt) / RAMP_MS));
           k.x += (dir * speed * k.g * dt) / 1000;
         }
@@ -214,7 +214,6 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke, onPhoto 
     if (r.left < v.left) k.x += v.left - r.left;
     else if (r.right > v.right) k.x -= r.right - v.right;
   };
-  const hover = (on: boolean) => (e: RPointerEvent) => { if (e.pointerType === "mouse") st.current.hover = on; };
 
   return (
     <section className="sc-lane" aria-label={`${label} photos`} data-lane={id} style={{ height: h }}>
@@ -228,8 +227,6 @@ function Lane({ id, label, items, ph, h, reduced, index, driftOn, woke, onPhoto 
           onPointerMove={move}
           onPointerUp={up}
           onPointerCancel={cancel}
-          onPointerEnter={hover(true)}
-          onPointerLeave={hover(false)}
           onKeyDown={key}
           onFocus={focusIn}
           onBlur={() => { st.current.focus = false; }}
@@ -271,7 +268,7 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll }: Pro
   const [woke, setWoke] = useState(open); // the photos only render once they have been unrolled
   if (open && !woke) setWoke(true);
 
-  // left edge clears the first two icon columns on desktop (the third, in the last row, sits under the lanes); lanes fill the rest
+  // left edge clears the two icon columns on desktop; lanes fill the rest
   useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
