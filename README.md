@@ -1,90 +1,170 @@
-# Wilson Soon
+# Wilson Soon's portfolio
 
-Hi, I'm Wilson, a Computer Science undergrad at NUS. This is my personal site to show what I've worked on, what I think about, and a bit of who I am outside of code.
+| doc | what it is |
+|---|---|
+| [learnings.md](learnings.md) | things i learned building it |
+| [docs/design-rationale.md](docs/design-rationale.md) | why it looks and works this way |
+| [technicals.md](technicals.md) | technical Q&A while building |
+| [SPIKE-PROGRESS.md](SPIKE-PROGRESS.md) | dated handover notes |
+| [docs/v2-research-notes.md](docs/v2-research-notes.md) | references and motion rules |
+| [docs/ai-chat-proposal.md](docs/ai-chat-proposal.md) | AI provider research and options |
+| [docs/ai-chat-decisions.md](docs/ai-chat-decisions.md) | AI choices and knowledge allowlist |
+| [worker/README.md](worker/README.md) | the Worker: endpoints, limits, admin |
+| [worker/knowledge.md](worker/knowledge.md) | assistant knowledge (Workers AI) |
+| [worker/knowledge-short.md](worker/knowledge-short.md) | shorter knowledge (Groq fallback) |
+| [deploy/vercel-redirect/README.md](deploy/vercel-redirect/README.md) | old Vercel URL redirect |
+| [CLAUDE.md](CLAUDE.md) | notes for Claude Code |
 
-**→ [wilsonsoon-website-portfolio.vercel.app](https://wilsonsoon-website-portfolio.vercel.app/)**
+A retro desktop-lookalike personal site, with an AI assistant that answers questions about me.
+Live: **https://portfolio.wilsonsoon.workers.dev**
 
-## Status
+## Vibes
 
-**Last reviewed: 2026-08-11 — Done — maintenance only**
+- **Retro green two-tone print.** Deep green ink on cream paper, a static film-grain layer, and a dark mode in
+  green-black. The wallpaper is a grayscale photo mapped between two greens, so any photo stays inside the palette.
+- **A desktop, not a page.** Top bar, app icons, draggable windows, a dock for minimised ones. Phones get full-screen
+  sheets instead of drag and resize.
+- **Restraint.** Colour is the theme and one accent, matte bubbles, solid paper panels instead of translucency, lowercase
+  labels. The boot is first-visit only and skippable; the plain version of the content is always one icon away.
+- **Motion with rules.** Delight only for rare moments (boot, CRT off, scroll roll-out); frequent actions are fast.
+  Transitions that can be interrupted, `cubic-bezier(0.23,1,0.32,1)` for enter/exit, never ease-in, exits faster than
+  entrances, and a gentler (not zero) reduced-motion mode.
+- **Original art.** Pixel cursor, a star-eyed slime and a mushroom on the boot bar, all drawn from scratch.
 
-- Live and deployed to Vercel; recent commits are content refreshes (projects, roles, links), not feature work.
-- `npm run build` succeeds (verified 2026-08-11); no lint/test scripts configured.
-- Only uncommitted paths are stray pnpm lockfiles (`pnpm-lock.yaml`, `pnpm-workspace.yaml`) — incidental, not real work.
+## Inspiration
 
----
+- A grainy two-tone print desktop (the reference was blue; this one is green).
+- Emil Kowalski's animation rules for the motion principles.
+- Anime promo reels with a paper hand-scroll on a roller, for the photo timeline (the border pattern is my own).
+- An iMessage-style thread that plays itself, for the "(1) unread" app.
+- Terminal portfolios (satnaing/terminal-portfolio, davidesantangelo.com and others) for the terminal.
+- A MapleStory-flavoured boot and cursor, kept original.
 
-## Motivation behind tech stack
+## Noteworthy bits
 
-A portfolio is mostly static content. My projects, work experience, and about page don't change between page loads and don't need to respond to live data, so I didn't want to ship a JavaScript framework to handle all of that.
+### Power-on, boot and desktop
+First visit: the screen powers off, then a CRT boot with a pixel bar (hover or tap and the slime hops). Return visits in
+the same tab land on the desktop already on. Tooltips delay only the first hover, neighbours show instantly.
 
-Most popular frameworks like React, Vue, and Next.js use a virtual DOM: a lightweight in-memory copy of the page that the framework diffs against the real DOM whenever state changes. That machinery has a cost. The diffing algorithm, the reconciler, and the runtime all ship to the browser as JavaScript. React alone sends about 45KB before you've written a single line of application code. Frameworks that do server-side rendering also require hydration: after the HTML loads, the browser re-executes all the components and attaches event listeners to the existing nodes, creating a window where the page looks interactive but isn't.
+<img src="docs/media/boot.gif" width="720" alt="power-on, CRT boot, the desktop and tooltips">
 
-[Astro](https://astro.build) renders everything to plain HTML at build time. There's no virtual DOM to ship and no hydration to reason about. The HTML the browser receives is already the final output. The only JS that ships is what I explicitly write in `<script>` blocks: about 450 lines covering dark mode, the mobile nav, photo carousel with drag and lightbox, scroll reveal, the typewriter effect, active nav tracking, and smooth anchor scrolling. Minified, that's roughly 6-9KB, compared to React's 45KB before a single line of my own code.
+### Spirit creatures
+<img src="docs/media/spirits.svg" width="320" alt="a pixel orange-capped mushroom and a star-eyed slime, hopping">
 
-For a personal site I plan to keep updating over time, that simplicity is also worth a lot as an author. There's no "is this running on the server or the client" to reason about, no hydration timing to debug, no framework version to stay current with. What I write is what the browser gets.
+A star-eyed slime and an orange-capped mushroom ride the boot bar, hopping along its fill (the mushroom trails). Hover
+or tap one and it does a big squash-and-stretch hop. They come back in the tour's "done" window, hopping beside
+"immortalising my being in (retro) pixels". Original pixel art, one character per pixel in `BootBar.tsx`, lightly
+MapleStory-flavoured but drawn from scratch. The SVG above is generated from that same pixel data.
 
----
+### First-visit tour
+A small "welcome / tour?" window asks first. Yes: about.txt opens and the tour steps through work, projects,
+involvements and contact, one maximised window at a time, with next / back / "skip → plaintext" in the corner. It ends
+with a small "done" window.
 
-## Stack
+<img src="docs/media/tour.gif" width="720" alt="the first-visit onboarding tour">
 
-- **[Astro 5](https://astro.build)** -- static site generation, `.astro` component templates, file-based routing
-- **[Tailwind CSS 3](https://tailwindcss.com)** via `@astrojs/tailwind` with a custom design system: beige background (`#FAF7F2`), dark charcoal foreground (`#2D2D2D`), purple accent (`#6B5B95`), full dark mode variants, and `accent-dark-hover` (`#7B6DB0`) for interactive states
-- **Vanilla JS** -- ~450 lines total across inline `<script>` blocks, zero external runtime libraries
-- **[Playfair Display](https://fonts.google.com/specimen/Playfair+Display)** via Google Fonts for headings (`font-heading`); Inter and JetBrains Mono loaded as local woff2 for body and code
+### Photo timeline and Photos app
+Four paper lanes (career, people, me, scenery) unroll over the desktop and drift on a loop; drag to throw them. Clicking
+a photo opens it in an iCloud-style Photos app (114 photos): chronological grid, albums, month jump, a viewer with swipe,
+zoom to 4x and a filmstrip.
 
----
+<img src="docs/media/timeline.gif" width="720" alt="the photo timeline scrolling, then the photo viewer and gallery">
 
-## Features
+### Terminal
+`help`, `ls`, `cat <file>`, `open` / `close <app>`, `ask <question>`, `whoami`, `neofetch`, `theme`, history, tab
+completion, plus a few jokes. It is a second route to the same content.
 
-### Typewriter
+<img src="docs/media/terminal.gif" width="720" alt="terminal commands">
 
-My favourite part of the site. The hero intro has a typewriter effect that cycles through words like "software engineer", "dancer", "tea lover", and more. It's a state machine with a `charIndex` counter and a `deleting` flag, driven by `setTimeout` wrapped inside `requestAnimationFrame`. The word list is stored as JSON in a `data-words` attribute on the span at build time, so no extra fetches are needed. It respects `prefers-reduced-motion`, switching to a simple 3-second word swap for users who prefer no animation.
+### Portfolio assistant
+A chat that answers questions about me from a hand-written knowledge file, and draws pictures (including illustrated
+ones of me) from an "image" button. It runs on Workers AI and falls back to Groq (text only) when the free daily limit
+is gone. The same backend powers the "(1) unread" messages app. If it can't answer, the question is logged and I answer
+it at `/admin`; saved answers go back into the chat.
 
-### Photo Carousel and Lightbox
+<img src="docs/media/assistant.gif" width="720" alt="the AI portfolio assistant answering a question">
 
-The about section has an infinite-scroll photo carousel that auto-plays and supports mouse/touch drag. It clones the photo list to create a seamless loop, driven by `requestAnimationFrame` accumulating a fractional pixel offset per frame. Dragging pauses the animation and applies momentum on release. Hovering any photo shows a "click to expand" hint. Clicking opens a lightbox overlay with a fade transition. Keyboard (Enter/Space to open, Escape to close) and click-outside are both handled. 16 photos total.
+### Also
+- **plaintext version.** The full content as a plain page, one top-bar icon away, for skimmers and recruiters.
+- **Theme toggle.** Sun/moon in the top bar, synced with the plaintext footer toggle and the terminal `theme` command.
+- **Phones.** Full-screen sheets, a flowing top bar, a touch cursor (hold a finger down and the pixel arrow appears above it).
+- **Sound.** Web Audio power-off and switch-on sounds with a persisted toggle.
+- **/admin.** Token-gated page to answer unanswered questions and read the chat log (30 days, per-tab random id, no IP,
+  disclosed under the chat input).
+- **v1.** The old Astro site still lives inside the desktop as an icon.
 
-### Dark and Light Mode
+## Tech stack
 
-Theme preference is stored in `localStorage` and applied by an inline script inside `<head>` before the page renders, so there's no flash of the wrong theme on load. Tailwind's `class` strategy is used throughout: `dark:` prefix styles only apply when the `<html>` element has the `.dark` class. The toggle button in the navbar flips that class and syncs it back to `localStorage`.
+**Frontend**
+- Vite + React 19 + TypeScript: the app and build.
+- Tailwind v4 (CSS-first) plus hand-written CSS: tokens and the greeting styles.
+- `motion`: animation where transitions alone don't do it.
+- Web Audio: power-on/off sounds.
 
-### Active Nav Link Indicator
+**Edge / backend**
+- Cloudflare Worker `portfolio`: serves the built site as static assets and runs `/api/*` and `/admin*`.
+- Wrangler: config, secrets and deploys.
+- Rate Limiting binding plus an in-memory daily cap: per-visitor limits so the free allowance lasts.
 
-The navbar tracks the active section as you scroll. An Intersection Observer-based check using `getBoundingClientRect().top` updates the active link, highlighted with a small colored dot below the link via a `::after` pseudo-element. The dot is purple in light mode and the dark-mode accent color in dark mode. Scroll listeners are throttled with `requestAnimationFrame`.
+**AI**
+- Workers AI, `@cf/google/gemma-4-26b-a4b-it`: chat, with thinking off.
+- Workers AI, FLUX.1 schnell and FLUX.2 klein 9B: images, and illustrated pictures of me from reference photos.
+- Groq, `openai/gpt-oss-20b`: text-only fallback; the key is a Worker secret.
 
-### Floating Navigation Buttons
+**Data**
+- D1 (SQLite): unanswered questions, saved answers, chat log, private wiki chunks with FTS5 search.
+- `src/data/*.json`: one content source for both the desktop and the plaintext version.
 
-Two small circular buttons sit fixed at the bottom-right corner. One scrolls to the previous section, one to the next. They track the active section by checking each section's `getBoundingClientRect().top` on scroll, debounced with `requestAnimationFrame`. The up button hides on the hero section; the down button hides on the contact section. An `isManualScrolling` flag with a 1-second timeout prevents the scroll listener from conflicting with the button-triggered scroll.
+**Tooling**
+- Plain Node test scripts for the Worker's pure logic, `tsc` typechecking.
+- `sharp` via `npm run photos:add`: resize and strip metadata from photos.
+- Vercel: only a tiny redirect project for the old URL.
 
-### Scroll Reveal Animations
+## Learnings
 
-Sections animate in as you scroll. Three classes are available: `scroll-reveal` (fade up), `scroll-reveal-left` (fade in from left, 24px), `scroll-reveal-right` (fade in from right, 24px). An Intersection Observer in `index.astro` adds `.revealed` to each element when it enters the viewport. All three classes reset to `opacity: 1; transform: none` under `prefers-reduced-motion`.
+- A key in the browser is public. The Worker holds it, so the browser only sends a question and gets an answer.
+- `VITE_*` variables are pasted into the JavaScript at build time: public, and changing one needs a rebuild.
+- Thinking models can spend all of `max_tokens` on hidden reasoning and return nothing; turn thinking off.
+- A sentinel (`UNKNOWN`) beats guessing: the Worker detects it deterministically and logs the question.
+- A Worker is identified only by its name: a new name is a new Worker with no secrets.
 
----
+More in [learnings.md](learnings.md), with depth in [docs/design-rationale.md](docs/design-rationale.md) and
+[technicals.md](technicals.md).
 
-## Local Dev
+## Run locally / deploy
 
-```bash
+```sh
 npm install
-npm run dev      # localhost:4321
-npm run build    # production build to ./dist/
-npm run preview  # preview the built site
+npm run dev          # vite; /api is proxied to the deployed Worker
+npm run build        # tsc -b && vite build -> dist/
+npm run preview      # serve the built site
+
+# deploy site + Worker together (run wrangler logged in, from worker/ for secrets)
+cd worker && npm install && npx wrangler login
+npx wrangler secret put GROQ_API_KEY   # the name only; paste the value at the prompt
+npx wrangler secret put ADMIN_TOKEN    # the /admin password
+npx wrangler d1 migrations apply portfolio-qa --remote
+cd .. && npm run deploy                # build, then wrangler deploy
+
+cd worker && npm test                  # Worker unit tests (also: npm run typecheck)
 ```
 
----
+The Worker only allows the origins in `ALLOWED_ORIGINS`: the live site and `localhost` ports 5173, 4321 and 4173. Vite's
+default (5173) works; if you use another port, pass `-- --port 4321 --strictPort`. See [worker/README.md](worker/README.md)
+for the first-time D1 setup and local Worker dev.
 
-## Structure
+## Project structure
 
 ```
 src/
-├── components/   # one .astro file per section or card type
-├── data/         # JSON files (work-experience, projects, activities)
-├── layouts/      # Layout.astro with <head>, dark mode init, smooth scroll
-├── pages/        # index.astro -- single page composing all sections
-└── styles/       # global.css with scroll-reveal, dot-grid, nav-link-active
-public/
-├── fonts/        # local woff2 files (Inter, JetBrains Mono)
-├── images/       # hero.jpg
-└── photos/       # 16 photos for the carousel
+  components/greeting/   the desktop: windows, apps, boot, tour, terminal, assistant, photos, timeline
+  data/                  work, projects, activities, skills and photo JSON
+  lib/ai.ts              calls /api/chat and /api/image
+  styles/                global tokens and plaintext page styles
+worker/                  Cloudflare Worker: chat, image, admin, D1 logic, knowledge files, tests
+db/migrations/           D1 schema
+scripts/                 photo and wiki-excerpt helpers
+public/                  fonts, photos, reference images, v1 (old Astro site)
+deploy/vercel-redirect/  redirect from the old Vercel URL
+docs/                    design rationale, research, AI decisions, media
 ```
