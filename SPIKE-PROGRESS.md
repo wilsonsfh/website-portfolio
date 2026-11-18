@@ -310,3 +310,13 @@ on this desktop" (shared `More` in apps.tsx) also at the end of plaintext's "get
 both lists include "portfolio assistant" (opens the panel via `ctx.ask`). Top bar: sun/moon theme toggle left of the
 assistant icon, synced with the plaintext toggle and terminal `theme`; phones (<640px): flowing bar, name "wilson",
 34px icons. Verified on localhost:5173 at 1400, 375, 360px.
+
+## Round 10 (2026-11-18)
+Fewer words by default. work: one-line `summary` per job; "more" shows location, the LinkedIn bullets (replacing the
+resume-level ones in work-experience.json, NUS company now "NUS Enterprise") and tags. projects: unchanged by default,
+"more" shows highlights. involvements: title only, "more" shows role/date and the line. about.txt: v1's hero ("hi! i'm
+wilson. i'm also a <typewriter>", based in 🇸🇬), words add "rock climber" and "(learning) guitarist". unread: a short chat
+with "me". plaintext-version.html picks up the app windows' print colours (rust roles, green tags/links/bullets, system
+font). README rewritten with GIFs in docs/media and the hopping slime + mushroom (docs/media/spirits.svg, generated from
+BootBar.tsx). Verified in `vite preview` at 1400px. Not changed: worker/knowledge*.md and chat-script.json still carry
+some resume-level work details (80+ SEs, 2x DAU, Metabase, BirdNET).
