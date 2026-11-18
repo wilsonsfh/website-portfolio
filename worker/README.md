@@ -15,7 +15,7 @@ Decisions: `../docs/ai-chat-decisions.md`.
 
 From the site (Vite): `src/lib/ai.ts` is the one client (used by the top-bar assistant and "(1) unread").
 It reads `import.meta.env.VITE_AI_URL`, the public worker URL (not a secret), e.g. in `.env.local` for dev or the Vercel
-project env for production: `VITE_AI_URL=https://portfolio-chat.<account>.workers.dev` (no trailing slash needed).
+project env for production: `VITE_AI_URL=https://wilson-portfolio-chat.<your-subdomain>.workers.dev` (no trailing slash needed).
 When it is unset the UI says "the assistant isn't connected yet." instead of failing. Add the site origin to
 `ALLOWED_ORIGINS` in `wrangler.jsonc`.
 

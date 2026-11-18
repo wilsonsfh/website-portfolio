@@ -14,7 +14,7 @@
   ],
   "vars": {
     // comma-separated list of exact origins allowed by CORS
-    "ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:4173",
+    "ALLOWED_ORIGINS": "https://wilsonsoon-website-portfolio.vercel.app,http://localhost:5173,http://localhost:4173",
     "TEXT_MODEL": "@cf/google/gemma-4-26b-a4b-it",
     "IMAGE_MODEL": "@cf/black-forest-labs/flux-1-schnell",
     "GROQ_MODEL": "openai/gpt-oss-20b"
