@@ -245,7 +245,9 @@ under `../` (spike-a, spike-c, v2-*): all merged; ask Wilson before removing the
 ask before deploying, deleting, or creating accounts/keys.
 
 ## Handover (2026-11-18, round 5) — newest; read with the one above
-**State:** all of round 5 is in the `v2` worktree, UNCOMMITTED and NOT DEPLOYED (Wilson to approve both).
+**State:** committed on `v2` (1661f80..d33a58b, not pushed) and deployed (version ee483bd9). Live image of Wilson
+verified. Some commits are mislabelled (shared hunks went to the earliest commit; see the Haiku agent note in chat).
+Vercel redirect live: wilsonsoon-website-portfolio.vercel.app → 308 to the Worker (config in deploy/vercel-redirect/).
 **Done:** onboarding tour (stacked windows, next/back/skip → plaintext, phone footer bar), contact "more on this desktop"
 links, app text restyle (system SF font, --warm rust, bold hierarchy), v1 icon (public/v1 = old Astro site built with
 `--base /v1`), terminal rewrite (cat/open/close/ask/neofetch/theme/history, tab + ↑↓, exit closes it, iOS keyboard fix),
@@ -261,4 +263,4 @@ hobbies, so it really is a gap): answer or dismiss it in /admin.
 **Follow-up (same evening):** tour bar moved to the screen's bottom-right corner; skip → plaintext keeps it (back to
 the tour / finish) until finish or plaintext closes; removed `-webkit-font-smoothing: antialiased` from app text (it made
 the grain look heavier). Window `extra` prop removed.
-**Open:** Vercel redirect for wilsonsoon-website-portfolio.vercel.app (needs a new Vercel project; ask first).
+**Also:** (1) unread has the same text/image icon toggles as the assistant.
