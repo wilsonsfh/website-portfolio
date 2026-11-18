@@ -7,7 +7,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && cd worker && npx wrangler deploy",
-    "photos:add": "node scripts/photos-add.mjs"
+    "photos:add": "node scripts/photos-add.mjs",
+    "deploy:admin": "cd admin && npx wrangler deploy",
+    "wiki:excerpt": "node scripts/wiki-excerpt.mjs"
   },
   "dependencies": {
     "motion": "^14.14.0",
