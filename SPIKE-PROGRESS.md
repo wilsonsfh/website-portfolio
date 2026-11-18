@@ -278,7 +278,7 @@ mode go to image mode (assistant + unread); prompt rule points at the picture bu
 **Not verified:** real iPhone "jump to"; the new prompt rule on the live model.
 **Deployed:** commit b468b16, Worker version f1287347 (live bundle checked; chat answers a vague picture request with the picture-button pointer). Not pushed.
 
-## Round 7 (2026-11-18) — uncommitted, not deployed
+## Round 7 (2026-11-18) — committed bc82ae5, deployed (version f0a6c664), not pushed
 Every visit starts on the bare desktop (no about.txt, any width). First visit: centred "welcome / tour?" window with
 no / yes (yes focused; Escape = no; blocks clicks until answered). Yes → about.txt maximised + tour; no → contact, tour
 marked done. All tour steps maximised; the under-about.txt bar placement was removed. Verified in a production preview
