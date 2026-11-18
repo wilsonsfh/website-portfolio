@@ -16,7 +16,6 @@ const write = (v: string) => {
   try { sessionStorage.setItem(KEY, v); } catch {}
 };
 const forced = () => new URLSearchParams(location.search).get("intro") === "1";
-const mainEl = () => document.getElementById("main");
 
 const BOOT = [
   "wilson-os 0.1",
@@ -40,32 +39,11 @@ export default function Greeting() {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  // landing position: always the top (desktop or power-off screen); #main stays below
+  // landing position: always the top (desktop or power-off screen)
   useLayoutEffect(() => {
     history.scrollRestoration = "manual";
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
-
-  // scrolling past the desktop also counts as having visited
-  useEffect(() => {
-    const on = () => {
-      if (window.scrollY > window.innerHeight / 2) {
-        if (read() === null) write("seen-off");
-        window.removeEventListener("scroll", on);
-      }
-    };
-    window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
-  }, []);
-
-  const plain = () => {
-    if (read() === null) write("seen-off");
-    const m = mainEl();
-    if (!m) return;
-    m.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-    m.setAttribute("tabindex", "-1");
-    m.focus({ preventScroll: true });
-  };
 
   const powerOn = () => {
     playOn();
@@ -104,7 +82,7 @@ export default function Greeting() {
     <section id="desktop" className="gr-root" aria-label="desktop greeting">
       {(phase === "desktop" || phase === "closing") && (
         <div className={`gr-crt${phase === "closing" ? " closing" : ""}`} inert={phase === "closing"}>
-          <Desktop onPlain={plain} onPowerOff={powerOff} focusOnMount={interactive.current} />
+          <Desktop onPowerOff={powerOff} focusOnMount={interactive.current} />
         </div>
       )}
       {phase === "closing" && <div className="gr-glow-off" aria-hidden="true" />}
