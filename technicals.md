@@ -162,3 +162,22 @@ answer      TEXT,                          -- may be empty until I answer
   per question, even if two visitors ask at the same moment. The code relies on it: `ON CONFLICT (normalized)` means "if
   this plain form already exists, don't add a second row".
 - **`CHECK`** limits a column to allowed values, so a typo like `'answred'` can't get in.
+
+**What is the excerpt file for?** `scripts/wiki-excerpt.local.md` holds only the wiki bits I approved, rewritten in plain
+words. It's the source the admin's "suggest" button searches when drafting an answer. It never goes to git (the name
+matches the gitignored `scripts/*.local.*`), so it can't reach the public repo; it's uploaded once into D1's
+`wiki_chunks` table, the only wiki text in the cloud.
+
+**What does "replaces all wiki rows" mean?** The upload file does `DELETE FROM wiki_chunks;` then one `INSERT` per chunk.
+So after every upload the table holds exactly what the file holds: delete something from the file and it disappears from
+the cloud too; edit something and there's no stale copy left. It never touches the `questions` table (visitor questions,
+suggestions, my answers).
+
+**Upload the excerpt before or after `npm run deploy`?** Doesn't matter. Deploy uploads code and site files; the excerpt
+upload writes rows into a table that already exists (the migration made it). The only ordering rule was migration before
+the first deploy with database code.
+
+**Why did "suggest" say "nothing in the wiki" for "hobbies"?** FTS5 matches words, not meaning: the excerpt said
+"Interests" and listed the activities, so "hobbies", "sports" and "fun" matched nothing. Fixed twice over: the heading now
+says "Hobbies and interests (what he does for fun, sports)", and when nothing matches and the excerpt is small (8 chunks
+or fewer) the whole excerpt goes to the model, which judges relevance.

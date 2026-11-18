@@ -65,7 +65,14 @@ request: v1 was Astro 5 + Tailwind 3 + vanilla JS; v2 is Vite + React 19 + TypeS
 
 ### Icons
 - Bigger, more prominent app icons came from Wilson's round-3 request. The AI icon had to be original and plain, "NOT a
-  Siri icon". Icon layout changes are still pending (section 11).
+  Siri icon".
+- Layout (round 4, Wilson's exact arrangement): two columns for rows 1–5 (about.txt | (1) unread, work | terminal,
+  projects, involvements, plaintext-version.html), then contact, photos, timeline in row 6 from the far left. Why two
+  columns: the timeline scrolls start right after the icon block, so a narrow block gives them more room. Short screens
+  (under ~780px tall) tighten the rows so row 6 never clips.
+- Glyphs: projects is a static bulb with three rays (a flicker-on-hover version was built and rejected: Wilson didn't
+  like it); involvements (renamed from activities) is a puzzle piece; timeline is a film strip.
+- Clicking an open app's icon closes its window (a minimised one is restored instead), so icons work as toggles.
 
 ### Windows
 - Pointer-captured drag, 8 resize handles, maximise (button or double-click), minimise to a bottom dock, and tooltips
@@ -118,11 +125,18 @@ the last handover.
   so there is one source of truth. Chosen so that updating a project updates both views.
 - **Terminal** (`help`, `whoami`, `ls`, `cat about.txt`, `open <x>`, `unroll`, `exit`): a second route to the same content
   for people who like it; unknown input prints a hint.
-- **Photo scrolls** are the greeting for photos: four paper lanes (career, people, me, scenery) that unroll over the
+- **Timeline scrolls** (round 4: their own film-strip icon, "timeline"; the photos icon opens the gallery) are the
+  greeting for photos: four paper lanes (career, people, me, scenery) that unroll over the
   desktop. The idea came from Wilson's anime reference videos (paper hand-scroll with a roller; the research notes say the
   border pattern must be his own, not the anime's). Final behaviour after rounds 2-3: lanes loop forever, a top strip
   holds a close button and an "open photos app" button, and clicking a photo opens it in the Photos viewer. Why circular:
-  Wilson asked for no empty gap at the end.
+  Wilson asked for no empty gap at the end. Round 4: nothing is visible until timeline is clicked (no rolled-up stub on any
+  width); the close button and "all photos" are cream chips (the old × was dark green on the dark green wallpaper, so it
+  looked missing); roll-up takes 0.8s with a soft ease; lanes unroll in a shuffled order with small random gaps (motion
+  borrowed from Wilson's scroll reference video: fast start, long settle, no bounce). Opening the scrolls no longer
+  minimises open windows (that caused a stray "about.txt" dock chip); the scrolls sit above windows instead.
+- **No page below the desktop** (round 4): the old plain page under the greeting was removed; the plaintext-version.html
+  window and the top-bar icon cover it, and the terminal's `exit` opens that window.
 - **Photos app** is iCloud-style: chronological grid, sidebar of albums, month jump, square/original toggle, a viewer with
   swipe, zoom to 4x, filmstrip and info. It exists so the 114 photos can be browsed, not only watched drifting.
 - **Story data** is `src/data/story.json`: lanes plus items with date, caption and `src`. Wilson edited captions (68
@@ -274,24 +288,21 @@ The model only decides what to say or draw, never which model runs.
 - **Sources before building.** The AI proposal marks every figure as official, secondhand or unverified and lists open
   questions for Wilson before anything was built.
 
-## 10. Pending this round (2026-11-18)
+## 10. Round 4 (2026-11-18), done
 
-Not in the notes yet; taken from the task brief:
-- Scrolls hidden until clicked on all widths, a visible close chip, a gradual roll-up, and a varied unroll order.
-- Icon layout changes.
-- An unanswered-questions database with an admin view (so questions the assistant could not answer reach Wilson).
+Scrolls hidden until clicked with a visible close chip, gradual roll-up and varied unroll order; photos/timeline split;
+page below the desktop removed; icon layout, names and glyphs; answer-directly prompt rule plus a "who he is" knowledge
+line; the unanswered-questions database with `/admin` (section 12). All deployed to https://portfolio.wilsonsoon.workers.dev.
 
 ## 11. Open questions
 
-- Phone behaviour of the scroll stub: Wilson was asked to choose (shift icons, right edge, none); the notes record the
-  outcome as "no stub on phones", and today's brief says all widths now use hidden-until-clicked.
 - Real-device checks are still owed: touch, iOS Safari, reduced motion, sound, boot bar at 375px and at live speed.
 - Whether the red-team test of the assistant was run.
 - Whether to prerender: a plain React app ships no prebuilt HTML, which matters for crawlers (research notes flagged it;
   I did not find the resolution).
 - The README on `v2` still describes the Astro v1 site and the deleted Vercel URL, and needs a rewrite. A design-story doc
   was planned "at the very end"; this file may be it.
-- The unanswered-questions store: where it lives and how the admin view is protected are undecided in the sources.
+- Keyboard Enter/Space on an icon to close its window is untested (clicks are tested).
 
 ## 12. Unanswered questions
 
@@ -305,16 +316,20 @@ reach Wilson, and his answers feed back into the chat. Choices:
 - **Minimal logging.** Only the latest user message, trimmed to 500 characters, deduped on a normalized form (lowercase,
   punctuation and spacing collapsed) with a count and first/last dates. No IP or identifier. A cap of 500 open questions
   bounds abuse. Dismissed questions stay in the table so repeats only bump their count.
-- **One D1 database, two Workers.** The public Worker writes questions and reads answers; the admin Worker reads, answers
-  and drafts. Answers are cached in memory for 5 minutes, so most chat requests never touch D1, and a saved answer goes
+- **One D1 database (`portfolio-qa`), one Worker.** The public Worker writes questions, reads answers and serves the
+  admin at `/admin`. Answers are cached in memory for 5 minutes, so most chat requests never touch D1, and a saved answer goes
   live within that window. Both providers get the answers (Groq a shorter list, because of its token limit).
 - **Admin at `/admin` on the public Worker, token-gated.** Wilson wanted one link. Cloudflare Access on `workers.dev`
   covers a whole Worker, not a path, so it cannot protect `/admin` alone (a custom domain would allow path-scoped Access
   later). Instead the page is public but shows only a password box, and every admin API call needs the `ADMIN_TOKEN`
   secret (constant-time compare, per-IP failed-attempt lockout, token kept in sessionStorage, `no-store` and `noindex`).
   The admin is one mountable handler with a pluggable `authorize`, so moving it to its own Worker behind Access is a small change.
-- **The wiki excerpt lives in D1, never in the repo.** The repo is public. Wilson picks the pages, a local script chunks
-  them and uploads with `wrangler d1 execute`; the page list and generated SQL are gitignored. Retrieval is FTS5 in D1.
+- **The wiki excerpt lives in D1, never in the repo.** The repo is public. Whole wiki pages mix safe and private sections
+  (the entity page puts interests next to health and family), so the excerpt is a hand-written file,
+  `scripts/wiki-excerpt.local.md` (gitignored), with only what Wilson approved: hobbies and interests, four personal
+  projects, career direction. A local script chunks it and uploads with `wrangler d1 execute`, replacing all chunks each
+  time so the file stays the single source of truth. Retrieval is FTS5 in D1; because word search misses synonyms
+  ("hobbies" vs "interests"), a small excerpt (8 chunks or fewer) is sent whole when nothing matches.
 - **Suggestions are never public.** A draft is stored in its own column, shown only in the admin and written from the wiki
   excerpt only. Nothing reaches visitors until Wilson edits and saves it as an answer.
 - **Known limits.** A follow-up message ("and what about that?") is logged without its context. The admin has one shared password (the token) and no accounts.

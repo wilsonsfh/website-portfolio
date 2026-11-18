@@ -198,3 +198,48 @@ project `wilsonsoon-website-portfolio` removed (URL 404). Groq test: `FORCE_FALL
 groq-test-portfolio.wilsonsoon.workers.dev) -> Groq 401, i.e. the stored GROQ_API_KEY value is rejected; Wilson re-puts
 the NEW key, then re-run the preview upload + curl (preview versions snapshot secrets at upload).
 Groq fallback verified 2026-11-18 via groq-test preview (provider groq, 200). Newest version is that preview again: run `npm run deploy` before the next `secret put`.
+
+## Handover (2026-11-18, end of day) — READ THIS FIRST in a new session
+**Live:** https://portfolio.wilsonsoon.workers.dev (Cloudflare Worker `portfolio`, account subdomain `wilsonsoon`), version
+7705a2e4 at 100%, deployed from `v2` at the commit after this note. Vercel project deleted; old Worker
+`wilson-portfolio-chat` deleted. `main` is still the old Astro site (not merged; decide later).
+**Docs to read:** `docs/design-rationale.md` (design + method reasoning, kept current), `technicals.md` (Wilson's technical
+Q&A), `learnings.md` (short "what I learned"), `worker/README.md` (endpoints, commands, D1, admin).
+
+**How it fits:** one Worker serves `dist/` as static assets; `/api/*` and `/admin*` run worker code (`run_worker_first`).
+`/api/chat` → Workers AI `@cf/google/gemma-4-26b-a4b-it` (thinking OFF via `chat_template_kwargs.enable_thinking=false`),
+Groq `openai/gpt-oss-20b` only after Workers AI's daily limit (3036). `/api/image` → Flux. Secrets: `GROQ_API_KEY`,
+`ADMIN_TOKEN` (both set). D1 `portfolio-qa` (id in wrangler.jsonc, binding `DB`), migrations in `db/migrations/`.
+Dev: `npm run dev -- --port 4321 --strictPort` (Vite proxies `/api` to the live Worker = real Neurons). Deploy:
+`npm run deploy` from the repo root (rebuilds first). Test the Groq path safely: `wrangler versions upload --var
+FORCE_FALLBACK:1 --preview-alias groq-test`, then `npm run deploy` again so the newest version is live (otherwise
+`secret put` refuses).
+
+**Done today (round 4, all deployed):** answer-directly prompt + "who he is" knowledge line; page below the desktop
+removed (terminal `exit` opens plaintext window); photos icon = gallery, new film-strip **timeline** icon = scrolls;
+scrolls hidden until clicked on all widths, cream × / "all photos" chips, 0.8s roll-up, shuffled unroll; stray
+"about.txt" dock chip fixed; icon layout (2 columns rows 1–5, row 6 contact/photos/timeline from the left), activities →
+**involvements** (puzzle), projects = static bulb with 3 rays (flicker rejected), plaintext-version.html; clicking an
+open app's icon closes it (minimised → restore); **unanswered questions**: model replies `UNKNOWN` → question logged in
+D1 (deduped, no IPs, cap 500 open) → visitor sees "i don't know that one yet…"; Wilson answers at `/admin` (password =
+ADMIN_TOKEN; retro theme; tabs open/answered/dismissed/database, read-only DB view); saved answers reach the chat within
+~5 min. "suggest" drafts from the wiki excerpt in D1 (`wiki_chunks`, FTS5; falls back to the whole excerpt when small).
+**Wiki excerpt:** hand-written `scripts/wiki-excerpt.local.md` (GITIGNORED — repo is PUBLIC); upload =
+`node scripts/wiki-excerpt.mjs --root scripts` (list in `scripts/wiki-pages.local.txt`) then
+`cd worker && npx wrangler d1 execute portfolio-qa --remote --file ../scripts/wiki-upload.local.sql` (replaces all chunks).
+Wilson approved its contents: hobbies/interests, 4 personal projects, career direction; never health/family/relationships,
+internship internals, colleagues, specific interviews.
+
+**Verified:** live chat answers (1.6s) and logs unknowns (test row deleted; `questions` is empty); `/admin` 401 without
+or with a wrong token, `no-store`/`noindex`; suggest tested locally with the real model (hobbies → good draft, favourite
+food → "nothing in the wiki"); icon positions/toggle/scrolls checked by agents in Chrome at 1512x746 and 375px.
+**Not verified / owed:** Wilson logging into live `/admin` (only he has the token); Enter/Space on an icon to close its
+window; reduced motion, real touch/iOS, sound; red-team prompts against the new decline/UNKNOWN rules; Groq path for
+UNKNOWN logging (same code, not run).
+**Open / ideas:** README.md still describes the Astro v1 site; merge `v2` → `main` when Wilson is happy; prerendering for
+crawlers undecided; custom domain (≈US$10/yr) would allow Cloudflare Access on just `/admin`. Many old worktrees exist
+under `../` (spike-a, spike-c, v2-*): all merged; ask Wilson before removing them. The main repo has uncommitted
+`package.json`/`package-lock.json` changes from before this session — not ours, untouched.
+**Gotchas:** `rm -rf` is blocked by a hook (use `trash`); never `git add -A` in worktrees (symlinked node_modules);
+`wrangler d1 create` "add it for you?" → answer no; 8 chat requests/min per IP rate limit trips quick test bursts;
+ask before deploying, deleting, or creating accounts/keys.

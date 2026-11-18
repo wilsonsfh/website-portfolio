@@ -64,3 +64,19 @@ secrets, since secrets belong to one Worker). Use `npm run deploy` from the repo
 **Testing safely:** `wrangler versions upload --var FORCE_FALLBACK:1 --preview-alias groq-test` uploads a version with
 its own URL (`groq-test-portfolio.wilsonsoon.workers.dev`) while production keeps serving the old one. That is how I
 tested the Groq fallback without touching the live site.
+
+## 2026-11-18: D1, an admin page, and the unanswered-questions loop
+
+- **D1 is a real SQL database (SQLite) inside Cloudflare**, not key-value storage (that's KV). Free: 500 MB per database,
+  100k rows written and 5M read per day; hitting a limit stops queries until 00:00 UTC, never bills.
+- **Migrations** are SQL files that set up the structure; `apply` runs only the ones not run yet (tracked in a hidden
+  `d1_migrations` table); `--remote` = the real database, `--local` = a copy on my laptop.
+- **Constraints do the guarding:** `NOT NULL` refuses empty required columns, `DEFAULT` fills values the code leaves out,
+  `UNIQUE` lets the database itself guarantee one row per question (with `ON CONFLICT`), `CHECK` allows only listed values.
+- **A sentinel beats guessing:** the model replies exactly `UNKNOWN` when it can't answer, so the Worker detects it
+  deterministically, logs the question and shows a fixed friendly line.
+- **Full-text search matches words, not meaning** ("hobbies" didn't find "interests"); for a tiny corpus, send it whole.
+- **A public repo changes where private text can live:** the wiki excerpt is a gitignored local file uploaded straight
+  into D1.
+- **`wrangler d1 create` offering to edit the config** added a second entry instead of filling mine, so `migrations
+  apply` hit the placeholder id. Answer "no" and paste the id yourself.
