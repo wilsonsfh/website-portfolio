@@ -65,7 +65,7 @@ export default function Desktop({ onPlain, onPowerOff, focusOnMount }: { onPlain
   const [wins, setWins] = useState<Win[]>(() => (window.innerWidth >= PHONE ? [place("about", 0, 11, focusOnMount)] : []));
 
   const reduce = useReducedMotion();
-  const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up to the clickable stub; the stub exists whenever the desktop is on
+  const [rollsOpen, setRollsOpen] = useState(false); // false = rolled up and hidden; the photos icon unrolls them
   const [photoReq, setPhotoReq] = useState<Ctx["photoReq"]>(null);
   const reqN = useRef(0);
   // unrolling sends the open windows to the dock first (phone has sheets and no dock: lanes just cover them)
