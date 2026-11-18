@@ -100,6 +100,11 @@ async function suggest(env: Env, id: number, now: string): Promise<Response> {
         ).bind(match).all<Chunk>()
       ).results
     : [];
+  // no word overlap ("hobbies" vs "interests"): a small excerpt is cheap to send whole and let the model judge relevance
+  if (!chunks.length) {
+    const all = (await env.DB.prepare("SELECT page, heading, text FROM wiki_chunks ORDER BY id LIMIT 9").all<Chunk>()).results;
+    if (all.length <= 8) chunks.push(...all);
+  }
 
   let suggestion = NOTHING;
   if (chunks.length) {
