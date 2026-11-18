@@ -74,3 +74,17 @@ export class FailLimiter {
     else c.n++;
   }
 }
+
+/** Read-only database tab: the only tables it can show. Names come from this list, never from the request. */
+export const DB_TABLES = ["questions", "wiki_chunks"] as const;
+export const DB_PAGE_SIZE = 50;
+
+/** Validate a table name and page number from the request; null = refuse. Returns bound LIMIT/OFFSET values. */
+export function dbPage(table: string, pageParam: string | null): { table: (typeof DB_TABLES)[number]; page: number; limit: number; offset: number } | null {
+  const t = DB_TABLES.find((x) => x === table);
+  if (!t) return null;
+  const raw = pageParam ?? "1";
+  if (!/^\d{1,6}$/.test(raw) || Number(raw) < 1) return null;
+  const page = Number(raw);
+  return { table: t, page, limit: DB_PAGE_SIZE, offset: (page - 1) * DB_PAGE_SIZE };
+}

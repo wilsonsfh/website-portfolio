@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { FailLimiter, NOTHING, ftsQuery, sameOrigin, suggestMessages, tokenEquals } from "../src/admin/logic.ts";
+import { DB_TABLES, FailLimiter, NOTHING, dbPage, ftsQuery, sameOrigin, suggestMessages, tokenEquals } from "../src/admin/logic.ts";
 
 // fts query
 assert.equal(ftsQuery("What are his hobbies?"), '"hobbies"');
@@ -27,4 +27,10 @@ assert.ok(!fl.blocked("ip", 2));
 fl.fail("ip", 2);
 assert.ok(fl.blocked("ip", 3) && !fl.blocked("other", 3));
 assert.ok(!fl.blocked("ip", 1001)); // window over
+// database tab: allowlist + pagination
+assert.deepEqual([...DB_TABLES], ["questions", "wiki_chunks"]);
+assert.deepEqual(dbPage("questions", null), { table: "questions", page: 1, limit: 50, offset: 0 });
+assert.equal(dbPage("wiki_chunks", "3")?.offset, 100);
+for (const bad of ["d1_migrations", "sqlite_sequence", "wiki_chunks_fts", "questions; drop table questions", "", "QUESTIONS"]) assert.equal(dbPage(bad, "1"), null);
+for (const bad of ["0", "-1", "1.5", "abc", "1;--", "9999999", ""]) assert.equal(dbPage("questions", bad), null);
 console.log("admin logic tests ok");
