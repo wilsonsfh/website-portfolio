@@ -77,7 +77,7 @@ export class FailLimiter {
 }
 
 /** Read-only database tab: the only tables it can show. Names come from this list, never from the request. */
-export const DB_TABLES = ["questions", "wiki_chunks"] as const;
+export const DB_TABLES = ["questions", "wiki_chunks", "chat_log"] as const;
 export const DB_PAGE_SIZE = 50;
 
 /** Validate a table name and page number from the request; null = refuse. Returns bound LIMIT/OFFSET values. */

@@ -71,6 +71,16 @@ export function nextUtcMidnight(now = Date.now()): number {
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1);
 }
 
+// ---- chat log ----
+
+export const CHAT_LOG_DAYS = 30;
+
+/** The browser's random per-tab id, or "anon" when missing or malformed (never trusted for anything but grouping). */
+export function visitorId(body: unknown): string {
+  const v = (body as { visitor?: unknown })?.visitor;
+  return typeof v === "string" && /^[A-Za-z0-9-]{8,40}$/.test(v) ? v : "anon";
+}
+
 // ---- unanswered questions ----
 
 /** The model replies with exactly this when the answer is not in KNOWLEDGE. */

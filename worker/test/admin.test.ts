@@ -32,7 +32,7 @@ fl.fail("ip", 2);
 assert.ok(fl.blocked("ip", 3) && !fl.blocked("other", 3));
 assert.ok(!fl.blocked("ip", 1001)); // window over
 // database tab: allowlist + pagination
-assert.deepEqual([...DB_TABLES], ["questions", "wiki_chunks"]);
+assert.deepEqual([...DB_TABLES], ["questions", "wiki_chunks", "chat_log"]);
 assert.deepEqual(dbPage("questions", null), { table: "questions", page: 1, limit: 50, offset: 0 });
 assert.equal(dbPage("wiki_chunks", "3")?.offset, 100);
 for (const bad of ["d1_migrations", "sqlite_sequence", "wiki_chunks_fts", "questions; drop table questions", "", "QUESTIONS"]) assert.equal(dbPage(bad, "1"), null);

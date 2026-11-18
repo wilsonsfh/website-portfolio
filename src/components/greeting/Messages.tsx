@@ -190,6 +190,7 @@ export default function Messages() {
           </div>
           <button type="submit" className="ms-send" disabled={!draft.trim() || busy}>{image ? "draw" : "send"}</button>
         </form>
+        <p className="ms-privacy">questions and answers are saved for 30 days so wilson can improve the answers.</p>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime } from "../src/logic.ts";
+import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, visitorId, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime } from "../src/logic.ts";
 
 // fallback decision
 assert.equal(limitReason(new Error("3036: You have used up your daily free allocation of 10,000 neurons")), "daily_limit");
@@ -74,3 +74,11 @@ assert.equal(imageMime("/9j/4AAQ"), "image/jpeg");
 assert.equal(imageMime("iVBORw0K"), "image/png");
 assert.equal(imageMime("UklGRiQ"), "image/webp");
 console.log("logic tests ok");
+
+// chat log visitor id: a browser uuid passes; anything else is grouped as "anon"
+assert.equal(visitorId({ visitor: "3f2a9c1e-7b4d-4e2a-9f1c-0a1b2c3d4e5f" }), "3f2a9c1e-7b4d-4e2a-9f1c-0a1b2c3d4e5f");
+assert.equal(visitorId({}), "anon");
+assert.equal(visitorId({ visitor: 42 }), "anon");
+assert.equal(visitorId({ visitor: "short" }), "anon");
+assert.equal(visitorId({ visitor: "x'; DROP TABLE chat_log; --" }), "anon");
+assert.equal(visitorId(null), "anon");

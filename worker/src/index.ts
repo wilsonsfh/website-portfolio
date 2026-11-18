@@ -2,8 +2,8 @@ import knowledge from "../knowledge.md";
 import knowledgeShort from "../knowledge-short.md";
 import { handleAdmin } from "./admin/handler.ts";
 import { FailLimiter, tokenEquals } from "./admin/logic.ts";
-import { logUnknown, answersSections } from "./qa.ts";
-import { FixedWindow, UNKNOWN_REPLY, UNKNOWN_TOKEN, isUnknown, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, type Msg } from "./logic.ts";
+import { logChat, logUnknown, answersSections } from "./qa.ts";
+import { FixedWindow, UNKNOWN_REPLY, UNKNOWN_TOKEN, isUnknown, visitorId, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, type Msg } from "./logic.ts";
 
 interface RateLimiter { limit(o: { key: string }): Promise<{ success: boolean }> }
 export interface Env {
@@ -69,7 +69,7 @@ export default {
     let body: unknown;
     try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400); }
 
-    return isImage ? image(body, env, json, req.url) : chat(body, env, json, ctx);
+    return isImage ? image(body, env, json, req.url, ctx) : chat(body, env, json, ctx);
   },
 } satisfies ExportedHandler<Env>;
 
@@ -99,10 +99,14 @@ async function chat(body: unknown, env: Env, json: J, ctx: ExecutionContext): Pr
   const messages: Msg[] = v.messages;
   const answers = await answersSections(env.DB);
   // Only the latest user message is ever logged, never the conversation.
-  const finish = (answer: string, extra: Record<string, unknown>) => {
-    if (!isUnknown(answer)) return json({ answer, ...extra });
-    ctx.waitUntil(logUnknown(env.DB, messages[messages.length - 1].content));
-    return json({ answer: UNKNOWN_REPLY, ...extra });
+  // every reply goes to the chat log (what the visitor saw); an UNKNOWN one also goes to the unanswered questions
+  const finish = (answer: string, extra: { provider: string } & Record<string, unknown>) => {
+    const question = messages[messages.length - 1].content;
+    const unknown = isUnknown(answer);
+    const shown = unknown ? UNKNOWN_REPLY : answer;
+    ctx.waitUntil(logChat(env.DB, visitorId(body), "text", question, shown, extra.provider));
+    if (unknown) ctx.waitUntil(logUnknown(env.DB, question));
+    return json({ answer: shown, ...extra });
   };
 
   let reason: string | null = null;
@@ -136,7 +140,7 @@ async function chat(body: unknown, env: Env, json: J, ctx: ExecutionContext): Pr
 // wilson's face for FLUX.2: two crops under 512px (the model's limit), served from the site's own assets
 const REFS = ["/ai-ref/wilson-1.jpg", "/ai-ref/wilson-2.jpg"];
 
-async function image(body: unknown, env: Env, json: J, url: string): Promise<Response> {
+async function image(body: unknown, env: Env, json: J, url: string, ctx: ExecutionContext): Promise<Response> {
   const v = validateImagePrompt(body);
   if (!v.ok) return json({ error: "bad_request", message: v.error }, 400);
   const unavailable = () => json({ error: "image_unavailable", reason: "daily_limit", message: "image generation is unavailable today: the daily limit is reached." }, 503);
@@ -162,6 +166,7 @@ async function image(body: unknown, env: Env, json: J, url: string): Promise<Res
       res = (await env.AI.run(env.IMAGE_MODEL as any, { prompt: v.prompt, steps: 4 } as any)) as { image?: string };
     }
     if (!res?.image) return json({ error: "empty_image" }, 502);
+    ctx.waitUntil(logChat(env.DB, visitorId(body), "image", v.prompt, "(image)", "workers-ai"));
     return json({ image: res.image, mime: imageMime(res.image), provider: "workers-ai" });
   } catch (e) {
     const reason = limitReason(e);

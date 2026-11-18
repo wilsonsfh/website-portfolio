@@ -48,6 +48,12 @@ export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise
     return json({ questions: list.results, counts: Object.fromEntries((counts.results as { status: string; n: number }[]).map((r) => [r.status, r.n])) });
   }
 
+  // chat log: the newest 300 rows; the page groups them by visitor
+  if (req.method === "GET" && path === "/api/chats") {
+    const res = await env.DB.prepare("SELECT id, visitor, kind, question, answer, provider, created_at FROM chat_log ORDER BY created_at DESC LIMIT 300").all();
+    return json({ rows: res.results });
+  }
+
   if (req.method === "GET" && path === "/api/db") {
     const res = await env.DB.batch(DB_TABLES.map((t) => env.DB.prepare(`SELECT COUNT(*) AS n FROM ${t}`))); // t is from the fixed allowlist
     return json({ tables: DB_TABLES.map((t, i) => ({ name: t, count: (res[i].results[0] as { n: number }).n })) });

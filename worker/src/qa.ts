@@ -1,4 +1,20 @@
-import { MAX_OPEN_QUESTIONS, buildAnswersSection, normalizeQuestion, type Answered } from "./logic.ts";
+import { CHAT_LOG_DAYS, MAX_OPEN_QUESTIONS, buildAnswersSection, normalizeQuestion, type Answered } from "./logic.ts";
+
+/** Log one question and the reply shown, and drop rows past the retention window. Never throws. */
+export async function logChat(db: D1Database | undefined, visitor: string, kind: "text" | "image", question: string, answer: string, provider: string): Promise<void> {
+  if (!db) return;
+  try {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - CHAT_LOG_DAYS * 86_400_000).toISOString();
+    await db.batch([
+      db.prepare("INSERT INTO chat_log (visitor, kind, question, answer, provider, created_at) VALUES (?, ?, ?, ?, ?, ?)")
+        .bind(visitor, kind, question.trim().slice(0, 500), answer.slice(0, 4000), provider, now.toISOString()),
+      db.prepare("DELETE FROM chat_log WHERE created_at < ?").bind(cutoff),
+    ]);
+  } catch (e) {
+    console.error("logChat failed", e);
+  }
+}
 
 /** Log a question the assistant could not answer. Dedupes on the normalized text. Never throws. */
 export async function logUnknown(db: D1Database | undefined, question: string): Promise<void> {

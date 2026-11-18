@@ -24,10 +24,19 @@ const fit = (turns: Turn[]): Turn[] => {
   return out;
 };
 
-async function post(path: string, body: unknown, signal?: AbortSignal): Promise<Result<{ data: any }>> {
+// a random id per browser tab, so the chat log can group one visitor's messages (no IP or account behind it)
+const visitor = () => {
+  try {
+    let v = sessionStorage.getItem("visitor-id");
+    if (!v) { v = crypto.randomUUID(); sessionStorage.setItem("visitor-id", v); }
+    return v;
+  } catch { return undefined; }
+};
+
+async function post(path: string, body: object, signal?: AbortSignal): Promise<Result<{ data: any }>> {
   let res: Response;
   try {
-    res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+    res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, visitor: visitor() }), signal });
   } catch (e) {
     if ((e as Error)?.name === "AbortError") throw e;
     return { ok: false, message: "couldn't reach the assistant. try again in a bit." };

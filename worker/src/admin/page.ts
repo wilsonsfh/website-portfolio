@@ -70,6 +70,7 @@ const PAGE = String.raw`<!doctype html>
   td.nul { color: var(--muted); }
   td.long.open { white-space: pre-wrap; }
   .empty { color: var(--muted); }
+  .chat-a { margin: 0 0 .75rem; padding-left: .6rem; border-left: 3px solid var(--line-strong); white-space: pre-wrap; overflow-wrap: anywhere; text-transform: none; font-size: .95rem; }
   @media (max-width: 480px) { main { padding: 1rem .75rem 3rem; } .body { padding: 14px 12px 16px; } .win { box-shadow: 4px 4px 0 var(--drop); } }
 </style>
 </head>
@@ -93,7 +94,7 @@ const PAGE = String.raw`<!doctype html>
 </main>
 <script>
 var BASE = "__BASE__";
-var TABS = [["open", "open"], ["answered", "answered"], ["dismissed", "dismissed"], ["db", "database"]];
+var TABS = [["open", "open"], ["answered", "answered"], ["dismissed", "dismissed"], ["chats", "chat log"], ["db", "database"]];
 var dbTable = "questions", dbPageNo = 1, lastCounts = {};
 var tab = "open";
 var tabsEl = document.getElementById("tabs");
@@ -125,7 +126,7 @@ function drawTabs(counts) {
   lastCounts = counts;
   tabsEl.textContent = "";
   TABS.forEach(function (t) {
-    var b = el("button", t[0] === "db" ? t[1] : t[1] + " (" + (counts[t[0]] || 0) + ")");
+    var b = el("button", t[0] === "db" || t[0] === "chats" ? t[1] : t[1] + " (" + (counts[t[0]] || 0) + ")");
     b.setAttribute("aria-pressed", String(tab === t[0]));
     b.onclick = function () { tab = t[0]; load(); };
     tabsEl.appendChild(b);
@@ -242,8 +243,35 @@ function drawDb(holder, d) {
   holder.appendChild(nav);
 }
 
+// chat log: one card per visitor (newest conversation first), their messages oldest first
+function loadChats() {
+  api("GET", "/api/chats").then(function (j) {
+    drawTabs(lastCounts);
+    listEl.textContent = "";
+    listEl.appendChild(el("p", "every question asked in the assistant and unread, with the reply shown. kept 30 days; newest 300 messages.", "meta"));
+    if (!j.rows.length) { listEl.appendChild(el("p", "nothing here yet.", "empty")); return; }
+    var order = [], byVisitor = {};
+    j.rows.forEach(function (r) {
+      if (!byVisitor[r.visitor]) { byVisitor[r.visitor] = []; order.push(r.visitor); }
+      byVisitor[r.visitor].push(r);
+    });
+    order.forEach(function (v) {
+      var rows = byVisitor[v].slice().reverse();
+      var a = el("article");
+      var last = rows[rows.length - 1].created_at;
+      a.appendChild(el("p", "visitor " + v.slice(0, 8) + " · " + rows.length + (rows.length === 1 ? " message" : " messages") + " · last " + last.slice(0, 16).replace("T", " ") + " utc", "meta"));
+      rows.forEach(function (r) {
+        a.appendChild(el("p", (r.kind === "image" ? "draw: " : "") + r.question, "q"));
+        a.appendChild(el("p", r.answer + "  (" + r.created_at.slice(11, 16) + ", " + (r.provider || "?") + ")", "chat-a"));
+      });
+      listEl.appendChild(a);
+    });
+  }).catch(function (e) { if (e.message !== "login") listEl.textContent = "could not load: " + e.message; });
+}
+
 function load() {
   if (tab === "db") return loadDb();
+  if (tab === "chats") return loadChats();
   api("GET", "/api/questions?status=" + tab).then(function (j) {
     drawTabs(j.counts);
     listEl.textContent = "";
