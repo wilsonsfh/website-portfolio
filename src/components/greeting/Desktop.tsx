@@ -4,6 +4,7 @@ import Tooltip from "./Tooltip";
 import Scrolls from "./Scrolls";
 import Assistant from "./Assistant";
 import Wallpaper from "./Wallpaper";
+import TouchCursor from "./TouchCursor";
 import Window, { BAR, MIN_W, MIN_H, clamp } from "./Window";
 import { APPS, appById, type AppId, type Ctx } from "./apps";
 import { getSoundOn, setSoundOn } from "./sound";
