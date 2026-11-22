@@ -32,4 +32,4 @@ Wilson attended the Cloudflare APJC Tech Summit in Kuala Lumpur, 3 to 6 August 2
 Wilson uses MCP servers and agent skills in his AI and agentic workflow, such as a Canvas MCP, a Socratic tutor skill and a 4-step Karpathy-guidelines skill.
 
 ## How to reach him
-The contact section of this site is the best way. His code is on GitHub as wilsonsfh.
+The about.txt window on this site lists his email, GitHub, X and LinkedIn. His code is on GitHub as wilsonsfh.
