@@ -110,9 +110,9 @@ function Activities() {
           key={a.title}
           logo={<Logos items={a.logos.length ? a.logos : [{ name: a.title }]} />}
           title={a.title}
-          more={a.descriptions.length > 0 && <ul className="points">{a.descriptions.map((d, i) => <li key={i}>{d}</li>)}</ul>}
         >
           {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
+          {a.descriptions.map((d, i) => <p className="desc" key={i}>{d}</p>)}
         </Item>
       ))}
     </section>

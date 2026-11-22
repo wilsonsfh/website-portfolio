@@ -76,6 +76,7 @@ body {
 /* logo beside the title: a light tile so dark wordmarks stay readable in the dark theme; the toggle stays at the far end */
 .item-heading.has-logo { align-items: center; }
 .item-heading.has-logo > .item-toggle { margin-left: auto; }
+.item-heading.has-logo > h3 { margin-right: auto; } /* no toggle (involvements): the title stays beside the logo */
 .logos { display: inline-flex; gap: 6px; flex-shrink: 0; }
 .logo { flex-shrink: 0; box-sizing: border-box; height: 40px; width: auto; max-width: 104px; padding: 3px 5px; object-fit: contain; background: #fff; border: 1px solid var(--line); border-radius: 7px; }
 img.logo[src$=".svg"] { padding: 0; border: 0; width: 40px; }
