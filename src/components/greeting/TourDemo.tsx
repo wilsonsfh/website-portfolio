@@ -132,7 +132,7 @@ const assistant: Script = async (c) => {
 };
 
 const SCRIPTS: Record<string, Script> = {
-  about, work: list("work"), projects: list("projects"), activities: list("involvements"), desktop, photos, terminal, assistant,
+  about, resume: list("resume-web"), desktop, photos, terminal, assistant,
 };
 
 // auto: autoplay, so after the demo (or a pause, for a stop without one) the cursor presses "next" too. read through a ref,

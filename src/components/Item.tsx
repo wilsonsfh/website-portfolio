@@ -1,14 +1,14 @@
 import { useId, useState, type ReactNode } from "react";
 
 // the control shares the title row and stays there while details open below the summary
-// head: the title row's class ("item-title" in the app windows, "item-head" on the plaintext page)
-export default function Item({ title, more, children, head = "item-title" }: { title: ReactNode; more?: ReactNode; children?: ReactNode; head?: string }) {
+export default function Item({ title, more, children, logo }: { title: ReactNode; more?: ReactNode; children?: ReactNode; logo?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
     <article className="item">
-      <div className="item-heading">
-        <h3 className={head}>{title}</h3>
+      <div className={`item-heading${logo ? " has-logo" : ""}`}>
+        {logo}
+        <h3 className="item-title">{title}</h3>
         {more && (
           <button type="button" className="item-toggle" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
             {open ? "collapse" : "expand"}

@@ -26,9 +26,8 @@ const err = (text: string): Line[] => [{ kind: "err", text }];
 
 // apps by the names a visitor might type
 const APP_NAMES: Record<string, AppId> = {
-  about: "about", "about.txt": "about", work: "work", projects: "projects", involvements: "activities", activities: "activities",
-  photos: "photos", contact: "contact", messages: "messages", terminal: "terminal", plain: "plain", simple: "plain",
-  "simple-version.html": "plain", v1: "v1",
+  about: "about", "about.txt": "about", work: "resume", projects: "resume", involvements: "resume", activities: "resume", resume: "resume", "resume-web": "resume",
+  photos: "photos", contact: "about", messages: "messages", terminal: "terminal", v1: "v1",
 };
 
 const FILES: Record<string, () => Line[]> = {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-// the spirit creatures' setting, shared by every copy (desktop and plaintext): hopping, still, or hidden
+// the spirit creatures' setting, shared by every copy: hopping, still, or hidden
 export type SpiritMode = "hop" | "still" | "hidden";
 const KEY = "spirits"; // localStorage; unset = hop
 const EVT = "spirits-change";
