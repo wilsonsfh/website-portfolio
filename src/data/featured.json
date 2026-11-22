@@ -1,0 +1,56 @@
+{
+  "shots": [
+    {
+      "title": "BlazeHack: learn Cloudflare by building with it",
+      "source": "blazehack.com",
+      "note": "the hands-on labs site my Cloudflare lab was built for.",
+      "image": "/images/featured/blazehack.jpg",
+      "href": "https://blazehack.com/"
+    },
+    {
+      "title": "Glints at NUS Centre for Future-ready Graduates",
+      "source": "LinkedIn",
+      "note": "sharing with students on careers in tech startups, with the partner institution.",
+      "image": "/images/featured/glints-institutions.jpg",
+      "href": "https://lnkd.in/p/gTMv6T9B"
+    },
+    {
+      "title": "Glints at NUS Entrepreneurship Society",
+      "source": "LinkedIn",
+      "note": "speaking at Phase Zero with the partner community.",
+      "image": "/images/featured/glints-communities.jpg",
+      "href": "https://lnkd.in/p/g55KSeQs"
+    },
+    {
+      "title": "Explore opportunities at Glints",
+      "source": "Glints",
+      "note": "the company i interned at as a product manager.",
+      "image": "/images/featured/glints-careers.jpg",
+      "href": "https://glints.com/sg"
+    },
+    {
+      "title": "Young Singaporeans build internship, entry-level job trackers",
+      "source": "The Straits Times",
+      "note": "the article on 'Sup, the career portal i co-founded.",
+      "image": "/images/featured/straits-times.jpg",
+      "href": "https://www.straitstimes.com/business/young-singaporeans-build-internship-entry-level-job-trackers-to-close-opportunity-gap"
+    },
+    {
+      "title": "'Sup Build2026 Hackathon",
+      "source": "Luma",
+      "note": "the hackathon i hosted through 'Sup, with sponsors i brought in.",
+      "image": "/images/featured/hackathon-luma.jpg",
+      "href": "https://luma.com/zda76sc1"
+    }
+  ],
+  "links": [
+    {
+      "label": "NUS Computing Club on Instagram",
+      "href": "https://www.instagram.com/nuscomputingclub/?hl=en"
+    },
+    {
+      "label": "NUS Computing Club on Telegram",
+      "href": "https://t.me/nuscomputingclub"
+    }
+  ]
+}

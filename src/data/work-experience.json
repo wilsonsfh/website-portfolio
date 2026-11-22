@@ -6,14 +6,15 @@
     "logoDarkBg": true,
     "role": "Solutions Engineering Intern",
     "date": "May 2026 - Aug 2026",
-    "location": "APJC",
-    "summary": "Built a security assessment webapp and hands-on security labs for Customer Engineers.",
+    "location": "APJC Customer Engineering, Singapore",
+    "summary": "Built the security assessment webapp and hands-on labs that Solutions Engineers now use with their own clients.",
     "description": [
-      "Built brownfield security assessment webapp in place of manual client data gathering, with guided fixes, historical comparisons, scored account security posture with live traffic summaries and auto-generated slide decks, thereby shortening Customer Engineers' preparation time for technical discovery",
-      "Built a browser-based Linux desktop on isolated Cloudflare Containers for users to run hands-on labs for configuring and testing security policies against their own accounts, routing each container's traffic through the WARP client over a VPN-like tunnel",
-      "Diagnosed containers re-enrolling as new WARP devices on every restart, and implemented automatic deregistration to prevent unused entries from overloading the device inventory ahead of a workshop"
+      "Extended an internal security assessment webapp around what Solutions Engineers told me in user research, instead of what I assumed they needed. It was demoed live to the whole APJC Customer Engineering meeting and then adopted into the Solutions Engineers' own workflow, and it kept being used after I left.",
+      "Scoped the next features with them: failed security criteria come with \"show me how\" remediation steps across the dashboard, the API and Terraform, each checked against Cloudflare's documentation so a fix can be trusted, and clients' security changes can be tracked by comparing configuration snapshots for quarterly reviews.",
+      "Built an in-browser Linux desktop on Cloudflare Containers for hands-on labs, where participants test policies on their own accounts. Each container's traffic goes through WARP and is encrypted over a VPN-like MASQUE tunnel, so a blocked domain really is blocked from inside the lab.",
+      "Caught that every container restart registered a brand new WARP device with a new virtual IP and left the old entry behind, which would have buried the device list during a workshop of participants restarting repeatedly. I documented the cause and scripted a cleanup against the Zero Trust API."
     ],
-    "tags": ["Zero Trust", "Workers", "Durable Objects", "KV"]
+    "tags": ["Zero Trust", "Workers", "Containers", "Terraform", "User Research"]
   },
   {
     "company": "Glints",
@@ -22,13 +23,13 @@
     "role": "Product Management Intern",
     "date": "Dec 2025 – Apr 2026",
     "location": "Singapore & Jakarta, Indonesia",
-    "summary": "Grew jobseeker daily active users through A/B tests, user research and partnerships.",
+    "summary": "Grew daily active users among SME jobseekers and employers through experiments, interviews and partnerships.",
     "description": [
-      "Grew Daily Active Users among jobseekers seeking opportunities at SMEs and SME employers, through A/B-tested job navigation and strategic partnerships with organisations and communities to increase brand awareness",
-      "Ran competitor analysis across Singapore's talent ecosystem, and led 10 user research interviews with jobseekers on job search behaviour and portal navigation, translating findings and triaging bug reports into technical requirements such as that of improved bottom navigation bar placement and map-based nearby job search",
-      "Built reusable database views in SQL scoped to Singapore and Malaysia jobseeker and employer funnels, and automated daily KPI reporting for the regional growth team, cutting database lookup time"
+      "Contributed to daily active user growth among SME jobseekers and employers by partnering with institutions and communities, tracking each partner's sign-ups with UTM links so we could see which ones actually brought people in, and by defining and testing A/B changes to the apply flow and onboarding job navigation.",
+      "Led jobseeker interviews on how people search for jobs and move around the portal, and ran a competitor analysis. I turned triaged bugs and what people struggled with into technical requirements, such as map-based nearby job search and a better bottom navigation placement.",
+      "Built reusable database views for the Singapore jobseeker and employer funnels, and automated daily KPI reports for the regional growth team, so the numbers arrived without anyone rebuilding the query."
     ],
-    "tags": ["SQL", "Metabase", "User Research", "Product Analytics"]
+    "tags": ["SQL", "Metabase", "A/B Testing", "User Research"]
   },
   {
     "company": "NUS Enterprise",
@@ -37,26 +38,11 @@
     "logoDarkBg": true,
     "role": "Software Engineering Intern",
     "date": "May 2025 – Jul 2025",
-    "location": "Singapore",
-    "summary": "Worked on a webapp that helps researchers with bioacoustic analysis of birds.",
+    "location": "Minimum Viable Product Studio, Singapore",
+    "summary": "Improved bird species identification in a bioacoustics webapp for researchers.",
     "description": [
-      "Built on brownfield webapp to support researchers with bioacoustic analysis of birds",
-      "Improved bird species identification across sub-geographic regions in Singapore by integrating bird Machine Learning classifier, open database and GPS coordinate data to increase classification accuracy"
+      "Improved bird species classification across Singapore's sub-regions by combining the BirdNET machine learning classifier with eBird sighting data and GPS coordinates, in a webapp that researchers use for bioacoustic analysis."
     ],
     "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
-  },
-  {
-    "company": "Singapore Land Authority",
-    "logo": "/images/logos/sla.png",
-    "website": "https://www.sla.gov.sg/",
-    "role": "Software Engineering Intern",
-    "date": "Nov 2020 – Feb 2021",
-    "location": "Singapore",
-    "summary": "Made building data move between software with an open-source model and plug-in code.",
-    "description": [
-      "Integrated open-source Building Habitats model as software medium for data interoperability",
-      "Implemented plug-in code to standardise data transfer across software applications"
-    ],
-    "tags": ["C#", "Autodesk Revit", "BHoM"]
   }
 ]

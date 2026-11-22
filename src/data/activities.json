@@ -1,35 +1,67 @@
 [
   {
-    "title": "Hackathons",
+    "title": "'Sup",
+    "logos": [
+      {
+        "name": "'Sup",
+        "src": "/images/logos/sup.png"
+      }
+    ],
+    "role": "Co-founder, Startup Founding Partnerships",
+    "date": "2026",
+    "descriptions": [
+      "Co-founded 'Sup, a career portal for students, and led a ground-up hackathon hosted across two venues, personally securing AI credit sponsorships from OpenAI, Cursor, Exa, Zo Computer and Workato for credits and cash prizes."
+    ]
+  },
+  {
+    "title": "Microsoft Singapore",
+    "logos": [
+      {
+        "name": "Microsoft",
+        "src": "/images/logos/microsoft.png"
+      }
+    ],
+    "role": "Student Ambassador",
+    "date": "2026",
+    "descriptions": [
+      "Supported Copilot Chat adoption among students through community events, organised hackathons and Copilot Chat workshops."
+    ]
+  },
+  {
+    "title": "Perplexity AI",
+    "logos": [
+      {
+        "name": "Perplexity",
+        "src": "/images/logos/perplexity.png"
+      }
+    ],
+    "role": "Campus Partner",
+    "date": "2025",
+    "descriptions": [
+      "Supported student adoption of the Comet web browser across school campuses."
+    ]
+  },
+  {
+    "title": "NUS Computing Club",
+    "logos": [
+      {
+        "name": "NUS Computing Club",
+        "src": "/images/logos/nus-computing-club.png"
+      }
+    ],
+    "role": "VP External",
+    "date": "2024 – 2025",
+    "descriptions": [
+      "Raised funds through aligned partnerships and school merchandise sales, and grew subscriptions across the club's Instagram and Telegram channels."
+    ]
+  },
+  {
+    "title": "AI Hackathons",
+    "logos": [],
     "role": "",
     "date": "",
     "descriptions": [
-      "Competitions: AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, SAP Cloud Accelerated Learning Experience 2025."
-    ]
-  },
-  {
-    "title": "ItsRainingRaincoats",
-    "role": "Product Manager",
-    "date": "Sep 2025 – Nov 2025",
-    "descriptions": [
-      "Worked on product requirements document (PRD) features to develop a donation collection scheduling chatbot for a non-profit organisation supporting migrant workers in Singapore."
-    ]
-  },
-  {
-    "title": "Student Ambassadorial Programmes",
-    "role": "Microsoft Student Ambassador · Perplexity Student Growth Partner",
-    "date": "",
-    "descriptions": [
-      "Microsoft Student Ambassador (Jan 2026 – Jun 2026): Collaborated with a team of student ambassadors to drive large-scale Copilot Chat student activations in Singapore, by organising technical workshops and events.",
-      "Perplexity Student Growth Partner (Aug – Dec 2025): Drove campus adoption and awareness of the AI-powered Comet Browser through community engagement."
-    ]
-  },
-  {
-    "title": "NUS Students' Computing Club",
-    "role": "Vice President of External Relations",
-    "date": "Aug 2024 – Aug 2025",
-    "descriptions": [
-      "Represented 6000+ computing students, led a 72-strong team, and raised $54,450 through partnerships."
+      "AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025."
     ]
   }
 ]

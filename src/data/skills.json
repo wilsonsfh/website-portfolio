@@ -1,6 +1,6 @@
 {
-  "Languages": ["Python", "JavaScript", "TypeScript", "Java", "C#", "C", "SQL"],
-  "Frameworks & Libraries": ["React", "Next.js", "Django", "Flask", "Express.js", "Node.js"],
-  "Databases & Cloud": ["PostgreSQL", "MongoDB", "MySQL", "Google Cloud Platform", "Google Cloud Storage"],
-  "Tools": ["Git", "Docker", "GitHub Actions", "Neovim", "Hadoop", "Tableau"]
+  "Languages": ["Python", "Java", "C++", "C#", "JavaScript", "Swift"],
+  "Frameworks & Libraries": ["React", "React Native", "SwiftUI", "Express.js", "MediaPipe"],
+  "Databases, Cloud & Data": ["PostgreSQL", "MongoDB", "MySQL", "Supabase", "Firestore", "Convex", "Cloudflare (Workers, D1, R2, KV, Durable Objects)", "AWS", "GCP", "Tableau"],
+  "Tools": ["Git", "Docker", "GitHub Actions", "Vite", "Vitest", "Playwright", "FFmpeg", "Wrangler", "Cloudflared", "Claude Code", "Codex", "Opencode"]
 }

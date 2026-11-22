@@ -1,71 +1,37 @@
 [
   {
     "title": "AppleNotestoX",
+    "logo": "/images/logos/projects/applenotestox.svg",
     "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
     "highlights": [
-      "Built a macOS webapp that exports Apple Notes content to a Markdown format and Notion, preserving inline media and traceability with source note identifier and date",
-      "Equipped on-device video transcription with Apple Speech and AVFoundation keyframes, feeding an AI-synthesized wiki that doubles as a study app with flashcards and narrated recaps of personal notes"
+      "Built a macOS app that exports between Apple Notes, Markdown and Notion, tagging each export with the original note's unique ID and date.",
+      "Bundled a study tool with spaced-repetition flashcards and on-device video transcription with Apple Speech for exports and flashcard notes, plus an AI assistant (Groq/Llama) that groups related notes, merges them and flags duplicates for cleanup."
     ],
-    "tags": ["SwiftUI", "AppleScript", "AVFoundation", "Apple Speech", "Node.js", "Notion API"],
+    "tags": [
+      "Swift",
+      "AppleScript",
+      "Apple Speech",
+      "Node.js"
+    ],
     "github": "https://github.com/wilsonsfh/AppleNotestoX",
     "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
     "livePseudo": true
   },
   {
     "title": "X Bookmark Injector",
+    "logo": "/images/logos/projects/x-bookmark-injector.svg",
     "description": "A Chromium extension that resurfaces a random saved X bookmark at the top of your For You feed.",
     "highlights": [
-      "Manifest V3 extension that reuses X's own logged-in GraphQL session to sync, de-duplicate, and rank bookmarks, then injects one as a native-looking post — zero backend, zero telemetry, all state local to the browser profile",
-      "Durable delete/undo saga survives service-worker restarts with a fail-closed response schema; 290 passing unit, integration, and race tests"
+      "Built a Chromium extension that randomly pulls a saved X bookmark to the top of For You, with Keep, Done and background auto-sync.",
+      "Retrieved bookmarks through X's internal GraphQL API from the page, reusing the logged-in session, with a service worker that paginates, schema-validates and caches them in chrome.storage."
     ],
-    "tags": ["Chromium MV3", "JavaScript", "esbuild", "Vitest"],
+    "tags": [
+      "JavaScript",
+      "esbuild",
+      "Vitest"
+    ],
     "github": "https://github.com/wilsonsfh/x-bookmark-injector",
     "live": "https://x-bookmark-injector-demo.wilsonsfh.workers.dev",
     "livePseudo": true
-  },
-  {
-    "title": "TradingSignalandHelper",
-    "description": "A local, paper-first US-stock signal desk with a human-in-the-loop trade helper.",
-    "highlights": [
-      "Turns price candles into BUY/SELL/HOLD calls via an EMA-crossover strategy, then routes each through a review-ticket dashboard showing take-profit, stop-loss, and live broker state before any order is confirmed",
-      "Production-minded order lifecycle — SQLite persistence, restart recovery, cross-process duplicate protection, replay-resistant webhooks, and a moomoo/OpenD paper-trading adapter; 152 tests, mock-first by default"
-    ],
-    "tags": ["Python", "Flask", "SQLite", "yfinance", "moomoo / OpenD"],
-    "github": "https://github.com/wilsonsfh/TradingSignalandHelper",
-    "live": ""
-  },
-  {
-    "title": "ClearerToday",
-    "description": "AI speech coach for enunciation practice and adaptive pronunciation feedback.",
-    "highlights": [
-      "Built an AI speech coach for enunciation based on analysis of phoneme-level mouth-shape gaps with MediaPipe Face Mesh and ElevenLabs transcription",
-      "Developed an adaptive feedback loop that stores persistent user gap profiles in Convex to rerank future guidance, retrieving live pronunciation references with Exa and generating next-drill instructions scored primarily by OpenAI frontier model."
-    ],
-    "tags": ["Next.js", "React", "TypeScript", "Convex", "MediaPipe Face Mesh", "ElevenLabs", "Exa"],
-    "github": "https://github.com/wilsonsfh/ClearerToday",
-    "live": ""
-  },
-  {
-    "title": "CorrectiveRehabApp",
-    "description": "End-to-end biomechanical analysis pipeline for gym exercises.",
-    "highlights": [
-      "Detects 8 lift-specific form issues (knee valgus, hip shift, butt wink, forward lean, etc.) with 0–100 symmetry scores and severity grading per rep across 6 exercises",
-      "Mobile skeleton visualizer renders react-native-svg overlays (24 joint connections, teal/orange/red severity coloring) with a side-by-side session diff view classifying issues as improved/regressed/resolved/new"
-    ],
-    "tags": ["React Native", "Expo", "FastAPI", "MediaPipe", "Google Cloud Run", "Supabase", "PostgreSQL"],
-    "github": "https://github.com/wilsonsfh/CorrectiveRehabApp",
-    "live": ""
-  },
-  {
-    "title": "Concept Visualizer",
-    "description": "Visual learn technical concepts through AI-powered step-through animated node graph.",
-    "highlights": [
-      "Covers only computer science domains in networking, algorithms, databases, and system design",
-      "AI explanations (Groq llama-3.3-70b) rendered as interactive React Flow graphs with Dagre auto-layout"
-    ],
-    "tags": ["Next.js", "Tailwind CSS", "React Flow", "Redis", "Groq API"],
-    "github": "https://github.com/wilsonsfh/concept-visualizer",
-    "live": "https://concept-visualizer-seven.vercel.app/",
-    "date": "Mar 2026"
   }
 ]
