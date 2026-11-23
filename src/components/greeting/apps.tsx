@@ -27,7 +27,7 @@ export type Ctx = {
 };
 
 // iOS ignores the download attribute and opens the PDF in a viewer with nothing to save; on touch devices hand the file to the share sheet ("save to files")
-const resumeFile = "Wilson-Soon-Resume.pdf";
+const resumeFile = "Wilson_Soon_Resume.pdf";
 async function saveResume(e: MouseEvent<HTMLAnchorElement>) {
   if (!navigator.canShare || !matchMedia("(pointer: coarse)").matches) return; // desktop: the plain download link
   e.preventDefault();
