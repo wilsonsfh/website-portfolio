@@ -277,6 +277,9 @@
 .dk-win[data-max="true"] .dk-title { cursor: default; }
 .dk-title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); transition: color 160ms ease; }
 .dk-win[data-active="true"] .dk-title-text { color: var(--fg); font-weight: 500; }
+.dk-act { display: inline-flex; align-items: center; gap: 6px; flex: none; margin: 0 8px 0 auto; padding: 3px 10px; border: 2px solid var(--edge); color: var(--fg); font-size: 13px; font-weight: 600; text-decoration: none; }
+.dk-act:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .dk-act:hover { background: var(--bg); } }
 .dk-wbtns { display: flex; flex: none; }
 .dk-wbtn {
   position: relative; display: grid; place-items: center; width: 40px; height: 36px; padding: 0; background: none;
@@ -551,8 +554,6 @@
 .dk-prose .rs-sec + .rs-sec { padding-top: 18px; border-top: 2px solid var(--edge); }
 /* the window decides, not the screen: one column (featured last, under involvements), two when the window is wide */
 .dk-prose.rs-wrap { container-type: inline-size; max-width: none; }
-.rs-top { display: flex; justify-content: flex-end; margin-bottom: 14px; }
-.dk-prose .rs-dl { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 2px solid var(--edge); color: var(--fg); font-size: 14px; font-weight: 600; text-decoration: none; }
 .rs-grid, .rs-main { display: flex; flex-direction: column; gap: 18px; }
 .rs-side .rs-sec { padding-top: 18px; border-top: 2px solid var(--edge); }
 @container (min-width: 760px) {

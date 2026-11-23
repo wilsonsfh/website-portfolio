@@ -20,10 +20,11 @@ type Props = {
   vw: number; vh: number;
   active: boolean; max: boolean; min: boolean; phone: boolean; flush?: boolean; autoFocus: boolean;
   onFocus: () => void; onToggleMax: () => void; onMinimize: () => void; dockPt: () => { x: number; y: number } | null; onClose: () => void; onBack: () => void; onMove: (x: number, y: number) => void; onRect: (x: number, y: number, w: number, h: number) => void;
+  action?: ReactNode;
   children: ReactNode;
 };
 
-export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, onMinimize, dockPt, onClose, onBack, onMove, onRect, children }: Props) {
+export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min, phone, flush, autoFocus, onFocus, onToggleMax, onMinimize, dockPt, onClose, onBack, onMove, onRect, action, children }: Props) {
   const reduce = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
@@ -123,7 +124,7 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min,
         <div
           className="dk-title"
           onPointerDown={(e) => {
-            if (phone || max || e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
+            if (phone || max || e.button !== 0 || (e.target as HTMLElement).closest("button, a")) return;
             e.currentTarget.setPointerCapture(e.pointerId);
             drag.current = { dx: e.clientX - cx, dy: e.clientY - cy };
           }}
@@ -134,10 +135,11 @@ export default function Window({ title, x, y, w, h, z, vw, vh, active, max, min,
           }}
           onPointerUp={() => { drag.current = null; }}
           onPointerCancel={() => { drag.current = null; }}
-          onDoubleClick={(e) => { if (!phone && !(e.target as HTMLElement).closest("button")) onToggleMax(); }}
+          onDoubleClick={(e) => { if (!phone && !(e.target as HTMLElement).closest("button, a")) onToggleMax(); }}
         >
           {phone && <button type="button" className="dk-back" onClick={onBack}>← back</button>}
           <span className="dk-title-text">{title}</span>
+          {action}
           {!phone && (
             <div className="dk-wbtns">
               <Tooltip text="minimize">{(t) => (

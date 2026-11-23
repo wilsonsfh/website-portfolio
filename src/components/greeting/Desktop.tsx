@@ -520,6 +520,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
               phone={phone}
               autoFocus={w.focus}
               flush={a.flush}
+              action={a.action}
               onFocus={() => focus(w.id)}
               onToggleMax={() => toggleMax(w.id)}
               onMinimize={() => minimize(w.id)}

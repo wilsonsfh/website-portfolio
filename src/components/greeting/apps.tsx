@@ -50,6 +50,11 @@ function About({ tour, ctx }: { tour: boolean; ctx: Ctx }) {
         {contacts.map((c) => (
           <li key={c.label}><Logo src={c.logo} name={c.label} /><span className="label">{c.label}</span><a href={c.href} {...ext(c.href)}>{c.text}</a></li>
         ))}
+        <li>
+          <span className="logo logo-mono" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg></span>
+          <span className="label">resume</span>
+          <a href="/resume.pdf" download="Wilson-Soon-Resume.pdf">download pdf</a>
+        </li>
       </ul>
       <More ctx={ctx} />
     </div>
@@ -159,15 +164,18 @@ function Featured() {
 
 // one window for the resume: work, projects, skills and involvements in resume order, with the featured pages beside them
 // (under involvements on narrow windows and phones)
+function ResumeDownload() {
+  return (
+    <a className="dk-act" href="/resume.pdf" download="Wilson-Soon-Resume.pdf">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg>
+      download resume
+    </a>
+  );
+}
+
 function Resume() {
   return (
     <div className="dk-prose rs-wrap">
-      <div className="rs-top">
-        <a className="rs-dl" href="/resume.pdf" download="Wilson-Soon-Resume.pdf">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg>
-          download resume
-        </a>
-      </div>
       <div className="rs-grid">
         <div className="rs-main">
           <Work />
@@ -267,12 +275,13 @@ export type App = {
   hFrac?: number; // height as a fraction of the viewport (overrides h, still clamped)
   flush?: boolean; // no body padding
   render: (ctx: Ctx) => ReactNode;
+  action?: ReactNode; // sits in the window title bar, left of the window buttons
 };
 
 export const APPS: App[] = [ // reading order: the phone grid wraps in this order; desktop places each icon in greeting.css
   { id: "about", tip: "read about me and get in touch", title: "about.txt", glyph: "M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6", w: 620, h: 660, render: (ctx) => <About tour={ctx.tourAt === "about"} ctx={ctx} /> },
   { id: "messages", tip: "someone texted you", title: "(1) unread", glyph: "M4 5h16v11H9l-5 4z M8 9.5h8 M8 12.5h5", w: 460, h: 620, flush: true, render: () => <Messages /> },
-  { id: "resume", tip: "my resume: work, projects, skills, involvements and featured pages", title: "resume-web", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 1060, h: 680, render: () => <Resume /> },
+  { id: "resume", tip: "my resume: work, projects, skills, involvements and featured pages", title: "resume-web", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 1060, h: 680, render: () => <Resume />, action: <ResumeDownload /> },
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
   { id: "v1", tip: "my previous website", title: "v1", glyph: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4 3.5v3.7h3.7 M12 8v4.2l3 1.8", w: 1000, h: 640, hFrac: 0.86, flush: true, render: () => <V1 /> },
   { id: "assistant", tip: "ask me anything", title: "portfolio assistant", glyph: ASK_GLYPH, w: 0, h: 0, render: () => null }, // not a window: opens the assistant panel
