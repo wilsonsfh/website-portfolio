@@ -10,7 +10,11 @@
     "role": "Co-founder, Startup Founding Partnerships",
     "date": "2026",
     "descriptions": [
-      "Co-founded 'Sup, a career portal for students, and led a ground-up hackathon hosted across two venues, personally securing AI credit sponsorships from OpenAI, Cursor, Exa, Zo Computer and Workato for credits and cash prizes."
+      "Co-founded student career portal 'Sup and led ground-up Hackathon with 358 participants across 2 venues while personally securing over $5,000 in AI credit and cash prize sponsorships from OpenAI, Cursor, Exa, Zo Computer and Workato"
+    ],
+    "links": [
+      ["Co-founded student career portal 'Sup", "https://www.straitstimes.com/business/young-singaporeans-build-internship-entry-level-job-trackers-to-close-opportunity-gap"],
+      ["Hackathon", "https://luma.com/zda76sc1"]
     ]
   },
   {
@@ -24,7 +28,7 @@
     "role": "Student Ambassador",
     "date": "2026",
     "descriptions": [
-      "Supported Copilot Chat adoption among students through community events, organised hackathons and Copilot Chat workshops."
+      "Supported 300+ Copilot Chat student adoption through community events, organised hackathons and Copilot Chat workshops"
     ]
   },
   {
@@ -38,7 +42,7 @@
     "role": "Campus Partner",
     "date": "2025",
     "descriptions": [
-      "Supported student adoption of the Comet web browser across school campuses."
+      "Supported 50+ student adoption of Comet web browser across campuses"
     ]
   },
   {
@@ -52,7 +56,11 @@
     "role": "VP External",
     "date": "2024 – 2025",
     "descriptions": [
-      "Raised funds through aligned partnerships and school merchandise sales, and grew subscriptions across the club's Instagram and Telegram channels."
+      "Raised $41,500 from aligned partnerships and $12,950 from school merchandise sales while growing subscriptions by 1,000 across Instagram and Telegram channels"
+    ],
+    "links": [
+      ["Instagram", "https://www.instagram.com/nuscomputingclub/?hl=en"],
+      ["Telegram", "https://t.me/nuscomputingclub"]
     ]
   },
   {
@@ -61,7 +69,7 @@
     "role": "",
     "date": "",
     "descriptions": [
-      "AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025."
+      "Singapore: AI Engineer 2026, TinyFish 2026, Cursor 2025"
     ]
   }
 ]

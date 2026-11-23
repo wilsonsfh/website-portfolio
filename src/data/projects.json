@@ -4,8 +4,8 @@
     "logo": "/images/logos/projects/applenotestox.svg",
     "description": "Local-first macOS pipeline that turns Apple Notes into a durable, reviewable knowledge wiki.",
     "highlights": [
-      "Built a macOS app that exports between Apple Notes, Markdown and Notion, tagging each export with the original note's unique ID and date.",
-      "Bundled a study tool with spaced-repetition flashcards and on-device video transcription with Apple Speech for exports and flashcard notes, plus an AI assistant (Groq/Llama) that groups related notes, merges them and flags duplicates for cleanup."
+      "Built macOS app that exports notes between Apple Notes, Markdown and Notion and tags each export with the original note's unique ID and date",
+      "Bundled study tool with SM-2 spaced-repetition flashcards, Apple Speech on-device video transcription and a Groq/Llama assistant that groups related notes and merges or flags duplicates"
     ],
     "tags": [
       "Swift",
@@ -22,8 +22,8 @@
     "logo": "/images/logos/projects/x-bookmark-injector.svg",
     "description": "A Chromium extension that resurfaces a random saved X bookmark at the top of your For You feed.",
     "highlights": [
-      "Built a Chromium extension that randomly pulls a saved X bookmark to the top of For You, with Keep, Done and background auto-sync.",
-      "Retrieved bookmarks through X's internal GraphQL API from the page, reusing the logged-in session, with a service worker that paginates, schema-validates and caches them in chrome.storage."
+      "Built Chromium extension to randomly pull a saved X bookmark at the top of For You with Keep, Done and background auto-sync",
+      "Retrieved bookmarks through X's internal GraphQL API from the page by reusing the logged-in session via a service worker that paginates, schema-validates and caches them in chrome.storage"
     ],
     "tags": [
       "JavaScript",

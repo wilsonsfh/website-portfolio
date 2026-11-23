@@ -179,3 +179,22 @@ deploy/vercel-redirect/  redirect from the old Vercel URL
 docs/                    design rationale, research, AI decisions, media
 referenceideas-for-portfolio/  original inspiration files and source credits (not deployed)
 ```
+
+## Updating the resume
+
+`resume/resume.tex` is the source of truth. The `src/data/{work-experience,projects,activities,skills}.json` files and
+`public/resume.pdf` are generated from it; don't edit them by hand.
+
+1. Edit or paste into `resume/resume.tex`. Never paste the personal-notes `\begin{comment}` block from the top of a
+   draft; `npm run resume:import -- <file>` strips it.
+2. Push to `main`. The `resume-sync` workflow regenerates the JSON, runs `npm run build` as a gate, compiles the PDF
+   and commits the results back as `github-actions[bot]` (nothing is committed if the build fails).
+3. Deploy when ready: Actions tab -> deploy -> Run workflow (it is manual on purpose).
+
+Locally: `npm run resume:sync` regenerates the JSON; `node scripts/resume-sync.mjs --check` fails if it is out of date
+(the `ci` workflow runs this on every PR and push).
+
+`deploy.yml` needs two repository secrets, added at Settings -> Secrets and variables -> Actions -> New repository secret:
+`CLOUDFLARE_API_TOKEN` (an API token with the "Edit Cloudflare Workers" template, plus D1 and Workers AI access if the
+token is scoped by hand) and `CLOUDFLARE_ACCOUNT_ID`. The Worker's own secrets (`GROQ_API_KEY`, `ADMIN_TOKEN`) stay in
+Cloudflare. The bot commit needs Settings -> Actions -> General -> Workflow permissions -> Read and write.

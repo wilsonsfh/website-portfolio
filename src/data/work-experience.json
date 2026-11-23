@@ -5,14 +5,17 @@
     "website": "https://www.cloudflare.com/",
     "logoDarkBg": true,
     "role": "Solutions Engineering Intern",
-    "date": "May 2026 - Aug 2026",
+    "date": "May 2026 – Aug 2026",
     "location": "APJC Customer Engineering, Singapore",
     "summary": "Built the security assessment webapp and hands-on labs that Solutions Engineers now use with their own clients.",
     "description": [
-      "Extended an internal security assessment webapp around what Solutions Engineers told me in user research, instead of what I assumed they needed. It was demoed live to the whole APJC Customer Engineering meeting and then adopted into the Solutions Engineers' own workflow, and it kept being used after I left.",
-      "Scoped the next features with them: failed security criteria come with \"show me how\" remediation steps across the dashboard, the API and Terraform, each checked against Cloudflare's documentation so a fix can be trusted, and clients' security changes can be tracked by comparing configuration snapshots for quarterly reviews.",
-      "Built an in-browser Linux desktop on Cloudflare Containers for hands-on labs, where participants test policies on their own accounts. Each container's traffic goes through WARP and is encrypted over a VPN-like MASQUE tunnel, so a blocked domain really is blocked from inside the lab.",
-      "Caught that every container restart registered a brand new WARP device with a new virtual IP and left the old entry behind, which would have buried the device list during a workshop of participants restarting repeatedly. I documented the cause and scripted a cleanup against the Zero Trust API."
+      "Extended internal security assessment webapp driven by Solutions Engineer user research, live demoed at APJC Monthly meeting with 90+ Customer Engineers and saw adoption into Solutions Engineers' workflow",
+      "Designed features to quick fix failed security criteria with \"Show me how\" steps across dashboard/API/Terraform verified against Cloudflare docs, and to compare client configuration snapshots for quarterly reviews",
+      "Engineered in-browser Linux desktop on Cloudflare Containers for labs where each user tests policies on their own account with traffic routed through WARP, an encrypted tunnel to Cloudflare's network",
+      "Diagnosed container restarts leaving stale WARP registrations and virtual IPs, documented the cause and scripted a Zero Trust API cleanup for a 20-participant lab"
+    ],
+    "links": [
+      ["labs", "https://blazehack.com/"]
     ],
     "tags": ["Zero Trust", "Workers", "Containers", "Terraform", "User Research"]
   },
@@ -25,9 +28,13 @@
     "location": "Singapore & Jakarta, Indonesia",
     "summary": "Grew daily active users among SME jobseekers and employers through experiments, interviews and partnerships.",
     "description": [
-      "Contributed to daily active user growth among SME jobseekers and employers by partnering with institutions and communities, tracking each partner's sign-ups with UTM links so we could see which ones actually brought people in, and by defining and testing A/B changes to the apply flow and onboarding job navigation.",
-      "Led jobseeker interviews on how people search for jobs and move around the portal, and ran a competitor analysis. I turned triaged bugs and what people struggled with into technical requirements, such as map-based nearby job search and a better bottom navigation placement.",
-      "Built reusable database views for the Singapore jobseeker and employer funnels, and automated daily KPI reports for the regional growth team, so the numbers arrived without anyone rebuilding the query."
+      "Contributed to 2.2x DAU growth among SME jobseekers and employers by partnering with institutions and communities through UTM-tracked signups, and A/B testing apply flow and onboarding job navigation",
+      "Designed and led 10 jobseeker interviews on job search behaviour and portal navigation and ran competitor analysis, turning findings and triaged bugs into technical requirements for map-based nearby job search and bottom navigation",
+      "Built reusable database views for Singapore jobseeker and employer funnels and automated daily KPI reports for the regional growth team"
+    ],
+    "links": [
+      ["institutions", "https://lnkd.in/p/gTMv6T9B"],
+      ["communities", "https://lnkd.in/p/g55KSeQs"]
     ],
     "tags": ["SQL", "Metabase", "A/B Testing", "User Research"]
   },
@@ -41,7 +48,7 @@
     "location": "Minimum Viable Product Studio, Singapore",
     "summary": "Improved bird species identification in a bioacoustics webapp for researchers.",
     "description": [
-      "Improved bird species classification across Singapore's sub-regions by combining the BirdNET machine learning classifier with eBird sighting data and GPS coordinates, in a webapp that researchers use for bioacoustic analysis."
+      "Improved bird species classification accuracy by 20% across Singapore sub-regions by integrating BirdNET ML classifier with eBird API sighting data and GPS coordinates into a researcher-facing bioacoustics webapp"
     ],
     "tags": ["React", "Django", "PostgreSQL", "Python", "Google Cloud Storage", "BirdNET"]
   }

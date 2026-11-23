@@ -26,6 +26,18 @@ export type Ctx = {
   tourAt: string | null; // the tour's current stop, if one is running
 };
 
+function resumeLinks(text: string, links: string[][]) {
+  const parts: ReactNode[] = [];
+  let remaining = text;
+  for (const [label, href] of links) {
+    const index = remaining.indexOf(label);
+    if (index < 0) continue;
+    parts.push(remaining.slice(0, index), <a key={href} href={href} {...ext(href)}>{label}</a>);
+    remaining = remaining.slice(index + label.length);
+  }
+  return [...parts, remaining];
+}
+
 // tour: on phones the handwritten note sits in the flow under the word (no room beside it); desktop floats it (TourDemo)
 function About({ tour, ctx }: { tour: boolean; ctx: Ctx }) {
   return (
@@ -55,7 +67,7 @@ function Work() {
           title={<a href={job.website} {...ext(job.website)}>{job.company}</a>}
           more={<>
             <p className="date">{job.location}</p>
-            <ul className="points">{job.description.map((d, i) => <li key={i}>{d}</li>)}</ul>
+            <ul className="points">{job.description.map((d, i) => <li key={i}>{resumeLinks(d, job.links ?? [])}</li>)}</ul>
           </>}
         >
           <p className="item-sub"><span className="role">{job.role}</span><span className="date">{job.date}</span></p>
@@ -76,7 +88,7 @@ function Projects() {
           key={p.title}
           logo={<Logo src={p.logo} name={p.title} />}
           title={<>
-            {p.title}
+            <a href={p.github} {...ext(p.github)}>{p.title}</a>
             <span className="links">
               {p.github && <a href={p.github} {...ext(p.github)}>github ↗</a>}
               {p.live && <a href={p.live} {...ext(p.live)}>live ↗</a>}
@@ -112,7 +124,7 @@ function Activities() {
           title={a.title}
         >
           {(a.role || a.date) && <p className="item-sub">{a.role && <span className="role">{a.role}</span>}{a.date && <span className="date">{a.date}</span>}</p>}
-          {a.descriptions.map((d, i) => <p className="desc" key={i}>{d}</p>)}
+          {a.descriptions.map((d, i) => <p className="desc" key={i}>{resumeLinks(d, a.links ?? [])}</p>)}
         </Item>
       ))}
     </section>

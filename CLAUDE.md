@@ -20,6 +20,7 @@ Vite + React 19 + TypeScript (strict) + Tailwind v4 via `@tailwindcss/vite` (CSS
 - `src/main.tsx` -> `src/App.tsx` -> `src/components/MainPage.tsx`.
 - `src/styles/global.css` — Tailwind import, `@theme` tokens, CSS variables, and all page styles (class names like `.row`, `.panel`).
 - `src/data/*.json` — `work-experience`, `projects`, `activities`, `skills`, `photos` (16 resized photos in `public/photos/reel/`, shared list for intros).
+- `resume/resume.tex` — source of truth for the resume; edit the tex, not `src/data/{work-experience,projects,activities,skills}.json` by hand (`npm run resume:sync` regenerates them; CI does it on push).
 - `public/` — fonts (Inter 400/500), images, `resume.pdf` (not linked).
 
 ## Page

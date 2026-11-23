@@ -1,0 +1,202 @@
+% LaTeX Resume Template from sb2nov/resume
+% https://github.com/sb2nov/resume
+%
+% Layout below is matched to Amy Kang's resume.
+% Layout spec (measured from the reference PDF):
+%   10pt Computer Modern, 0.5in margins, 12pt line pitch, ragged-right
+%   name 20.74pt bold; contact line 9pt; section headings 12pt bold with rule
+%   entry line: bold title | bold company, team ........ bold dates
+%   bullets flush left, text indented 10pt, no extra item spacing
+
+\documentclass[a4paper,10pt]{article}
+% Computer Modern Roman, matching the reference resume
+\usepackage[T1]{fontenc}
+% Adjust margins
+\usepackage[a4paper,top=0.5in,bottom=0.5in,left=0.5in,right=0.5in,nohead,nofoot]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{verbatim}
+\definecolor{linkblue}{RGB}{43,77,111}
+\usepackage[colorlinks=true,linkcolor=linkblue,urlcolor=linkblue]{hyperref}
+
+
+% Set page margins
+\pagestyle{empty}
+% (original fancyhdr lines, now covered by \pagestyle{empty} + geometry nohead/nofoot)
+% \fancyhf{} % clear all header and footer fields
+% \renewcommand{\headrulewidth}{0pt} % remove the header rule
+% \renewcommand{\footrulewidth}{0pt} % remove the footer rule
+\urlstyle{same}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\raggedright
+
+% Sections formatting
+% (12pt bold, full-width rule underneath)
+\newlength{\secrulegap}\setlength{\secrulegap}{-1pt}
+\newlength{\secbefore}\setlength{\secbefore}{7pt}
+\newlength{\secafter}\setlength{\secafter}{3.4pt}
+\titleformat{\section}{\large\bfseries\raggedright}{}{0em}{}[\vspace{\secrulegap}\titlerule]
+\titlespacing*{\section}{0pt}{\secbefore}{\secafter}
+
+% Separators (the gaps are measured from the reference PDF)
+\newcommand{\pipe}{\hspace{6.1pt}$|$\hspace{6.1pt}}  % between entry-line parts
+\newcommand{\cpipe}{\hspace{5.7pt}|\hspace{5.7pt}}   % between contact-line parts
+
+% Custom commands
+\newcommand{\resumeItem}[1]{\item #1}
+% Entry line: \resumeSubheading{Title}{Dates}{Company}{Team}
+\newcommand{\resumeSubheading}[4]{\noindent\textbf{#1}\pipe\textbf{#3}, #4\hfill\textbf{#2}\par}
+% Generic entry line: left text, right text (right may be empty)
+\newcommand{\resumeLine}[2]{\noindent #1\hfill\textbf{#2}\par}
+% Skills-style line: \resumeSkill{Label}{items}
+\newcommand{\resumeSkill}[2]{\noindent\textbf{#1:} #2\par}
+
+% Keep section entries flush with the left margin.
+% Place the bullet at the left margin, with wrapped text aligned after it.
+\newcommand{\resumeItemListStart}{\begin{itemize}[label=\textbullet,align=left,leftmargin=10pt,labelsep=0pt,labelwidth=10pt,itemsep=0pt,topsep=1pt,parsep=0pt,partopsep=0pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}}
+
+%-------------------------------------------
+%%%%%%  CV STARTS HERE  %%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+
+%----------HEADING-----------------
+{\centering
+{\huge\bfseries Soon Fu Hong Wilson}\\[8pt]
+\small Singapore\cpipe
+\href{mailto:wilionsoon2010@gmail.com}{wilionsoon2010@gmail.com}\cpipe
+\href{https://linkedin.com/in/wilsonsfh}{linkedin.com/in/wilsonsfh}\cpipe
+\href{https://github.com/wilsonsfh}{github.com/wilsonsfh}\cpipe
+\href{https://portfolio.wilsonsoon.workers.dev/}{portfolio}
+\par}
+
+%-----------SUMMARY-----------------
+% The first heading sits closer to the contact line (matches the reference); restored right after.
+\titlespacing*{\section}{0pt}{3pt}{\secafter}
+\section{Summary}
+\titlespacing*{\section}{0pt}{\secbefore}{\secafter}
+Software engineer working with multi-agentic workflows using MCP, Skills and Hooks. I follow AI development news closely through open-source and interactions, and experiment continuously with applied AI tools and build projects. I enjoy anything tech, building communities and owning partnerships owing to opportunities at school and on my own
+% CUT: Software engineer working with multi-agentic workflows using MCP, Skills and Hooks. I experiment with open-source skills and build projects. I enjoy building communities and owning partnerships
+% CUT: I enjoy anything tech, building communities and owning partnerships owing to opportunities at school and on my own
+% CUT: I follow AI development news closely through open-source and interactions, and experiment continuously with applied AI tools.
+% CUT: , backed by hackathon involvements, personal tinkering and shipped projects adopted post-handover from internships.
+
+%-----------EXPERIENCE-----------------
+\section{Experience}
+    \resumeSubheading
+      {Solutions Engineering Intern}{May 2026 -- Aug 2026}
+      {Cloudflare}{APJC Customer Engineering}
+      \resumeItemListStart
+      %security maturity scores - backend logic from criteria matching
+            \resumeItem{Extended internal security assessment webapp driven by Solutions Engineer user research, live demoed at APJC Monthly meeting with 90+ Customer Engineers and saw adoption into Solutions Engineers' workflow}
+
+            % CUT: \resumeItem{Scoped new features to quick fix failed security criteria with ``Show me how'' remediation steps in dashboard, API and Terraform verified against Cloudflare docs, and compare clients' configuration snapshots for quarterly reviews}
+            % CUT: Implemented new features to compare client configuration snapshots for quarterly reviews and to quick fix failed security criteria with ``Show me how'' steps across dashboard, API and Terraform verified against Cloudflare docs
+            \resumeItem{Designed features to quick fix failed security criteria with ``Show me how'' steps across dashboard/API/Terraform verified against Cloudflare docs, and to compare client configuration snapshots for quarterly reviews}
+
+            % CUT (wordier): \resumeItem{Designed and built in-browser Linux desktop running Cloudflare Containers instance for \href{https://blazehack.com/}{labs} that each user can test policies on their own accounts, with container's traffic routed through WARP to Cloudflare and encrypted over VPN-like MASQUE tunnel}
+            \resumeItem{Engineered in-browser Linux desktop on Cloudflare Containers for \href{https://blazehack.com/}{labs} where each user tests policies on their own account with traffic routed through WARP, an encrypted tunnel to Cloudflare's network}
+
+            % CUT (wordier): \resumeItem{Diagnosed container restarts creating a new WARP registration and virtual IP each time and stale entry retaining old IP, documented the cause, and scripted a cleanup for virtual IPs and stale entries with Zero Trust API for 20-participant lab}
+            % CUT (wordier): \resumeItem{Diagnosed container restarts creating a new WARP registration and virtual IP each time, leaving stale entries, and scripted a Zero Trust API cleanup for a 20-participant lab}
+            % CUT: \resumeItem{Diagnosed stale WARP registrations and virtual IPs left by container restarts and scripted a Zero Trust API cleanup for a 20-participant lab}
+            % CUT: \resumeItem{Diagnosed container restarts leaving stale WARP registrations and virtual IPs, then scripted a Zero Trust API cleanup for a 20-participant lab}
+            \resumeItem{Diagnosed container restarts leaving stale WARP registrations and virtual IPs, documented the cause and scripted a Zero Trust API cleanup for a 20-participant lab}
+
+        \begin{comment}             VER JULY 2026
+            \resumeItem{Built \textbf{PulseCheck}, a security assessment webapp replacing manual client data gathering, scoring accounts against \textbf{Web Application Firewall}, \textbf{SSL/TLS}, \textbf{Rate Limiting} and \textbf{Bot Management} configuration with live traffic summaries and generating slide decks to shorten preparation time for technical discovery.}
+            \resumeItem{Scoped and shipped iterations from internal user research with Solutions and Customer Solutions Engineers, on guided onboarding, step-by-step prioritised security fixes, and historical comparisons, now adopted across their own client accounts and still in use after handover.}
+
+            \resumeItem{Built a Linux desktop \textbf{webapp} on \textbf{Cloudflare Containers} and TigerVNC via noVNC, letting users run hands-on labs in \textbf{isolated containers} for configuring policies to test and understand Cloudflare products, \textbf{without a VM or local installation}.}
+            \resumeItem{Delivered \textbf{technical demos} to the VP of Solutions Engineering at APJC-wide meeting of \textbf{90+ SEs}, shadowed SEs on customer engagements, and supported \textbf{outbound client acquisition} at the \textbf{APJC KL Tech Summit}.}
+
+            \resumeItem{Delivered \textbf{technical demos} to the VP of Solutions Engineering at APJC-wide meeting of \textbf{90+ SEs}, shadowed SEs on customer engagements, and supported \textbf{outbound client acquisition} at the \textbf{APJC KL Tech Summit}.}
+        \end{comment}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Product Management Intern}{Dec 2025 -- Apr 2026}
+      {Glints}{Online Talent Platform}
+      \resumeItemListStart
+        % CUT (wordier): \resumeItem{Contributed to 2.2x DAU Growth among SME jobseekers and employers, partnering with \href{https://lnkd.in/p/gTMv6T9B}{institutions} and \href{https://lnkd.in/p/g55KSeQs}{communities} (UTM-tracked signups) that increased brand awareness, alongside defining and testing of A/B apply flow and onboarding job navigation changes}
+        \resumeItem{Contributed to 2.2x DAU growth among SME jobseekers and employers by partnering with \href{https://lnkd.in/p/gTMv6T9B}{institutions} and \href{https://lnkd.in/p/g55KSeQs}{communities} through UTM-tracked signups, and A/B testing apply flow and onboarding job navigation}
+
+        % CUT (wordier): \resumeItem{Designed and led 10 jobseeker interviews on job search behaviour and portal navigation, and ran competitor analysis, turning triaged bugs and findings into technical requirements for map-based nearby job search and bottom navigation}
+        \resumeItem{Designed and led 10 jobseeker interviews on job search behaviour and portal navigation and ran competitor analysis, turning findings and triaged bugs into technical requirements for map-based nearby job search and bottom navigation}
+
+        % CUT: \resumeItem{Built reusable database views for Singapore jobseeker and employer funnels, automated daily KPI reports for regional growth team}
+        \resumeItem{Built reusable database views for Singapore jobseeker and employer funnels and automated daily KPI reports for the regional growth team}
+
+        \begin{comment} VER JULY 2026
+        \resumeItem{Wrote \textbf{SQL} queries in \textbf{Metabase} to analyse jobseeker and employer funnels, cutting \textbf{database lookup time by 20\%} by narrowing query scope for Singapore and Malaysia.}
+        \resumeItem{Led \textbf{user research interviews} and translated findings into technical requirements, working with Engineering to scope and ship \textbf{P0 iterations}, prioritising localisation work for regional relaunch.}
+        \resumeItem{Grew user \textbf{DAU} by \textbf{120\%}, increasing awareness among students, jobseekers seeking opportunities at SMEs, and SME employers through data-driven experiments and strategic partnerships.}
+        \end{comment}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Software Engineering Intern}{May 2025 -- Jul 2025}
+      {NUS Enterprise}{Minimum Viable Product Studio}
+      \resumeItemListStart
+        \resumeItem{Improved bird species classification accuracy by 20\% across Singapore sub-regions by integrating BirdNET ML classifier with eBird API sighting data and GPS coordinates into a researcher-facing bioacoustics webapp}
+      \resumeItemListEnd
+
+%-----------PROJECTS-----------------
+\section{Projects}
+    % TODO: Replace / add 2-3 recent projects from hackathons, coursework, or personal work
+    % Ideally include: one full-stack web app, one systems/algorithms project, one ML/data project
+    % For each: brief description, your role, technologies used, and GitHub link
+    \resumeLine{\href{https://github.com/wilsonsfh/AppleNotestoX}{\textbf{AppleNotes to X}}\pipe Swift, AppleScript, Apple Speech, Node.js}{}
+      \resumeItemListStart
+      % CUT: \resumeItem{Built macOS app that export between Apple Notes, Markdown and Notion, tagging exports with original note's unique ID and date}
+      \resumeItem{Built macOS app that exports notes between Apple Notes, Markdown and Notion and tags each export with the original note's unique ID and date}
+      % CUT: \resumeItem{Bundled study tool with spaced-repetition flashcards (SM-2), with on-device video transcription Apple Speech for transcribing exports and flashcard notes, and AI assistant Groq/Llama to group related notes, merge and flag  duplicates for cleanup}
+      \resumeItem{Bundled study tool with SM-2 spaced-repetition flashcards, Apple Speech on-device video transcription and a Groq/Llama assistant that groups related notes and merges or flags duplicates}
+      \resumeItemListEnd
+
+    \resumeLine{\href{https://github.com/wilsonsfh/x-bookmark-injector}{\textbf{X Bookmark Injector}}\pipe JavaScript, esbuild, Vitest}{}
+      \resumeItemListStart
+      % CUT: \resumeItem{Built Chromium extension to randomly pull a saved X bookmark at the top of For You, with Keep, Done and background auto-sync}
+      \resumeItem{Built Chromium extension to randomly pull a saved X bookmark at the top of For You with Keep, Done and background auto-sync}
+       % CUT: \resumeItem{Retrieved bookmarks through X's internal GraphQL API from the page and reuse the logged-in session, with a service worker that paginates, schema-validates and caches them in chrome.storage}
+       \resumeItem{Retrieved bookmarks through X's internal GraphQL API from the page by reusing the logged-in session via a service worker that paginates, schema-validates and caches them in chrome.storage}
+      \resumeItemListEnd
+
+%-----------EDUCATION-----------------
+\section{Education}
+    \resumeLine{\textbf{National University of Singapore}\pipe Singapore}{Aug 2023 -- May 2027}
+    \resumeLine{Bachelor of Computing, Computer Science (Honours)}{}
+
+%-----------ACTIVITIES-----------------
+\section{Involvements}
+  \resumeItemListStart
+    % CUT: \resumeItem{\textbf{Startup Founding Partnerships} (2026): \href{https://www.straitstimes.com/business/young-singaporeans-build-internship-entry-level-job-trackers-to-close-opportunity-gap}{Co-founded `Sup}, a career portal for students, and led ground-up \href{https://luma.com/zda76sc1}{Hackathon} with 358 participants hosted across 2 venues, personally securing AI credit sponsorships from OpenAI, Cursor, Exa, Zo Computer, and Workato for over \$5,000 in credits and cash prizes}
+    \resumeItem{\textbf{Startup Founding Partnerships} (2026): \href{https://www.straitstimes.com/business/young-singaporeans-build-internship-entry-level-job-trackers-to-close-opportunity-gap}{Co-founded student career portal `Sup} and led ground-up \href{https://luma.com/zda76sc1}{Hackathon} with 358 participants across 2 venues while personally securing over \$5,000 in AI credit and cash prize sponsorships from OpenAI, Cursor, Exa, Zo Computer and Workato}
+
+    % CUT: \resumeItem{\textbf{Microsoft Singapore Student Ambassador} (2026): Supported 300+ Copilot Chat student adoption through community events, organised hackathons, Copilot Chat workshops}
+    \resumeItem{\textbf{Microsoft Singapore Student Ambassador} (2026): Supported 300+ Copilot Chat student adoption through community events, organised hackathons and Copilot Chat workshops}
+
+    % CUT: \resumeItem{\textbf{Perplexity AI Campus Partner} (2025): Supported \textbf{50+} student adoption of \textbf{Comet} web browser across school campuses.}
+    \resumeItem{\textbf{Perplexity AI Campus Partner} (2025): Supported 50+ student adoption of Comet web browser across campuses}
+
+    % CUT: \resumeItem{\textbf{NUS Computing Club VP External} (2024-2025): Raised \$41,500 from aligned partnerships, \$12,950 from school merchandise sales, and growing subscriptions by 1,000 across \href{https://www.instagram.com/nuscomputingclub/?hl=en}{Instagram} and \href{https://t.me/nuscomputingclub}{Telegram} channels}
+    \resumeItem{\textbf{NUS Computing Club VP External} (2024-2025): Raised \$41,500 from aligned partnerships and \$12,950 from school merchandise sales while growing subscriptions by 1,000 across \href{https://www.instagram.com/nuscomputingclub/?hl=en}{Instagram} and \href{https://t.me/nuscomputingclub}{Telegram} channels}
+
+    % ONE-PAGE: was \resumeSkill{AI Hackathons}{AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025}
+    \resumeItem{\textbf{AI Hackathons} (Singapore): AI Engineer 2026, TinyFish 2026, Cursor 2025}
+  \resumeItemListEnd
+
+
+%-----------SKILLS-----------------
+\section{Technical Skills}
+   \resumeSkill{Languages}{Python, Java, C++, C\#, JavaScript, Swift}
+   \resumeSkill{Frameworks \& Libraries}{React, React Native, SwiftUI, Express.js, MediaPipe}
+   % ONE-PAGE: was \resumeSkill{Databases, Cloud \& Data}{PostgreSQL, MongoDB, MySQL, Supabase, Firestore, Convex, Cloudflare (Workers, D1, R2, KV, Durable Objects), AWS, GCP, Tableau}
+   \resumeSkill{Databases \& Cloud}{PostgreSQL, MongoDB, MySQL, Supabase, Cloudflare (Workers, D1, R2, KV), AWS, GCP}
+   % ONE-PAGE: was ... Wrangler, Cloudflared, Claude Code, Codex, Opencode
+   \resumeSkill{Tools}{Git, Docker, GitHub Actions, Vite, Vitest, Playwright, FFmpeg, Wrangler, Claude Code, Codex, Opencode}
+
+\end{document}
