@@ -551,6 +551,8 @@
 .dk-prose .rs-sec + .rs-sec { padding-top: 18px; border-top: 2px solid var(--edge); }
 /* the window decides, not the screen: one column (featured last, under involvements), two when the window is wide */
 .dk-prose.rs-wrap { container-type: inline-size; max-width: none; }
+.rs-top { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+.dk-prose .rs-dl { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 2px solid var(--edge); color: var(--fg); font-size: 14px; font-weight: 600; text-decoration: none; }
 .rs-grid, .rs-main { display: flex; flex-direction: column; gap: 18px; }
 .rs-side .rs-sec { padding-top: 18px; border-top: 2px solid var(--edge); }
 @container (min-width: 760px) {
