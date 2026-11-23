@@ -103,3 +103,11 @@
 /* the lanes cover any open window (window z starts at 12 and climbs), below the dock and top bar */
 .sc:not(.sc-rolled) .sc-lanes { pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .sc-close:active, .sc-all:active, .sc-back:active { transform: none; } }
+
+/* phones: "← back" at the top left replaces the close ×, and reads the same wherever the timeline was opened from */
+.sc-lbl-p, .sc-back-p { display: none; }
+@media (max-width: 639.98px) {
+  .sc-back-p, .sc-lbl-p { display: inline; }
+  .sc-back-p { display: block; }
+  .sc-lbl-d, .sc-close-d { display: none; }
+}

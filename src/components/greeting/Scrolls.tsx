@@ -261,7 +261,7 @@ type Props = {
   from: "icon" | "photos"; onBack: () => void; // from Photos: a "back" button replaces the close button
 };
 
-const el_focus = (root: HTMLElement | null, sel: string) => root?.querySelector<HTMLElement>(sel)?.focus({ preventScroll: true });
+const el_focus = (root: HTMLElement | null, sel: string) => [...(root?.querySelectorAll<HTMLElement>(sel) ?? [])].find((b) => b.offsetParent)?.focus({ preventScroll: true }); // the visible one: the phone and desktop buttons swap by css
 
 export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll, from, onBack }: Props) {
   const root = useRef<HTMLDivElement>(null);
@@ -356,7 +356,8 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll, from,
   return (
     <div className={`sc${reduced ? " sc-reduced" : ""}${open ? "" : " sc-rolled"}`} ref={root} style={{ "--sc-close": `${reduced ? FADE_MS : CLOSE_MS}ms` } as CSSProperties}>
       <div className="sc-head">
-        {from === "photos" && <button type="button" className="sc-back" onClick={onBack}>← photos</button>}
+        {from === "photos" && <button type="button" className="sc-back" onClick={onBack}><span className="sc-lbl-d">← photos</span><span className="sc-lbl-p">← back</span></button>}
+        {from === "icon" && <button type="button" className="sc-back sc-back-p" onClick={onToggle}>← back</button>}
         <Tooltip text="show all photos">{(t) => (
         <button type="button" className="sc-all" onClick={onAll} aria-label="show all photos" {...t}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
@@ -364,7 +365,7 @@ export default function Scrolls({ open, reduced, onToggle, onPhoto, onAll, from,
           </svg>
         </button>
         )}</Tooltip>
-        {from === "icon" && <button type="button" className="sc-close" onClick={onToggle} aria-label="roll up photos">×</button>}
+        {from === "icon" && <button type="button" className="sc-close sc-close-d" onClick={onToggle} aria-label="roll up photos">×</button>}
       </div>
       <div className="sc-lanes" inert={!open}>
         {story.lanes.map((l, i) => (
