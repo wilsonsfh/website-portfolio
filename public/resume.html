@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>Resume — Wilson Soon</title>
+    <style>
+      @font-face {
+        font-family: Inter;
+        src: url('/fonts/inter-400.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #F1EAD3; color: #123D2B; font-family: Inter, system-ui, sans-serif; }
+      main { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+      header {
+        display: flex; justify-content: flex-end; flex-shrink: 0;
+        padding: max(4px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 4px 16px;
+      }
+      a {
+        display: inline-flex; align-items: center; gap: 7px; min-height: 44px;
+        color: inherit; font-size: 12px; text-decoration: none;
+      }
+      a:focus-visible { outline: 2px solid #1A6E3E; outline-offset: 3px; }
+      @media (hover: hover) and (pointer: fine) {
+        a:hover { text-decoration: underline; text-underline-offset: 3px; }
+      }
+      iframe { flex: 1; min-height: 0; width: 100%; border: 0; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <main aria-label="Wilson Soon's resume">
+      <header>
+        <a href="/resume.pdf" download="Wilson_Soon_Resume.pdf" aria-label="Download Wilson Soon's resume as a PDF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg>
+          download pdf
+        </a>
+      </header>
+      <iframe src="/resume.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH" title="Wilson Soon's resume PDF"></iframe>
+    </main>
+    <script type="module">
+      // Touch devices can save the PDF through the system share sheet.
+      document.querySelector('a[download]').addEventListener('click', async (event) => {
+        if (!navigator.canShare || !matchMedia('(pointer: coarse)').matches) return;
+        event.preventDefault();
+        try {
+          const response = await fetch('/resume.pdf');
+          if (!response.ok) throw new Error('Resume unavailable');
+          const file = new File([await response.blob()], 'Wilson_Soon_Resume.pdf', { type: 'application/pdf' });
+          if (!navigator.canShare({ files: [file] })) throw new Error('File sharing unavailable');
+          await navigator.share({ files: [file] });
+        } catch (error) {
+          if (error.name !== 'AbortError') location.href = '/resume.pdf';
+        }
+      });
+    </script>
+  </body>
+</html>

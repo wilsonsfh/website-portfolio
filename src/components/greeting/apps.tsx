@@ -1,4 +1,4 @@
-import { useId, useState, type MouseEvent, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import workExperience from "../../data/work-experience.json";
 import projects from "../../data/projects.json";
 import activities from "../../data/activities.json";
@@ -25,21 +25,6 @@ export type Ctx = {
   ask: () => void; // open the portfolio assistant panel
   tourAt: string | null; // the tour's current stop, if one is running
 };
-
-// iOS ignores the download attribute and opens the PDF in a viewer with nothing to save; on touch devices hand the file to the share sheet ("save to files")
-const resumeFile = "Wilson_Soon_Resume.pdf";
-async function saveResume(e: MouseEvent<HTMLAnchorElement>) {
-  if (!navigator.canShare || !matchMedia("(pointer: coarse)").matches) return; // desktop: the plain download link
-  e.preventDefault();
-  try {
-    const blob = await (await fetch("/resume.pdf")).blob();
-    const file = new File([blob], resumeFile, { type: "application/pdf" });
-    if (!navigator.canShare({ files: [file] })) throw new Error("no file sharing");
-    await navigator.share({ files: [file] });
-  } catch (err) {
-    if ((err as Error).name !== "AbortError") location.href = "/resume.pdf";
-  }
-}
 
 function resumeLinks(text: string, links: string[][]) {
   const parts: ReactNode[] = [];
@@ -68,7 +53,7 @@ function About({ tour, ctx }: { tour: boolean; ctx: Ctx }) {
         <li>
           <span className="logo logo-mono" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg></span>
           <span className="label">resume</span>
-          <a href="/resume.pdf" download={resumeFile} onClick={saveResume}>download pdf</a>
+          <a href="/resume.html">download pdf</a>
         </li>
       </ul>
       <More ctx={ctx} />
@@ -181,7 +166,7 @@ function Featured() {
 // (under involvements on narrow windows and phones)
 function ResumeDownload() {
   return (
-    <a className="dk-act" href="/resume.pdf" download={resumeFile} onClick={saveResume}>
+    <a className="dk-act" href="/resume.html">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11 M7 10l5 5 5-5 M5 20h14" /></svg>
       download resume
     </a>
