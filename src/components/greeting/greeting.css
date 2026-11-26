@@ -228,6 +228,7 @@
   #dk-icon-assistant { grid-area: 3 / 2; }
   #dk-icon-timeline { grid-area: 4 / 1; }
   #dk-icon-photos { grid-area: 4 / 2; }
+  #dk-icon-cabo { grid-area: 1 / 3; }
   .dk-mobs { grid-area: 5 / 1 / 6 / 3; }
 }
 /* short laptop screens: tighter rows so all four fit */

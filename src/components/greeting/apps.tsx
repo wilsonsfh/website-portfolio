@@ -12,7 +12,7 @@ import { AboutCards, SkillGroups } from "../AboutCards";
 import featured from "../../data/featured.json";
 import { ledeFlag, contacts, ext } from "../../copy";
 
-export type AppId = "about" | "resume" | "photos" | "timeline" | "terminal" | "messages" | "v1" | "assistant";
+export type AppId = "about" | "resume" | "photos" | "timeline" | "terminal" | "messages" | "v1" | "assistant" | "cabo";
 
 // speech bubble with a question mark: the assistant (top bar and desktop icon)
 export const ASK_GLYPH = "M4 5h16v11h-8l-4 3.5V16H4z M9.8 8.7a2.2 2.2 0 1 1 3.2 2c-.6.3-1 .8-1 1.4v.3 M12 14.4v.2";
@@ -199,6 +199,7 @@ const MORE: { id: AppId | "timeline"; name: string; what: string }[] = [
   { id: "photos", name: "photos", what: "my photo library, by month" },
   { id: "timeline", name: "timeline", what: "four film strips of my years: career, people, me and scenery" },
   { id: "v1", name: "v1", what: "my previous website" },
+  { id: "cabo", name: "cabo", what: "play a round of cards, solo or with friends" },
 ];
 
 // the app's own desktop-icon glyph, so a link reads as the icon it opens
@@ -284,6 +285,7 @@ export const APPS: App[] = [ // reading order: the phone grid wraps in this orde
   { id: "resume", tip: "my resume: work, projects, skills, involvements and featured pages", title: "resume-web", glyph: "M4 8h16v11H4z M9 8V5h6v3 M4 13h16", w: 1060, h: 680, render: () => <Resume />, action: <ResumeDownload /> },
   { id: "terminal", tip: "type commands instead", title: "terminal", glyph: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5", w: 680, h: 460, flush: true, render: (ctx) => <Terminal ctx={ctx} /> },
   { id: "v1", tip: "my previous website", title: "v1", glyph: "M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4 3.5v3.7h3.7 M12 8v4.2l3 1.8", w: 1000, h: 640, hFrac: 0.86, flush: true, render: () => <V1 /> },
+  { id: "cabo", tip: "play cards solo or with friends", title: "cabo", glyph: "M7 7V3h14v16h-4 M3 7h14v14H3z M10 10l4 4-4 4-4-4z", w: 1100, h: 720, hFrac: 0.86, flush: true, render: () => <iframe className="dk-frame" src="https://cabo.wilsonsoon.workers.dev" title="Cabo card game" loading="lazy" />, action: <a className="dk-act" href="https://cabo.wilsonsoon.workers.dev" {...ext("https://cabo.wilsonsoon.workers.dev")}>open in tab ↗</a> },
   { id: "assistant", tip: "ask me anything", title: "portfolio assistant", glyph: ASK_GLYPH, w: 0, h: 0, render: () => null }, // not a window: opens the assistant panel
   { id: "photos", tip: "look through my photos", title: "photos", glyph: "M3 5h18v14H3z M3 16l5-5 4 4 3-3 6 6 M16 9.5h.01", w: 980, h: 700, flush: true, render: (ctx) => <PhotosApp ctx={ctx} /> },
   { id: "timeline", tip: "scroll through my timeline", title: "timeline", glyph: "M3 5h18v14H3z M7 5v14 M17 5v14 M3 9.5h4 M3 14.5h4 M17 9.5h4 M17 14.5h4", w: 0, h: 0, render: () => null }, // not a window: its icon unrolls the scrolls
