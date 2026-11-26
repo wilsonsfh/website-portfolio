@@ -3,7 +3,7 @@ import knowledgeShort from "../knowledge-short.md";
 import { handleAdmin } from "./admin/handler.ts";
 import { FailLimiter, tokenEquals } from "./admin/logic.ts";
 import { logChat, logUnknown, answersSections } from "./qa.ts";
-import { FixedWindow, chatPersona, systemPrompt, unknownReply, isUnknown, visitorId, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, type Msg } from "./logic.ts";
+import { selectKnowledge, FixedWindow, chatPersona, systemPrompt, unknownReply, isUnknown, visitorId, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, type Msg } from "./logic.ts";
 
 import { traceRequest, type RequestTrace, type TracingEnv } from "./langsmith.ts";
 
@@ -105,7 +105,7 @@ async function chat(body: unknown, env: Env, json: J, ctx: ExecutionContext, tra
   else if (Date.now() < aiBlockedUntil) reason = "daily_limit";
   else {
     try {
-      const res = await trace.model("workers-ai.chat", { ls_provider: "cloudflare", ls_model_name: env.TEXT_MODEL }, () => env.AI.run(env.TEXT_MODEL as any, { messages: [{ role: "system", content: systemPrompt(persona, knowledge + answers.full) }, ...messages], max_tokens: 400, chat_template_kwargs: { enable_thinking: false } } as any));
+      const res = await trace.model("workers-ai.chat", { ls_provider: "cloudflare", ls_model_name: env.TEXT_MODEL }, () => env.AI.run(env.TEXT_MODEL as any, { messages: [{ role: "system", content: systemPrompt(persona, selectKnowledge(knowledge, knowledgeShort, messages) + answers.full) }, ...messages], max_tokens: 400, chat_template_kwargs: { enable_thinking: false } } as any));
       const answer = extractText(res);
       if (answer) return finish(answer, { provider: "workers-ai", fallback: false });
       return json({ error: "empty_answer" }, 502);

@@ -16,17 +16,20 @@ At Cloudflare, Wilson built an app that integrates and automates criteria matchi
 Wilson attended the Cloudflare APJC Tech Summit in Kuala Lumpur, 3 to 6 August 2026.
 
 ## Projects
-- AppleNotestoX: a public macOS app (SwiftUI) that turns Apple Notes into a study wiki with flashcards and narrated recaps. It exports to Markdown and Notion, and transcribes video on the device. github.com/wilsonsfh/AppleNotestoX
-- X Bookmark Injector: a Chromium extension that puts one random saved X bookmark at the top of your For You feed. No backend, no telemetry. github.com/wilsonsfh/x-bookmark-injector
-- TradingSignalandHelper: a paper-trading US-stock signal desk where a human reviews each BUY, SELL or HOLD call. github.com/wilsonsfh/TradingSignalandHelper
-- 2unemployment: a job board for Singapore new-grad software engineering roles, built on Astro, Cloudflare Workers and D1, with deterministic matching and no LLM. github.com/wilsonsfh/2unemployment
-- Architecture Relive: pick a real Gothic cathedral, read its checked facts, play its history and step into a simplified 3D nave. Facts are verified against stored Wikipedia text at build time, and the AI is optional. github.com/wilsonsfh/architecture-relive
-- Cabo: a two-player CABO card game with a memory bot and online rooms, and rules kept in a pure reducer. github.com/wilsonsfh/cabo
-- Glassbox: a two-person encrypted chat prototype with a Noise handshake and a relay that only sees ciphertext. github.com/wilsonsfh/glassbox
-- Mouthpiece: an interactive design simulation of a Mac voice-input tool, with safety states shown in the design.
-- Patchbay: a local agent harness with hot-pluggable plugins and a code mode where the model writes one script against a typed tool API.
-- Terminal Boss: an MCP server that gives an AI agent real interactive terminal sessions with exact input and explicit cleanup.
-- TRACE: a browser-agent simulation where you approve a plan first and inspect a receipt for each step, with no live model or real payment.
+- AppleNotestoX: macOS app that turns Apple Notes into a study wiki with flashcards and recaps. github.com/wilsonsfh/AppleNotestoX.
+- X Bookmark Injector: Chromium extension that puts one random saved X bookmark atop your For You feed. github.com/wilsonsfh/x-bookmark-injector.
+- TradingSignalandHelper: paper-trading US-stock signal desk where a human reviews each BUY, SELL or HOLD. github.com/wilsonsfh/TradingSignalandHelper
+- 2unemployment: job board for Singapore new-grad software roles, with deterministic matching and no LLM. github.com/wilsonsfh/2unemployment.
+- Architecture Relive: pick a real Gothic cathedral, check its facts, play its history and step into a 3D nave. github.com/wilsonsfh/architecture-relive.
+- Cabo: two-player CABO card game with a memory bot and online rooms. github.com/wilsonsfh/cabo.
+- Glassbox: two-person encrypted chat prototype where the relay only sees ciphertext. github.com/wilsonsfh/glassbox.
+- Mouthpiece: interactive design simulation of a Mac voice-input tool.
+- Patchbay: local agent harness with hot-pluggable plugins and a script-writing code mode.
+- Terminal Boss: MCP server giving an AI agent real interactive terminal sessions.
+- TRACE: browser-agent simulation where you approve a plan first, with no live model or real payment.
+- Portfolio assistant: the chat on this site that answers questions about Wilson and can draw pictures. github.com/wilsonsfh/website-portfolio.
+- Unread (the (1) unread chat app): self-playing text chat where an AI stand-in for Wilson answers in the first person.
+- Terminal (the portfolio terminal window): shell-style commands for reading the site, plus a chat mode.
 
 ## Activities
 - Hackathons: AI Engineer Hackathon Singapore 2026, TinyFish Hackathon Singapore 2026, Cursor Hackathon Singapore 2025, GovTech-NTU Product Club Hackathon 2025, SAP Cloud Accelerated Learning Experience 2025.

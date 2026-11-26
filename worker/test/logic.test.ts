@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, visitorId, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, chatPersona, unknownReply, systemPrompt } from "../src/logic.ts";
+import { readFileSync } from "node:fs";
+import { selectKnowledge, FixedWindow, UNKNOWN_REPLY, buildAnswersSection, isUnknown, visitorId, normalizeQuestion, allowedOrigin, extractText, limitReason, nextUtcMidnight, validateChat, validateImagePrompt, refersToWilson, unsafeForWilson, wilsonPrompt, imageMime, chatPersona, unknownReply, systemPrompt } from "../src/logic.ts";
 
 // fallback decision
 assert.equal(limitReason(new Error("3036: You have used up your daily free allocation of 10,000 neurons")), "daily_limit");
@@ -99,3 +100,55 @@ assert.ok(/honest/.test(pw)); // asked "are you a bot?", it says it is an ai sta
 // small talk and follow-ups are not "facts about wilson", so they must not fall to UNKNOWN (both personas)
 for (const p of [pa, pw]) assert.ok(/how's wilson/.test(p) && /what do you mean/.test(p));
 console.log("persona tests ok");
+
+// ---- selectKnowledge: send only the project entries a question is about, plus a one-line list of all projects ----
+const FULL = "# About\n\n## Who he is\nbased in sg\n\n## Projects\n\n### Alpha App\nalpha details\n- Tags: React, Three.js.\n\n### Beta Tool (Mar 2026)\nbeta details\n- Tags: Python, Flask.\n\n### Gamma Kit\ngamma details\n- Tags: React, Python.\n\n## Activities\nhackathons\n";
+const SHORT = "# short\n\n## Who he is\nx\n\n## Projects\n- Alpha App: one-liner a\n- Beta Tool: one-liner b\n- Gamma Kit: one-liner c\n\n## Activities\ny\n";
+const ask = (c: string) => [{ role: "user" as const, content: c }];
+const has = (s: string, ...parts: string[]) => parts.every((p) => s.includes(p));
+const lacks = (s: string, ...parts: string[]) => parts.every((p) => !s.includes(p));
+
+// a name in the question picks that entry; everything outside Projects stays; every project keeps a one-liner
+let sel = selectKnowledge(FULL, SHORT, ask("tell me about beta tool"));
+assert.ok(has(sel, "beta details", "one-liner a", "one-liner b", "one-liner c", "based in sg", "hackathons"));
+assert.ok(lacks(sel, "alpha details", "gamma details"));
+// case, hyphen and spacing do not matter
+assert.ok(has(selectKnowledge(FULL, SHORT, ask("ALPHA-APP?")), "alpha details"));
+assert.ok(lacks(selectKnowledge(FULL, SHORT, ask("alphabet soup")), "alpha details")); // whole words only
+// a general question gets only the one-liners
+sel = selectKnowledge(FULL, SHORT, ask("what has he built?"));
+assert.ok(has(sel, "one-liner a", "one-liner b", "one-liner c") && lacks(sel, "alpha details", "beta details", "gamma details"));
+// a follow-up with no name keeps the project from the recent turns
+sel = selectKnowledge(FULL, SHORT, [{ role: "user", content: "tell me about alpha app" }, { role: "assistant", content: "it is a thing." }, { role: "user", content: "how many tests does it have?" }]);
+assert.ok(has(sel, "alpha details") && lacks(sel, "beta details"));
+// a tag in the latest question picks entries that carry it; a name match is not needed
+sel = selectKnowledge(FULL, SHORT, ask("which project uses three.js?"));
+assert.ok(has(sel, "alpha details") && lacks(sel, "beta details", "gamma details"));
+sel = selectKnowledge(FULL, SHORT, ask("anything with python?"));
+assert.ok(has(sel, "beta details", "gamma details") && lacks(sel, "alpha details"));
+// no Projects section in either file: leave the knowledge untouched
+assert.equal(selectKnowledge("## Who he is\nx\n", SHORT, ask("alpha app")), "## Who he is\nx\n");
+assert.equal(selectKnowledge(FULL, "## Who he is\nx\n", ask("alpha app")), FULL);
+// the project named in the latest message wins the cap over ones only named in older turns (a list reply, then "tell me more about X")
+const FULL4 = FULL.replace("## Activities", "### Delta Dash\ndelta details\n- Tags: Rust.\n\n## Activities");
+const SHORT4 = SHORT.replace("- Gamma Kit: one-liner c", "- Gamma Kit: one-liner c\n- Delta Dash: one-liner d");
+sel = selectKnowledge(FULL4, SHORT4, [{ role: "user", content: "what has he built?" }, { role: "assistant", content: "alpha app, beta tool, gamma kit and delta dash." }, { role: "user", content: "tell me more about delta dash" }]);
+assert.ok(has(sel, "delta details") && lacks(sel, "gamma details")); // delta asked about; the oldest-listed one is dropped, not delta
+// a short name that sits inside a longer matched name does not take a slot ("terminal" inside "terminal boss")
+const FULLT = FULL.replace("## Activities", "### Gamma (the site's own)\nsite gamma details\n- Tags: Vite.\n\n## Activities");
+sel = selectKnowledge(FULLT, SHORT, ask("tell me about gamma kit"));
+assert.ok(has(sel, "gamma details") && lacks(sel, "site gamma details"));
+sel = selectKnowledge(FULLT, SHORT, ask("what is gamma?"));
+assert.ok(has(sel, "site gamma details")); // the short name alone still matches its own entry
+// real files: a named project is kept, the others are cut, the prompt gets much smaller, at most 3 entries
+const realFull = readFileSync(new URL("../knowledge.md", import.meta.url), "utf8");
+const realShort = readFileSync(new URL("../knowledge-short.md", import.meta.url), "utf8");
+sel = selectKnowledge(realFull, realShort, ask("what is 2unemployment?"));
+assert.ok(has(sel, "### 2unemployment", "Greenhouse") && lacks(sel, "### Cabo", "### Glassbox"));
+assert.ok(has(sel, "Solutions Engineering Intern, Cloudflare", "## Activities", "- Cabo:")); // work, activities and all one-liners stay
+assert.ok(sel.length < realFull.length * 0.6, `expected a much smaller prompt, got ${sel.length} of ${realFull.length}`);
+const entries = (s: string) => (s.match(/^### /gm) ?? []).length - (realFull.slice(0, realFull.indexOf("## Projects")).match(/^### /gm) ?? []).length - (realFull.slice(realFull.indexOf("## Activities")).match(/^### /gm) ?? []).length;
+assert.ok(entries(selectKnowledge(realFull, realShort, ask("what uses javascript?"))) <= 3);
+// the always-on rules stay compact
+assert.ok(pa.length < 2000 && pw.length < 2400, `prompt rules grew: ${pa.length} / ${pw.length}`);
+console.log("knowledge selection tests ok");

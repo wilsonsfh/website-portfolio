@@ -128,7 +128,7 @@ A local US-stock signal desk that starts with paper trading, with a human in the
 - Tags: Python, Flask, SQLite, yfinance, moomoo / OpenD.
 
 ### 2unemployment
-A job board for Singapore full-time new-grad software engineering roles. Each listing shows its source, and salary estimates are kept separate from advertised pay. GitHub: https://github.com/wilsonsfh/2unemployment
+A job board for Singapore full-time new-grad software engineering roles. Each listing shows its source, and salary estimates are kept separate from advertised pay. GitHub: https://github.com/wilsonsfh/2unemployment. Live demo: https://2unemployment.wilsonsoon.workers.dev/
 - A daily job fetches public Greenhouse, Lever and Ashby feeds from ten configured boards. It keeps Singapore, full-time, graduate-level roles. It uses no LLM and no paid jobs API.
 - Matching and lifecycle rules are deterministic. A role missing from two successful fetches is marked closed, and a failed source keeps its previous records.
 - Architecture: Astro renders the public job pages, and a paginated Worker API serves a React search, filter and compare view. The daily snapshot is imported into Cloudflare D1 in one transaction.
@@ -137,7 +137,7 @@ A job board for Singapore full-time new-grad software engineering roles. Each li
 - Tags: Astro, React, TypeScript, Cloudflare Workers, Cloudflare D1, SQLite, Better Auth, Node.js, Wrangler, GitHub Actions.
 
 ### Architecture Relive
-Pick a real Gothic cathedral, read its checked facts, play its history as a short storyline, and step inside a simplified 3D nave. GitHub: https://github.com/wilsonsfh/architecture-relive
+Pick a real Gothic cathedral, read its checked facts, play its history as a short storyline, and step inside a simplified 3D nave. GitHub: https://github.com/wilsonsfh/architecture-relive. Live demo: https://architecture-relive.wilsonsoon.workers.dev/
 - Facts come from a checked build. Wikidata and Wikipedia data is stored with its retrieval date, and the build refuses to run if a curated scene or feature quote is not found word for word in the stored Wikipedia text. It covers four cathedrals and 21 scenes, and every claim shown carries a status such as VERIFIED, CURATED or ILLUSTRATIVE.
 - A server-side resolver accepts a typed name only if Wikipedia and Wikidata return a real place with coordinates. It keeps only photos under Creative Commons or public domain licences, with the author and licence stored.
 - The AI model is optional. It is called through OpenRouter with an ordered fallback list, and its scene text is kept only if each quote appears verbatim in the article. Without a key, extracted article sentences are used instead.
@@ -146,7 +146,7 @@ Pick a real Gothic cathedral, read its checked facts, play its history as a shor
 - Tags: Node.js, JavaScript, GSAP, Three.js, OpenRouter, Wikidata, Wikipedia API, Wikimedia Commons, Cloudflare Workers.
 
 ### Cabo
-A two-player CABO card game prototype with a memory bot and online rooms. GitHub: https://github.com/wilsonsfh/cabo
+A two-player CABO card game prototype with a memory bot and online rooms. GitHub: https://github.com/wilsonsfh/cabo. Live demo: https://cabo.wilsonsoon.workers.dev
 - One standard 52-card deck. A Jack forces a blind swap, a Queen gives a private look at a pair and then a swap or keep choice, and discarding a 7, 8, 9, 10, Jack or Queen opens a 2.5-second window in which the other player can stack a matching rank.
 - The rules live in a pure, immutable reducer. Each player receives a filtered view, so hidden cards never reach the other browser.
 - It runs locally on Node 22 or newer with no install. Online rooms use a WebSocket server, and there is also a Cloudflare Durable Object version. Rooms and chat stay in memory and reset on restart.
@@ -154,7 +154,7 @@ A two-player CABO card game prototype with a memory bot and online rooms. GitHub
 - Tags: JavaScript, Node.js, WebSocket, Cloudflare Durable Objects, SVG, Web Animations API, Playwright.
 
 ### Glassbox
-A two-person encrypted chat prototype that runs between two browsers through a local WebSocket relay. GitHub: https://github.com/wilsonsfh/glassbox
+A two-person encrypted chat prototype that runs between two browsers through a local WebSocket relay. GitHub: https://github.com/wilsonsfh/glassbox. Live demo: https://glassbox.wilsonsoon.workers.dev
 - Two browsers share a 32-byte invite and complete a Noise NNpsk0 handshake, then exchange frames encrypted with libsodium secretstream. Room, role and sequence are bound into each frame.
 - Sending stays locked until both users compare the full 64-character fingerprint. Messages are capped at 4,096 bytes, and sessions end after 15 minutes.
 - The relay sees only ciphertext and binds to loopback. The project reports 31 of 31 Node tests passing, covering tampering, replay and key change.
@@ -162,7 +162,7 @@ A two-person encrypted chat prototype that runs between two browsers through a l
 - Tags: JavaScript, Node.js, WebSocket, Noise Protocol, libsodium, WebCrypto, Cloudflare Durable Objects, esbuild.
 
 ### Mouthpiece
-An interactive design simulation of a proposed Mac voice-input tool that places cleaned-up speech into a chosen app.
+An interactive design simulation of a proposed Mac voice-input tool that places cleaned-up speech into a chosen app. Live demo: https://mouthpiece.wilsonsoon.workers.dev
 - It records no audio and controls no other apps. Speech, permissions, cleanup and insertion are scripted fixtures, so it shows the intended interaction and not real dictation.
 - A five-step walkthrough ends with a Meaning Receipt that compares what was said with what was written. Restore Raw replaces only the text Mouthpiece inserted.
 - Safety states are part of the design: a changed destination needs fresh confirmation, protected fields are refused, and denied clipboard access shows selectable text.
@@ -170,14 +170,14 @@ An interactive design simulation of a proposed Mac voice-input tool that places 
 - Tags: HTML, CSS, JavaScript, GSAP, Python, Playwright, Cloudflare Workers.
 
 ### Patchbay
-A local agent harness where plugins can be added or unplugged while the host keeps running.
+A local agent harness where plugins can be added or unplugged while the host keeps running. Live demo: https://terminal-boss.wilsonsoon.workers.dev/patchbay/
 - Code mode has the model write one script against a generated, typed tool API. The script runs in a separate QuickJS/WebAssembly child process and goes through the same audited dispatcher as direct tool calls.
 - In an offline photo benchmark (73 tool calls per mode), code mode needed 2 model turns instead of 74 and sent about 99% less serialized context. The model was a deterministic rehearsal, not a live one.
 - Plugins add tools, policy hooks and a model provider. Unplugging one removes its capabilities without restarting the host.
 - Tags: Node.js, JavaScript, QuickJS, WebAssembly, JSON Schema, Ajv, Python.
 
 ### Terminal Boss
-An MCP server that gives an AI agent owned, interactive terminal sessions with exact input, cursor-based output reads and explicit cleanup.
+An MCP server that gives an AI agent owned, interactive terminal sessions with exact input, cursor-based output reads and explicit cleanup. Live demo: https://terminal-boss.wilsonsoon.workers.dev/terminal-boss/
 - Each session runs a real program in a pseudo-terminal through a small Python supervisor. Output is kept in a bounded byte buffer and the screen is rendered by a headless terminal emulator.
 - Input is sent exactly as given, with no implicit newline. Each send needs a fresh screen receipt, and success only confirms that the bytes reached the terminal.
 - A read-only observer on loopback shows sessions and output. The hosted Cloudflare site replays a captured run only.
@@ -185,12 +185,34 @@ An MCP server that gives an AI agent owned, interactive terminal sessions with e
 - Tags: TypeScript, Node.js, Python, Model Context Protocol, xterm.js, Zod, Cloudflare Workers.
 
 ### TRACE
-A browser-agent simulation with a flight recorder: preview a plan, approve it, then inspect each step's receipt. No live model or real payment is involved.
+A browser-agent simulation with a flight recorder: preview a plan, approve it, then inspect each step's receipt. No live model or real payment is involved. Live demo: https://trace.wilsonsoon.workers.dev
 - Actions run only for an exact approved plan revision. Editing, recovery, pausing or stopping revokes authority, and password, card and unsafe URL targets are rejected.
 - The travel and flight flows use fictional data. The flight flow stops at a simulated payment gate (a made-up S$184 fare, S$0 charged) and creates only an in-memory reference.
 - Narration is scripted, not live. Unknown questions get an honest "no recorded answer" reply.
 - 40 Node tests cover core logic, narration, flight data and restyle checks. The Chrome side-panel extension is a skeleton whose installation is not verified.
 - Tags: JavaScript, GSAP, HTML, CSS, Chrome Extensions (Manifest V3), Node.js, Cloudflare Workers.
+
+### Assistant (the portfolio chat assistant)
+The chat on this site that answers questions about Wilson and can also draw pictures. Live demo: https://portfolio.wilsonsoon.workers.dev (open "portfolio assistant" from the top bar or the desktop, or press Ctrl/Cmd+K). GitHub: https://github.com/wilsonsfh/website-portfolio
+- Text mode answers from a knowledge file Wilson wrote. A question it can't answer gets a fixed "i don't know that one yet" reply, and the question is saved so Wilson can write an answer for it.
+- Image mode draws pictures with Workers AI. Pictures of Wilson use his reference photos, and a short blocklist of scenes is refused.
+- Workers AI answers first. When its free daily limit runs out, a Groq model takes over for text only, and the chat says so. Per-visitor rate limits keep the free allowance from being drained.
+- Tracing sends only metadata (provider, timing, status) to LangSmith, never questions or answers.
+- Tags: Cloudflare Workers, Workers AI, Groq, D1, React, TypeScript, LangSmith.
+
+### Unread (the (1) unread chat app)
+A self-playing text chat on the desktop where visitors ask questions and get first-person replies from an AI stand-in for Wilson. Live demo: https://portfolio.wilsonsoon.workers.dev (open it from its desktop icon, the guided tour, or the "more on this desktop" list in about.txt).
+- A scripted intro plays first, then topic buttons and a text box appear.
+- Typed questions go to the same chat Worker as the assistant, with the recent thread as context. A "wilson" persona makes replies use "I", and the chat is honest that it is an AI stand-in. Questions it can't answer point to the contact links in about.txt.
+- The image button sends prompts to image mode when images are available that day.
+- Tags: React, TypeScript, Vite, motion, Cloudflare Workers, Workers AI, Groq.
+
+### Terminal (the portfolio terminal window)
+A terminal window on the desktop with shell-style commands for reading the site's content and a chat mode for the assistant. Live demo: https://portfolio.wilsonsoon.workers.dev (open it from the terminal icon in the dock, or follow the desktop tour).
+- Commands include help, ls, cat work.txt, open photos, theme and the contact links. Tab completes command, file and app names, and the up and down arrows step through history.
+- Typing assistant, or ask followed by a question, sends it to the portfolio chat Worker (Workers AI first, Groq as the text fallback).
+- Its content comes from the same JSON data files as the rest of the site.
+- Tags: React, TypeScript, Vite, CSS, Cloudflare Workers, Workers AI, Groq.
 
 ## Activities
 

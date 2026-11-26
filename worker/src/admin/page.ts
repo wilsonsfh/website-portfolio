@@ -110,7 +110,7 @@ function token() { try { return sessionStorage.getItem("admin-token") || ""; } c
 function api(method, path, body) {
   return fetch(BASE + path, { method: method, headers: { "Content-Type": "application/json", "X-Admin-Token": token() }, body: body ? JSON.stringify(body) : undefined })
     .then(function (r) { return r.json().then(function (j) {
-      if (r.status === 401 || r.status === 429) { showLogin(r.status === 429 ? "too many tries, wait a few minutes." : (token() ? "wrong password." : "")); throw new Error("login"); }
+      if (r.status === 401 || r.status === 429) { showLogin(r.status === 429 ? "too many tries, wait a few minutes." : (token() ? "wrong password. hint: birthday." : "")); throw new Error("login"); }
       if (!r.ok) throw new Error(j.error || r.status); return j; }); });
 }
 var loginEl = document.getElementById("login");
