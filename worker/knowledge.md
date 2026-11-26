@@ -127,23 +127,70 @@ A local US-stock signal desk that starts with paper trading, with a human in the
 - Built to be careful about orders: SQLite storage, recovery after a restart, protection against duplicates across processes, webhooks that can't be replayed, and a moomoo/OpenD paper-trading adapter. 152 tests, and it uses mocks by default.
 - Tags: Python, Flask, SQLite, yfinance, moomoo / OpenD.
 
-### ClearerToday
-An AI speech coach for practising enunciation, with feedback that adapts. GitHub: https://github.com/wilsonsfh/ClearerToday
-- Looks at the gap between the mouth shapes for each sound (phoneme) using MediaPipe Face Mesh, and transcribes speech with ElevenLabs.
-- Keeps a profile of each user's gaps in Convex and uses it to re-rank future advice. It finds live pronunciation references with Exa and writes the next drill. An OpenAI frontier model does most of the scoring.
-- Tags: Next.js, React, TypeScript, Convex, MediaPipe Face Mesh, ElevenLabs, Exa.
+### 2unemployment
+A job board for Singapore full-time new-grad software engineering roles. Each listing shows its source, and salary estimates are kept separate from advertised pay. GitHub: https://github.com/wilsonsfh/2unemployment
+- A daily job fetches public Greenhouse, Lever and Ashby feeds from ten configured boards. It keeps Singapore, full-time, graduate-level roles. It uses no LLM and no paid jobs API.
+- Matching and lifecycle rules are deterministic. A role missing from two successful fetches is marked closed, and a failed source keeps its previous records.
+- Architecture: Astro renders the public job pages, and a paginated Worker API serves a React search, filter and compare view. The daily snapshot is imported into Cloudflare D1 in one transaction.
+- Signed-in users track their own applications with Better Auth (Google, GitHub or email code). Every query is scoped to the user ID the server derives, never one the browser sends.
+- 69 offline tests, and the build and a Wrangler dry run happen before each deploy.
+- Tags: Astro, React, TypeScript, Cloudflare Workers, Cloudflare D1, SQLite, Better Auth, Node.js, Wrangler, GitHub Actions.
 
-### CorrectiveRehabApp
-Analyses gym exercises end to end and points out form problems. GitHub: https://github.com/wilsonsfh/CorrectiveRehabApp
-- Finds 8 lift-specific form issues (knee valgus, hip shift, butt wink, forward lean and others). Each rep gets a 0 to 100 symmetry score and a severity grade, across 6 exercises.
-- The mobile app draws a skeleton overlay with react-native-svg (24 joint connections, coloured teal, orange or red by severity). A side-by-side session view marks each issue as improved, regressed, resolved or new.
-- Tags: React Native, Expo, FastAPI, MediaPipe, Google Cloud Run, Supabase, PostgreSQL.
+### Architecture Relive
+Pick a real Gothic cathedral, read its checked facts, play its history as a short storyline, and step inside a simplified 3D nave. GitHub: https://github.com/wilsonsfh/architecture-relive
+- Facts come from a checked build. Wikidata and Wikipedia data is stored with its retrieval date, and the build refuses to run if a curated scene or feature quote is not found word for word in the stored Wikipedia text. It covers four cathedrals and 21 scenes, and every claim shown carries a status such as VERIFIED, CURATED or ILLUSTRATIVE.
+- A server-side resolver accepts a typed name only if Wikipedia and Wikidata return a real place with coordinates. It keeps only photos under Creative Commons or public domain licences, with the author and licence stored.
+- The AI model is optional. It is called through OpenRouter with an ordered fallback list, and its scene text is kept only if each quote appears verbatim in the article. Without a key, extracted article sentences are used instead.
+- The browser app is plain JavaScript with hash routes for the result, story and interior screens. GSAP drives the timelines, and Three.js builds a procedural nave of over 150 meshes, labelled as a simplified model and not a scan.
+- The public version is a Cloudflare Worker that serves the static site and answers the API from a saved catalogue, so it has no live lookup or generation.
+- Tags: Node.js, JavaScript, GSAP, Three.js, OpenRouter, Wikidata, Wikipedia API, Wikimedia Commons, Cloudflare Workers.
 
-### Concept Visualizer (Mar 2026)
-Learn technical ideas through a step-by-step animated graph. GitHub: https://github.com/wilsonsfh/concept-visualizer. Live: https://concept-visualizer-seven.vercel.app/
-- Covers only computer science topics: networking, algorithms, databases and system design.
-- Explanations come from Groq (llama-3.3-70b) and are drawn as interactive React Flow graphs, laid out automatically with Dagre.
-- Tags: Next.js, Tailwind CSS, React Flow, Redis, Groq API.
+### Cabo
+A two-player CABO card game prototype with a memory bot and online rooms. GitHub: https://github.com/wilsonsfh/cabo
+- One standard 52-card deck. A Jack forces a blind swap, a Queen gives a private look at a pair and then a swap or keep choice, and discarding a 7, 8, 9, 10, Jack or Queen opens a 2.5-second window in which the other player can stack a matching rank.
+- The rules live in a pure, immutable reducer. Each player receives a filtered view, so hidden cards never reach the other browser.
+- It runs locally on Node 22 or newer with no install. Online rooms use a WebSocket server, and there is also a Cloudflare Durable Object version. Rooms and chat stay in memory and reset on restart.
+- Tests cover 1,000 complete bot games and two real network clients. The README calls it an unaudited prototype.
+- Tags: JavaScript, Node.js, WebSocket, Cloudflare Durable Objects, SVG, Web Animations API, Playwright.
+
+### Glassbox
+A two-person encrypted chat prototype that runs between two browsers through a local WebSocket relay. GitHub: https://github.com/wilsonsfh/glassbox
+- Two browsers share a 32-byte invite and complete a Noise NNpsk0 handshake, then exchange frames encrypted with libsodium secretstream. Room, role and sequence are bound into each frame.
+- Sending stays locked until both users compare the full 64-character fingerprint. Messages are capped at 4,096 bytes, and sessions end after 15 minutes.
+- The relay sees only ciphertext and binds to loopback. The project reports 31 of 31 Node tests passing, covering tampering, replay and key change.
+- The docs call it unaudited and not suitable for sensitive conversations.
+- Tags: JavaScript, Node.js, WebSocket, Noise Protocol, libsodium, WebCrypto, Cloudflare Durable Objects, esbuild.
+
+### Mouthpiece
+An interactive design simulation of a proposed Mac voice-input tool that places cleaned-up speech into a chosen app.
+- It records no audio and controls no other apps. Speech, permissions, cleanup and insertion are scripted fixtures, so it shows the intended interaction and not real dictation.
+- A five-step walkthrough ends with a Meaning Receipt that compares what was said with what was written. Restore Raw replaces only the text Mouthpiece inserted.
+- Safety states are part of the design: a changed destination needs fresh confirmation, protected fields are refused, and denied clipboard access shows selectable text.
+- Static HTML, CSS and JavaScript with bundled GSAP and no build step. The project reports 43 of 43 source checks and 115 of 115 browser checks.
+- Tags: HTML, CSS, JavaScript, GSAP, Python, Playwright, Cloudflare Workers.
+
+### Patchbay
+A local agent harness where plugins can be added or unplugged while the host keeps running.
+- Code mode has the model write one script against a generated, typed tool API. The script runs in a separate QuickJS/WebAssembly child process and goes through the same audited dispatcher as direct tool calls.
+- In an offline photo benchmark (73 tool calls per mode), code mode needed 2 model turns instead of 74 and sent about 99% less serialized context. The model was a deterministic rehearsal, not a live one.
+- Plugins add tools, policy hooks and a model provider. Unplugging one removes its capabilities without restarting the host.
+- Tags: Node.js, JavaScript, QuickJS, WebAssembly, JSON Schema, Ajv, Python.
+
+### Terminal Boss
+An MCP server that gives an AI agent owned, interactive terminal sessions with exact input, cursor-based output reads and explicit cleanup.
+- Each session runs a real program in a pseudo-terminal through a small Python supervisor. Output is kept in a bounded byte buffer and the screen is rendered by a headless terminal emulator.
+- Input is sent exactly as given, with no implicit newline. Each send needs a fresh screen receipt, and success only confirms that the bytes reached the terminal.
+- A read-only observer on loopback shows sessions and output. The hosted Cloudflare site replays a captured run only.
+- Reported tests pass on Linux, and macOS use is unverified. It runs arbitrary host commands and is not a sandbox.
+- Tags: TypeScript, Node.js, Python, Model Context Protocol, xterm.js, Zod, Cloudflare Workers.
+
+### TRACE
+A browser-agent simulation with a flight recorder: preview a plan, approve it, then inspect each step's receipt. No live model or real payment is involved.
+- Actions run only for an exact approved plan revision. Editing, recovery, pausing or stopping revokes authority, and password, card and unsafe URL targets are rejected.
+- The travel and flight flows use fictional data. The flight flow stops at a simulated payment gate (a made-up S$184 fare, S$0 charged) and creates only an in-memory reference.
+- Narration is scripted, not live. Unknown questions get an honest "no recorded answer" reply.
+- 40 Node tests cover core logic, narration, flight data and restyle checks. The Chrome side-panel extension is a skeleton whose installation is not verified.
+- Tags: JavaScript, GSAP, HTML, CSS, Chrome Extensions (Manifest V3), Node.js, Cloudflare Workers.
 
 ## Activities
 

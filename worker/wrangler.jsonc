@@ -3,6 +3,7 @@
   "name": "portfolio",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-17",
+  "compatibility_flags": ["nodejs_compat"],
   // no account_id here: wrangler takes it from `wrangler login`
   "ai": { "binding": "AI" },
   // the built site (run `npm run build` in the repo root first); only /api/* and /admin* reach the worker code
@@ -21,6 +22,10 @@
     { "name": "RL_IMAGE", "namespace_id": "7102", "simple": { "limit": 1, "period": 60 } }
   ],
   "vars": {
+    "LANGSMITH_TRACING": "true",
+    "LANGSMITH_AGENT_ID": "portfolio-assistant",
+    "LANGSMITH_AGENT_ENVIRONMENT": "production",
+    "LANGSMITH_ENDPOINT": "https://apac.api.smith.langchain.com",
     // comma-separated list of exact origins allowed by CORS
     "ALLOWED_ORIGINS": "https://portfolio.wilsonsoon.workers.dev,http://localhost:4321,http://localhost:5173,http://localhost:4173",
     "TEXT_MODEL": "@cf/google/gemma-4-26b-a4b-it",

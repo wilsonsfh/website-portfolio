@@ -1,7 +1,8 @@
 import { DB_TABLES, dbPage, ftsQuery, sameOrigin, suggestMessages, type Chunk } from "./logic.ts";
+import { traceRequest, type RequestTrace, type TracingEnv } from "../langsmith.ts";
 import { page } from "./page.ts";
 
-export interface Env {
+export interface Env extends TracingEnv {
   AI: Ai;
   DB: D1Database;
   TEXT_MODEL: string;
@@ -26,7 +27,7 @@ const COLS = "id, question, asked_count, first_asked, last_asked, status, answer
 
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
 
-export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise<Response> {
+export async function handleAdmin(req: Request, env: Env, mount: Mount, ctx?: Pick<ExecutionContext, "waitUntil">): Promise<Response> {
   const url = new URL(req.url);
   const path = url.pathname.startsWith(mount.base) ? url.pathname.slice(mount.base.length) || "/" : null;
   if (path === null) return json({ error: "not_found" }, 404);
@@ -86,7 +87,7 @@ export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise
     if (typeof a !== "string" || !a.trim() || a.length > 2000) return json({ error: "bad_answer" }, 400);
     return changed(await env.DB.prepare("UPDATE questions SET status = 'answered', answer = ?, answered_at = ? WHERE id = ?").bind(a.trim(), now, id).run());
   }
-  if (req.method === "POST" && act === "suggest") return suggest(env, id, now);
+  if (req.method === "POST" && act === "suggest") return traceRequest(env, ctx, "portfolio.admin.suggest", (trace) => suggest(env, id, now, trace));
   return json({ error: "not_found" }, 404);
 }
 
@@ -94,7 +95,7 @@ export async function handleAdmin(req: Request, env: Env, mount: Mount): Promise
 const changed = (r: D1Result) => (r.meta.changes ? json({ ok: true }) : json({ error: "not_found" }, 404));
 
 /** Draft an answer from the top wiki chunks (or general knowledge). Stored for the admin only; never read by the public worker. */
-async function suggest(env: Env, id: number, now: string): Promise<Response> {
+async function suggest(env: Env, id: number, now: string, trace: RequestTrace): Promise<Response> {
   const row = await env.DB.prepare("SELECT question FROM questions WHERE id = ?").bind(id).first<{ question: string }>();
   if (!row) return json({ error: "not_found" }, 404);
 
@@ -115,7 +116,7 @@ async function suggest(env: Env, id: number, now: string): Promise<Response> {
   // always asked, even with no excerpt: a question that is not about wilson is answered from general knowledge
   let suggestion: string;
   try {
-    const res = (await env.AI.run(env.TEXT_MODEL as any, { messages: suggestMessages(row.question, chunks), max_tokens: 300, chat_template_kwargs: { enable_thinking: false } } as any)) as any;
+    const res = (await trace.model("workers-ai.suggest", { ls_provider: "cloudflare", ls_model_name: env.TEXT_MODEL }, () => env.AI.run(env.TEXT_MODEL as any, { messages: suggestMessages(row.question, chunks), max_tokens: 300, chat_template_kwargs: { enable_thinking: false } } as any))) as any;
     const t = res?.response ?? res?.choices?.[0]?.message?.content;
     if (typeof t !== "string" || !t.trim()) return json({ error: "empty_answer" }, 502);
     suggestion = t.trim();

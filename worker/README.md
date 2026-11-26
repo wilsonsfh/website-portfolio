@@ -115,3 +115,51 @@ that calls the real handler with a fake `AI`). The D1 paths work as is. Checks: 
 `handleAdmin(req, env, { base, authorize })` is a mountable seam. To host it as its own Worker behind Cloudflare Access
 instead (git history has that version), call it from a new Worker with `base: ""` and an `authorize` that checks the
 `Cf-Access-Jwt-Assertion` header or JWT, and drop the `/admin` route here.
+
+
+## Optional LangSmith tracing
+
+No CLI login is needed. The Worker uses the `langsmith` SDK directly; LangChain and LangGraph are not required.
+Tracing is disabled in `wrangler.jsonc` until both `LANGSMITH_TRACING=true` and a server-side API key are present.
+
+For production, create an API key in LangSmith → Settings → API Keys, then from `worker/` run:
+
+```sh
+npx wrangler secret put LANGSMITH_API_KEY
+```
+
+Set `LANGSMITH_TRACING` to `"true"` in `wrangler.jsonc` and deploy with the root `npm run deploy`.
+For local development, copy `.dev.vars.example` to `.dev.vars` and set the key/flag there.
+The default project is `portfolio-assistant`; optional `LANGSMITH_ENDPOINT` selects the account's API region,
+and `LANGSMITH_WORKSPACE_ID` selects a workspace where required by the API key. Never use a `VITE_` variable
+for these secrets. To disable exports, set the flag back to `"false"` and redeploy.
+
+Open the `portfolio-assistant` project in LangSmith. A fallback request appears as:
+
+```text
+portfolio.chat [provider=groq, fallback=true, status_code=200]
+├─ workers-ai.chat [model, error=MODEL_FAILED]
+└─ groq.chat [model, tokens when reported]
+```
+
+Image requests appear as `portfolio.image` with one `workers-ai.image` or `workers-ai.image.reference` span.
+Authenticated admin drafts appear as `portfolio.admin.suggest` with a `workers-ai.suggest` span.
+The public UI and existing D1 logging are unchanged. Each request has its own tracing client, and
+`ctx.waitUntil()` flushes its batch after responding so serverless shutdown does not discard queued spans.
+Trace-export failures are best effort and do not fail the assistant request.
+
+| Stage | Model | Input → output | Parallelism | On failure |
+|-------|-------|----------------|-------------|------------|
+| Text answer | `TEXT_MODEL` (Workers AI) | Knowledge, approved answers, recent conversation → answer | One call | Recognized capacity/limit failures use Groq; other errors retain existing responses |
+| Text fallback | `GROQ_MODEL` | Short knowledge and recent conversation → answer | After primary failure, or when primary is blocked/forced off | Existing unavailable/error response; no new retries |
+| Image | `IMAGE_MODEL` or `WILSON_IMAGE_MODEL` | Prompt, optional reference assets → image | Separate endpoint | Existing limit/error response; no image fallback |
+| Admin suggestion | `TEXT_MODEL` | Retrieved wiki chunks and question → private draft | Separate authenticated request | Existing admin error response; draft still needs manual saving |
+| LangSmith export | None | Routing metadata, counts, timing and status → trace batch | After response | Two-second network timeout, no configured retries; does not alter app responses |
+
+Only metadata is exported. Prompts, conversation text, knowledge/wiki excerpts, visitor IDs/IPs, answers,
+image prompts, reference photos, generated images, keys and raw provider errors are not sent to LangSmith.
+Numeric token usage is recorded only when returned by a provider. This keeps content-based evaluation disabled;
+adding such evaluations would require a separate decision about what content to export.
+
+`npm test` includes real SDK serialization with mocked providers and trace ingestion, testing hierarchy,
+fallbacks, HTTP errors, image branches, disabled/missing credentials and trace failures without API spend.
