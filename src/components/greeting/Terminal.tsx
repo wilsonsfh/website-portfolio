@@ -5,6 +5,7 @@ import activities from "../../data/activities.json";
 import { lede, aboutParagraphs, skillLine, contacts } from "../../copy";
 import { IMAGE_OFF, askChat, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
 import type { AppId, Ctx } from "./apps";
+import { Linked } from "../../lib/Linked";
 
 // head: a bold, accent-coloured line; p: the prompt shown on an "in" line. assistant mode (after Claude Code / Codex):
 // box: the welcome panel (one line per \n); reply: an answer, marked ⏺; img: a picture (text is its alt)
@@ -263,7 +264,7 @@ export default function Terminal({ ctx }: { ctx: Ctx }) {
         l.kind === "img"
           ? <img key={i} className="dk-term-img" src={l.src} alt={l.text} />
           : <p key={i} className={l.kind === "out" ? undefined : l.kind}>
-              {l.kind === "in" ? <><span className="dk-prompt">{l.p ?? SHELL}</span> {l.text}</> : l.kind === "reply" ? <><span className="dk-dot" aria-hidden="true">⏺</span>{l.text}</> : l.text}
+              {l.kind === "in" ? <><span className="dk-prompt">{l.p ?? SHELL}</span> {l.text}</> : l.kind === "reply" ? <><span className="dk-dot" aria-hidden="true">⏺</span><Linked text={l.text} /></> : l.text}
             </p>
       ))}
       {busy && <p className="dk-wait">{chat ? "✻ thinking…" : "thinking…"}</p>}

@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Tooltip from "./Tooltip";
 import { IMAGE_OFF, LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
 import { ASK_GLYPH } from "./apps";
+import { Linked } from "../../lib/Linked";
 import "./assistant.css";
 
 type Out = { kind: "text"; text: string } | { kind: "image"; q: string; src: string } | { kind: "error"; message: string };
@@ -33,7 +34,7 @@ function Reveal({ text, reduced }: { text: string; reduced: boolean }) {
     const id = setInterval(() => setN((v) => { if (v + step >= text.length) clearInterval(id); return Math.min(text.length, v + step); }), 25);
     return () => clearInterval(id);
   }, [text, reduced]);
-  return <p className="as-text"><span className="as-sr">{text}</span><span aria-hidden="true">{text.slice(0, n)}</span><i className="as-cur" aria-hidden="true" /></p>;
+  return <p className="as-text"><span className="as-sr"><Linked text={text} /></span><span aria-hidden="true">{n < text.length ? text.slice(0, n) : <Linked text={text} focusable={false} />}</span><i className="as-cur" aria-hidden="true" /></p>;
 }
 
 // open state lives in Desktop, so the desktop icon can open it too
@@ -203,7 +204,7 @@ export default function Assistant({ open, onOpenChange: setOpen }: { open: boole
                       return (
                         <div className="as-turn" key={i}>
                           <p className="as-q"><span aria-hidden="true">&gt; </span>{e.q}</p>
-                          {out.kind === "text" && (newest ? <Reveal text={out.text} reduced={reduced} /> : <p className="as-text">{out.text}</p>)}
+                          {out.kind === "text" && (newest ? <Reveal text={out.text} reduced={reduced} /> : <p className="as-text"><Linked text={out.text} /></p>)}
                           {out.kind === "image" && (out.src ? <img className="as-img" src={out.src} alt={`generated image: ${out.q}`} /> : <p className="as-note">(picture not kept)</p>)}
                           {out.kind === "error" && !notes.includes(out.message) && <p className="as-err">{out.message}</p>}
                         </div>

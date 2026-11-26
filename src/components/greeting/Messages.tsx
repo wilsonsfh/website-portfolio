@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import script from "../../data/chat-script.json";
 import photos from "../../data/photos.json";
 import { LIMIT_NOTE, askChat, flags, imageAvailable, makeImage, wantsImage, type Turn } from "../../lib/ai";
+import { Linked } from "../../lib/Linked";
 import Tooltip from "./Tooltip";
 import "./messages.css";
 
@@ -34,7 +35,7 @@ function Bubble({ item, reduced }: { item: Item; reduced: boolean }) {
       <span className="ms-sr">{from === "visitor" ? "you: " : "wilson: "}</span>
       {msg.image && <img className="ms-gen" src={msg.image} alt={msg.photoAlt} width={260} height={260} />}
       {photo && <img src={photo.src} alt={msg.photoAlt ?? photo.alt} width={240} height={160} decoding="async" />}
-      {msg.text && <span>{msg.text}</span>}
+      {msg.text && <span><Linked text={msg.text} /></span>}
       {msg.links && (
         <span className="ms-links">
           {msg.links.map((l) => (

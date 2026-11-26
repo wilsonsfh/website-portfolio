@@ -37,6 +37,7 @@
   --line: rgba(0, 0, 0, 0.1);
   --line-strong: rgba(0, 0, 0, 0.3);
   --accent: #6B5B95;
+  --link: #2563eb;
 }
 
 :root.dark {
@@ -46,7 +47,10 @@
   --line: rgba(255, 255, 255, 0.12);
   --line-strong: rgba(255, 255, 255, 0.3);
   --accent: #9B8CC4;
+  --link: #7aa7ff;
 }
+
+.chat-link { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
 
 html { scroll-behavior: smooth; }
 
