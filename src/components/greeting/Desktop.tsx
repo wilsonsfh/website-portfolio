@@ -57,11 +57,12 @@ const CAPTION: Partial<Record<Step, string>> = {
   assistant: "ask anything about me. it answers from notes i wrote, and draws pictures too: press draw to see this one.",
 };
 const stepTitle = (s: Step) => (s === "desktop" ? "desktop" : appById(s).title);
-const TOUR_KEY = "tour-done"; // sessionStorage: finished or skipped in this tab
+const TOUR_KEY = "tour-done"; // localStorage: when the tour was last finished or skipped; the offer stays away for TOUR_QUIET_MS
+const TOUR_QUIET_MS = 24 * 60 * 60 * 1000;
 type Tour = { cur: Step; trail: Step[] }; // cur: the current TOUR step; trail: where the visitor came from, for "back"
 const RESUME_KEY = "tour-at"; // sessionStorage: the stop the visitor left the tour on, so "tour again" returns there
 const readResume = (): Step | null => { try { const v = sessionStorage.getItem(RESUME_KEY) as Step | null; return v && TOUR.includes(v) ? v : null; } catch { return null; } };
-const tourDone = () => { try { return sessionStorage.getItem(TOUR_KEY) === "1"; } catch { return false; } };
+const tourDone = () => { try { return Date.now() - Number(localStorage.getItem(TOUR_KEY)) < TOUR_QUIET_MS; } catch { return false; } };
 const MAX_INSET = 8; // gap around a maximized window
 const SEAL_MS = 2200; // the finish window: 300ms wait, 400ms in, held 1.5s, then out
 
@@ -195,7 +196,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     const next = finished ? null : tour?.cur ?? resume;
     setResume(next);
     try {
-      sessionStorage.setItem(TOUR_KEY, "1");
+      localStorage.setItem(TOUR_KEY, String(Date.now()));
       if (next) sessionStorage.setItem(RESUME_KEY, next); else sessionStorage.removeItem(RESUME_KEY);
     } catch {}
     setTour(null);
@@ -217,12 +218,14 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
   // the tour plays itself: the demo cursor presses "next" after each stop until a real click or key pauses it (TourDemo);
   // the bar's play button resumes it (playKey restarts the current stop's demo, then it carries on)
   const [auto, setAuto] = useState(true);
+  const [reminding, setReminding] = useState(false); // said no to the first-visit offer: the cursor points out "tour again" once
   const [playKey, setPlayKey] = useState(0);
   const play = () => { setAuto(true); setPlayKey((k) => k + 1); };
   // the tour starts (or restarts) at a step: one maximised window, like answering yes
   const startTour = (at: Step) => {
     const z = ++zRef.current;
     setAuto(true);
+    setReminding(false);
     setTour({ cur: at, trail: [] });
     setWins(NOWIN.includes(at) ? [] : [{ ...place(at as AppId, 0, z, true), max: true }]);
     setRollsFrom("icon");
@@ -233,7 +236,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     setAsking(false);
     const z = ++zRef.current;
     if (yes) startTour(TOUR[0]);
-    else endTour();
+    else { endTour(); setReminding(true); }
   };
   useEffect(() => {
     if (!asking) return;
@@ -331,7 +334,7 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
     <div className="dk" ref={root} tabIndex={-1}>
       <Wallpaper />
       <TouchCursor />
-      <TourDemo step={tour?.cur ?? null} auto={auto} playKey={playKey} onTake={() => setAuto(false)} />
+      <TourDemo step={tour?.cur ?? (reminding ? "remind" : null)} auto={auto} playKey={playKey} onTake={() => setAuto(false)} />
       <Scrolls open={rollsOpen} reduced={!!reduce} onToggle={toggleRolls} onPhoto={showPhoto} onAll={() => showPhoto(null)} from={rollsFrom} onBack={() => setRollsOpen(false)} />
       <header className="dk-bar">
         <span className="dk-left">
@@ -432,8 +435,8 @@ export default function Desktop({ onPowerOff, focusOnMount }: { onPowerOff: () =
       )}
       <AnimatePresence>
         {asking && (
-          // blocks the desktop until answered; Escape = no
-          <motion.div className="dk-ask-wrap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+          // blocks the desktop until answered; Escape or a click outside the dialog = no
+          <motion.div className="dk-ask-wrap" onClick={(e) => { if (e.target === e.currentTarget) answer(false); }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
             <motion.div
               className="dk-win dk-seal" role="dialog" aria-modal="true" aria-labelledby="dk-ask-q"
               initial={{ opacity: 0, transform: reduce ? "none" : "scale(0.95)" }}

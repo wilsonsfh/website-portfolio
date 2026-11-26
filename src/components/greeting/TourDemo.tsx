@@ -16,6 +16,7 @@ const STOP_MS = 5000; // + the ~1s glide and press on "next" ≈ 6s, the measure
 const MODIFIERS = ["Shift", "Control", "Alt", "Meta"]; // holding one (cmd-tab, a shortcut) isn't taking over
 const COMMANDS = ["help", "whoami"];
 const PHONE = 640; // matches Desktop's phone breakpoint
+const NOTE_TEXT = "this keeps changing!";
 const IMAGE_ASK ="show wilson in pixel art"; // typed, not sent: every tour would otherwise spend the daily image quota
 
 type Cursor = {
@@ -23,7 +24,8 @@ type Cursor = {
   toPt: (x: number, y: number) => Promise<void>;
   press: (el: HTMLElement, opts?: { hold?: number; poke?: boolean }) => Promise<void>;
   type: (input: HTMLInputElement, text: string) => Promise<boolean>;
-  note: (x: number, y: number) => void;
+  note: (x: number, y: number, text?: string) => void;
+  unnote: () => void;
   wait: (ms: number) => Promise<void>;
   alive: () => boolean;
 };
@@ -131,8 +133,20 @@ const assistant: Script = async (c) => {
   await c.type(input, IMAGE_ASK);
 };
 
+// said no to the first-visit offer: glide from the middle (where the dialog was) to "tour again", with a note above it
+const remind: Script = async (c) => {
+  const b = btn(document, ".dk-tour-corner.idle .dk-tbtn", "tour again");
+  if (!b) return;
+  await c.to(b);
+  if (!c.alive()) return; // a click during the glide already hid everything
+  const r = b.getBoundingClientRect();
+  c.note(r.right, r.top - 44, "here if you ever need a guide!");
+  await c.wait(4000);
+  if (c.alive()) c.unnote();
+};
+
 const SCRIPTS: Record<string, Script> = {
-  about, resume: list("resume-web"), desktop, photos, terminal, assistant,
+  about, resume: list("resume-web"), desktop, photos, terminal, assistant, remind,
 };
 
 // auto: autoplay, so after the demo (or a pause, for a stop without one) the cursor presses "next" too. read through a ref,
@@ -158,12 +172,14 @@ export default function TourDemo({ step, auto, playKey, onTake }: { step: string
       if (!e.isTrusted || (e instanceof KeyboardEvent && MODIFIERS.includes(e.key))) return;
       alive = false;
       cur.hidden = true;
+      nt.hidden = true;
       takeRef.current();
     };
     window.addEventListener("pointerdown", stop, true);
     window.addEventListener("keydown", stop, true);
     const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-    const at = { x: window.innerWidth - 60, y: window.innerHeight - 90 }; // starts by the tour bar
+    // starts by the tour bar; the reminder starts mid-screen, where the dialog was, so it visibly travels to the button
+    const at = step === "remind" ? { x: window.innerWidth / 2, y: window.innerHeight / 2 } : { x: window.innerWidth - 60, y: window.innerHeight - 90 };
     const place = () => { cur.style.translate = `${at.x}px ${at.y}px`; }; // translate, so the press's scale stays in place
     const glide = async (x: number, y: number, glove: boolean) => {
       if (!alive) return;
@@ -201,10 +217,16 @@ export default function TourDemo({ step, auto, playKey, onTake }: { step: string
         }
         return alive;
       },
-      note: (x, y) => {
-        nt.style.transform = `translate3d(${x}px,${y}px,0)`;
+      note: (x, y, text) => {
+        const label = nt.querySelector("span");
+        if (label) label.textContent = text ?? NOTE_TEXT;
+        nt.classList.toggle("remind", text !== undefined);
         nt.hidden = false;
+        // the reminder's note ends at x (right-aligned above the button), clamped on screen; the about note starts at x
+        const left = text === undefined ? x : Math.max(8, x - nt.offsetWidth);
+        nt.style.transform = `translate3d(${left}px,${y}px,0)`;
       },
+      unnote: () => { nt.hidden = true; },
     };
     const show = () => {
       cur.style.transition = "none";
@@ -220,6 +242,7 @@ export default function TourDemo({ step, auto, playKey, onTake }: { step: string
         show();
         await run(c);
       }
+      if (step === "remind") { cur.hidden = true; return; }
       if (!autoRef.current) {
         await wait(1000); // linger, so it's seen where it finished
         cur.hidden = true;
@@ -250,7 +273,7 @@ export default function TourDemo({ step, auto, playKey, onTake }: { step: string
         <svg width="46" height="26" viewBox="0 0 46 26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M44 20c-12 4-26 2-38-12 M6 8l1 8 M6 8l8 1" />
         </svg>
-        <span>this keeps changing!</span>
+        <span>{NOTE_TEXT}</span>
       </div>
       <div className="dk-touch dk-demo" ref={el} hidden aria-hidden="true" />
     </>,
