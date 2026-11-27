@@ -63,7 +63,7 @@ const PAGE = String.raw`<!doctype html>
   #login h1 { font: 500 28px/1 Georgia, serif; margin: 0; }
   #login svg { width: 44px; height: 44px; margin-bottom: 6px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   #login input, #login button { width: min(240px, calc(100% - 32px)); height: 46px; border-radius: 8px; box-shadow: none; }
-  #login input { text-align: center; letter-spacing: .2em; border: 1px solid var(--line-strong); background: var(--field); color: var(--fg); }
+  #login input { -webkit-text-security: disc; text-align: center; letter-spacing: .2em; border: 1px solid var(--line-strong); background: var(--field); color: var(--fg); }
   #login button { background: var(--fg); color: var(--bg); border: 0; font-size: 22px; }
   #login .msg { min-height: 1.3em; color: #9b2d30; text-align: center; }
   #login .shackle { transform-origin: 8px 11px; }
@@ -96,7 +96,7 @@ const PAGE = String.raw`<!doctype html>
   <form id="login">
     <h1>Admin</h1>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
-    <input id="tok" type="password" autocomplete="current-password" aria-label="PIN">
+    <input id="tok" type="text" name="access-code" inputmode="numeric" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore aria-label="PIN">
     <button type="submit" aria-label="Unlock">→</button>
     <span class="msg" id="loginmsg" role="status"></span>
   </form>
