@@ -13,9 +13,7 @@
       "Apple Speech",
       "Node.js"
     ],
-    "github": "https://github.com/wilsonsfh/AppleNotestoX",
-    "live": "https://applenotestox-demo.wilsonsfh.workers.dev",
-    "livePseudo": true
+    "github": "https://github.com/wilsonsfh/AppleNotestoX"
   },
   {
     "title": "X Bookmark Injector",
@@ -30,8 +28,6 @@
       "esbuild",
       "Vitest"
     ],
-    "github": "https://github.com/wilsonsfh/x-bookmark-injector",
-    "live": "https://x-bookmark-injector-demo.wilsonsfh.workers.dev",
-    "livePseudo": true
+    "github": "https://github.com/wilsonsfh/x-bookmark-injector"
   }
 ]

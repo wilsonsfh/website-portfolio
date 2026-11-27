@@ -96,7 +96,6 @@ function Projects() {
             <a href={p.github} {...ext(p.github)}>{p.title}</a>
             <span className="links">
               {p.github && <a href={p.github} {...ext(p.github)}>github ↗</a>}
-              {p.live && <a href={p.live} {...ext(p.live)}>live ↗</a>}
             </span>
           </>}
           more={<ul className="points">{p.highlights.map((h, i) => <li key={i}>{h}</li>)}</ul>}
