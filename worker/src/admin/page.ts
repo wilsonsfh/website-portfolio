@@ -59,6 +59,18 @@ const PAGE = String.raw`<!doctype html>
   .msg { color: var(--muted); font-size: .85rem; }
   #login { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
   #login[hidden] { display: none; }
+  #login { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; gap: 14px; margin: 0; background: repeating-linear-gradient(0deg, rgba(241, 234, 211, .05) 0 1px, transparent 1px 3px), var(--wall-tint); color: #F1EAD3; text-transform: none; transition: opacity 200ms cubic-bezier(.23,1,.32,1); }
+  #login h1 { font: 500 28px/1 Georgia, serif; margin: 0; }
+  #login svg { width: 44px; height: 44px; margin-bottom: 6px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  #login input, #login button { width: min(240px, calc(100% - 32px)); height: 46px; border-radius: 8px; box-shadow: none; }
+  #login input { text-align: center; letter-spacing: .2em; border: 1px solid var(--line-strong); background: var(--field); color: var(--fg); }
+  #login button { background: var(--fg); color: var(--bg); border: 0; font-size: 22px; }
+  #login .msg { min-height: 1.3em; color: #9b2d30; text-align: center; }
+  #login .shackle { transform-origin: 8px 11px; }
+  #login.unlocking .shackle { animation: lock-lift 300ms cubic-bezier(.23,1,.32,1) forwards; }
+  @keyframes lock-lift { to { transform: translateY(-2.5px) rotate(-32deg); } }
+  #login.leaving { opacity: 0; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { #login { transition: none; } #login.unlocking .shackle { animation: none; } }
   input { font: inherit; min-height: 44px; background: var(--field); color: var(--fg); border: 2px solid var(--edge); border-radius: 4px; padding: .35rem .7rem; }
   .dbpick { margin: 0 0 .75rem; }
   .tscroll { overflow-x: auto; border: 2px solid var(--edge); border-radius: 4px; background: var(--field); }
@@ -81,11 +93,12 @@ const PAGE = String.raw`<!doctype html>
   <div class="body">
   <h1>questions the assistant couldn't answer</h1>
   <p class="sub">answers you save go live in the chat within about 5 minutes. suggestions are drafts for you only.</p>
-  <form id="login" hidden>
-    <label for="tok">password</label>
-    <input id="tok" type="password" autocomplete="current-password">
-    <button class="primary">enter</button>
-    <span class="msg" id="loginmsg"></span>
+  <form id="login">
+    <h1>Admin</h1>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
+    <input id="tok" type="password" autocomplete="current-password" aria-label="PIN">
+    <button type="submit" aria-label="Unlock">→</button>
+    <span class="msg" id="loginmsg" role="status"></span>
   </form>
   <nav id="tabs"></nav>
   <section id="list"></section>
@@ -106,19 +119,24 @@ function el(tag, text, cls) {
   if (cls) e.className = cls;
   return e;
 }
-function token() { try { return sessionStorage.getItem("admin-token") || ""; } catch (e) { return ""; } }
+var adminToken = "";
+try { sessionStorage.removeItem("admin-token"); } catch (e) {}
+function token() { return adminToken; }
+function session() { try { return localStorage.getItem("portfolio-admin-session") || ""; } catch (e) { return ""; } }
+function storeSession(value) { try { if (value) localStorage.setItem("portfolio-admin-session", value); else localStorage.removeItem("portfolio-admin-session"); } catch (e) {} }
 function api(method, path, body) {
-  return fetch(BASE + path, { method: method, headers: { "Content-Type": "application/json", "X-Admin-Token": token() }, body: body ? JSON.stringify(body) : undefined })
+  return fetch(BASE + path, { method: method, headers: { "Content-Type": "application/json", "X-Admin-Token": token(), "X-Admin-Session": session() }, body: body ? JSON.stringify(body) : undefined })
     .then(function (r) { return r.json().then(function (j) {
-      if (r.status === 401 || r.status === 429) { showLogin(r.status === 429 ? "too many tries, wait a few minutes." : (token() ? "wrong password. hint: birthday." : "")); throw new Error("login"); }
-      if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+      if (r.status === 401 || r.status === 429) { storeSession(""); showLogin(r.status === 429 ? "too many tries, wait a few minutes." : (token() ? "wrong password. hint: birthday." : "")); throw new Error("login"); }
+      if (!r.ok) throw new Error(j.error || r.status); var issued = r.headers.get("X-Admin-Session"); if (issued) storeSession(issued); adminToken = ""; if (!loginEl.hidden && !loginEl.classList.contains("unlocking")) { var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; loginEl.classList.add("unlocking"); setTimeout(function () { loginEl.classList.add("leaving"); setTimeout(function () { loginEl.hidden = true; loginEl.classList.remove("unlocking", "leaving"); }, reduce ? 0 : 200); }, reduce ? 0 : 300); } return j; }); });
 }
 var loginEl = document.getElementById("login");
 function showLogin(m) { loginEl.hidden = false; tabsEl.textContent = ""; listEl.textContent = ""; document.getElementById("loginmsg").textContent = m || ""; document.getElementById("tok").focus(); }
 loginEl.onsubmit = function (e) {
   e.preventDefault();
-  try { sessionStorage.setItem("admin-token", document.getElementById("tok").value); } catch (x) {}
-  loginEl.hidden = true; load();
+  adminToken = document.getElementById("tok").value;
+  document.getElementById("tok").value = "";
+  load();
 };
 function day(iso) { return iso ? iso.slice(0, 10) : ""; }
 
