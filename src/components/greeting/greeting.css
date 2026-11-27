@@ -397,6 +397,8 @@
 .dk-tbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--drop); }
 .dk-tbtn:focus-visible { outline: 2px solid var(--on-wall); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .dk-tbtn:hover { background: var(--muted); } .dk-tbtn.primary:hover { background: var(--fg); border-color: var(--edge); } }
+.dk-tour-corner.idle .dk-tbtn:active { background: #174f38; color: #fff; }
+@media (hover: hover) and (pointer: fine) { .dk-tour-corner.idle .dk-tbtn:hover { background: #174f38; color: #fff; } }
 /* idle (no tour running): just the buttons, no bar */
 @media (max-width: 639.98px) {
   .dk-tour-corner { left: 0; right: 0; bottom: 0; }
@@ -486,7 +488,7 @@
 }
 .dk-note span { rotate: -4deg; margin-top: 10px; }
 /* the reminder above "tour again": text first, arrow on its right pointing down at the button */
-.dk-note.remind { flex-direction: row-reverse; padding: 0 24px 0 0; margin-top: 0; }
+.dk-note.remind { flex-direction: row-reverse; padding: 0 24px 0 0; margin-top: 0; color: var(--link); }
 .dk-note.remind svg { scale: -1 -1; }
 .dk-note.remind span { margin-top: 0; }
 /* phones: the same note in the flow under the word (About renders it during the tour), so it never covers text */
