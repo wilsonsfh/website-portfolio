@@ -22,7 +22,7 @@ export const aboutFree = ["exploring tea brands", "freestyle dancing", "photogra
 
 export const contacts = [
   { label: "email", href: "mailto:wilionsoon2010@gmail.com", text: "wilionsoon2010@gmail.com", logo: "/images/logos/email.svg" },
-  { label: "github", href: "https://github.com/wilsonsfh", text: "wilsonsfh", logo: "/images/logos/github.svg" },
+  { label: "github", href: "https://github.wilsonsoon.workers.dev/", text: "github index", logo: "/images/logos/github.svg" },
   { label: "x", href: "https://x.com/wilsonsfh_", text: "wilsonsfh_", logo: "/images/logos/x.png" },
   { label: "linkedin", href: "https://linkedin.com/in/wilsonsfh", text: "wilsonsfh", logo: "/images/logos/linkedin.png" },
 ];

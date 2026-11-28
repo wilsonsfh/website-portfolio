@@ -91,8 +91,8 @@
           "text": "code and demos are on github, and there are more in the projects row on the page",
           "links": [
             {
-              "label": "github.com/wilsonsfh",
-              "href": "https://github.com/wilsonsfh"
+              "label": "github index",
+              "href": "https://github.wilsonsoon.workers.dev/"
             }
           ]
         }
@@ -201,8 +201,8 @@
               "href": "https://linkedin.com/in/wilsonsfh"
             },
             {
-              "label": "github",
-              "href": "https://github.com/wilsonsfh"
+              "label": "github index",
+              "href": "https://github.wilsonsoon.workers.dev/"
             },
             {
               "label": "x",
@@ -225,8 +225,8 @@
         "href": "https://linkedin.com/in/wilsonsfh"
       },
       {
-        "label": "github",
-        "href": "https://github.com/wilsonsfh"
+        "label": "github index",
+        "href": "https://github.wilsonsoon.workers.dev/"
       }
     ]
   }

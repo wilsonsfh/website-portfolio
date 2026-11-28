@@ -1,7 +1,7 @@
 # About Wilson Soon (short version)
 
 ## Who he is
-Wilson Soon is based in Singapore and studies computer science at the National University of Singapore (NUS). He builds software and has worked in engineering, product and solutions roles. He is on GitHub as wilsonsfh. He was Vice President of External Relations at the NUS Students' Computing Club (Aug 2024 to Aug 2025). He represented 6000+ computing students, led a team of 72 and raised $54,450 through partnerships.
+Wilson Soon is based in Singapore and studies computer science at the National University of Singapore (NUS). He builds software and has worked in engineering, product and solutions roles. He is on GitHub as wilsonsfh (repo board: github.wilsonsoon.workers.dev). He was Vice President of External Relations at the NUS Students' Computing Club (Aug 2024 to Aug 2025). He represented 6000+ computing students, led a team of 72 and raised $54,450 through partnerships.
 
 ## Work experience
 - Solutions Engineering Intern, Cloudflare (May to Aug 2026, APJC). He built a security assessment web app with guided fixes, security posture scores and auto-generated slide decks, which shortened Customer Engineers' preparation for technical discovery. He also built a browser-based Linux desktop on isolated Cloudflare Containers for hands-on security labs, routed through the WARP client.
@@ -40,4 +40,4 @@ Wilson attended the Cloudflare APJC Tech Summit in Kuala Lumpur, 3 to 6 August 2
 Wilson uses MCP servers and agent skills in his AI and agentic workflow, such as a Canvas MCP, a Socratic tutor skill and a 4-step Karpathy-guidelines skill.
 
 ## How to reach him
-The about.txt window on this site lists his email, GitHub, X and LinkedIn. His code is on GitHub as wilsonsfh.
+The about.txt window on this site lists his email, GitHub, X and LinkedIn. His code is on GitHub as wilsonsfh (repo board: github.wilsonsoon.workers.dev).
